@@ -1,0 +1,337 @@
+---
+import Layout from '../layouts/Layout.astro';
+import QuoteCard from '../components/QuoteCard.astro';
+import { getCollection } from 'astro:content';
+
+const allKarya = await getCollection('karya');
+const featuredKarya = allKarya.filter(k => k.data.featured).slice(0, 4);
+const quotes = await getCollection('quotes');
+const firstQuote = quotes[0]?.data;
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Category count helpers
+const countIlmiah = allKarya.filter(k => k.data.category === 'ilmiah').length;
+const countPuisi = allKarya.filter(k => k.data.category === 'puisi').length;
+const countCerpen = allKarya.filter(k => k.data.category === 'cerpen').length;
+const countDrama = allKarya.filter(k => k.data.category === 'drama').length;
+const countAntologi = allKarya.filter(k => k.data.category === 'antologi').length;
+---
+
+<Layout 
+  title="Ruang Sastra — SMPI Yambu'ul Qur'an"
+  description="Portal Literasi & Apresiasi Karya — Wadah publikasi karya tulis ilmiah, puisi & prosa, cerpen, antologi, naskah drama, dan quotes SMPI Yambu'ul Qur'an."
+>
+  
+  <!-- HERO SECTION -->
+  <section class="py-16 md:py-20 border-b border-[var(--rule-strong)]">
+    <div class="wrap">
+      <p class="mono text-xs md:text-sm text-[var(--crimson)] mb-6 tracking-wide uppercase font-medium">
+        Portal Literasi &amp; Apresiasi Karya — SMPI Yambu'ul Qur'an
+      </p>
+      
+      <p class="font-['Fraunces',serif] italic font-normal text-xl md:text-2xl lg:text-3xl leading-relaxed text-[var(--ink)] max-w-3xl mb-6">
+        Di sini, tulisan bukan sekadar susunan huruf, dan panggung bukan sekadar tempat berakting. Portal ini adalah ruang apresiasi tempat para siswa SMPI Yambu'ul Qur'an mengasah nalar kritis, merajut imajinasi, dan menuangkan gagasan.
+      </p>
+
+      <p class="font-['Fraunces',serif] italic font-normal text-lg md:text-xl leading-relaxed text-[var(--ink-soft)] max-w-3xl m-0">
+        Mulai dari analisis bacaan, untaian puisi yang mendalam, alunan musikalisasi puisi, esai kritis, hingga naskah dan pementasan drama—seluruhnya lahir dari proses belajar, keberanian bertutur, dan semangat berkarya generasi Qur'ani yang berwawasan luas.
+      </p>
+
+      <div class="flex items-center gap-4 mt-8 flex-wrap">
+        <a href={`${basePath}/karya`} class="btn-literary btn-literary-solid">
+          Jelajahi Pojok Baca →
+        </a>
+        <a href={`${basePath}/kirim`} class="btn-literary">
+          Kirim Naskah Karya
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION TENTANG -->
+  <section id="tentang" class="py-14 md:py-16 border-b border-[var(--rule-strong)]">
+    <div class="wrap">
+      <div class="mb-8">
+        <span class="mono text-xs text-[var(--ink-faint)] tracking-widest uppercase block mb-1">
+          Tentang Portal
+        </span>
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] m-0">
+          Yang tumbuh di Ruang Sastra
+        </h2>
+        <p class="font-['Source_Serif_4',serif] text-base text-[var(--ink-soft)] mt-2 max-w-xl">
+          Ragam aktivitas yang menjadi tempat siswa berlatih berpikir kritis, menghaluskan budi, dan bertutur secara santun:
+        </p>
+      </div>
+
+      <ul class="list-none p-0 m-0 space-y-3">
+        <li class="flex items-baseline gap-3 py-3 border-t border-[var(--rule)]">
+          <span class="text-[var(--gold)] text-lg flex-shrink-0">❧</span>
+          <span class="font-['Source_Serif_4',serif] text-[var(--ink-soft)] leading-relaxed">
+            <strong class="font-['Fraunces',serif] font-semibold text-[var(--ink)]">Analisis bacaan</strong> — melatih nalar kritis membaca dan membedah struktur teks sastra maupun kajian sains.
+          </span>
+        </li>
+        <li class="flex items-baseline gap-3 py-3 border-t border-[var(--rule)]">
+          <span class="text-[var(--gold)] text-lg flex-shrink-0">❧</span>
+          <span class="font-['Source_Serif_4',serif] text-[var(--ink-soft)] leading-relaxed">
+            <strong class="font-['Fraunces',serif] font-semibold text-[var(--ink)]">Puisi</strong> — untaian kata yang mendalam untuk merekam getar spiritualitas dan kepekaan rasa.
+          </span>
+        </li>
+        <li class="flex items-baseline gap-3 py-3 border-t border-[var(--rule)]">
+          <span class="text-[var(--gold)] text-lg flex-shrink-0">❧</span>
+          <span class="font-['Source_Serif_4',serif] text-[var(--ink-soft)] leading-relaxed">
+            <strong class="font-['Fraunces',serif] font-semibold text-[var(--ink)]">Musikalisasi puisi</strong> — alunan bait-bait puisi yang dihidupkan dengan harmoni nada dan petikan dawai.
+          </span>
+        </li>
+        <li class="flex items-baseline gap-3 py-3 border-t border-[var(--rule)]">
+          <span class="text-[var(--gold)] text-lg flex-shrink-0">❧</span>
+          <span class="font-['Source_Serif_4',serif] text-[var(--ink-soft)] leading-relaxed">
+            <strong class="font-['Fraunces',serif] font-semibold text-[var(--ink)]">Esai kritis</strong> — gagasan dan argumen ilmiah yang dituangkan secara runtut dengan dasar data dan kepustakaan.
+          </span>
+        </li>
+        <li class="flex items-baseline gap-3 py-3 border-t border-[var(--rule)]">
+          <span class="text-[var(--gold)] text-lg flex-shrink-0">❧</span>
+          <span class="font-['Source_Serif_4',serif] text-[var(--ink-soft)] leading-relaxed">
+            <strong class="font-['Fraunces',serif] font-semibold text-[var(--ink)]">Naskah &amp; pementasan drama</strong> — panggung teater sebagai ruang melatih olah tubuh, vokal, dan keberanian bertutur di depan khalayak.
+          </span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SECTION POJOK BACA LITERATUR -->
+  <section id="pojok-baca" class="py-14 md:py-16 border-b border-[var(--rule-strong)]">
+    <div class="wrap">
+      <div class="mb-7">
+        <span class="mono text-xs text-[var(--ink-faint)] tracking-widest uppercase block mb-1">
+          Pojok Baca Literatur
+        </span>
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] m-0">
+          Ruang baca untuk semua karya
+        </h2>
+        <p class="font-['Source_Serif_4',serif] text-base text-[var(--ink-soft)] mt-2 max-w-xl">
+          Setiap karya siswa yang terkumpul tersimpan di satu ruang baca terkurasi, terbuka untuk dibaca siapa saja — guru, orang tua, maupun sesama siswa di mana pun berada.
+        </p>
+      </div>
+
+      <!-- 6 Category Filter Chips -->
+      <div class="flex flex-wrap gap-2.5 my-6">
+        <a href={`${basePath}/karya?kategori=ilmiah`} class="literary-chip">
+          <span>Karya Tulis Ilmiah</span>
+          <span class="mono text-[0.68rem] opacity-75">({countIlmiah})</span>
+        </a>
+        <a href={`${basePath}/karya?kategori=puisi`} class="literary-chip">
+          <span>Puisi &amp; Prosa</span>
+          <span class="mono text-[0.68rem] opacity-75">({countPuisi})</span>
+        </a>
+        <a href={`${basePath}/karya?kategori=cerpen`} class="literary-chip">
+          <span>Cerpen</span>
+          <span class="mono text-[0.68rem] opacity-75">({countCerpen})</span>
+        </a>
+        <a href={`${basePath}/karya?kategori=antologi`} class="literary-chip">
+          <span>Antologi</span>
+          <span class="mono text-[0.68rem] opacity-75">({countAntologi})</span>
+        </a>
+        <a href={`${basePath}/karya?kategori=drama`} class="literary-chip">
+          <span>Naskah Drama</span>
+          <span class="mono text-[0.68rem] opacity-75">({countDrama})</span>
+        </a>
+        <a href={`${basePath}/quotes`} class="literary-chip">
+          <span>Quotes Sastra</span>
+          <span class="mono text-[0.68rem] opacity-75">({quotes.length})</span>
+        </a>
+      </div>
+
+      <div class="mt-8">
+        <a href={`${basePath}/karya`} class="btn-literary">
+          Buka Pojok Baca Lengkap →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION KARYA PILIHAN (EDITORIAL PICKS) -->
+  <section id="karya-pilihan" class="py-14 md:py-16 border-b border-[var(--rule-strong)]">
+    <div class="wrap">
+      <div class="mb-8">
+        <span class="mono text-xs text-[var(--ink-faint)] tracking-widest uppercase block mb-1">
+          Kumpulan Karya Anak Hebat
+        </span>
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] m-0">
+          Karya pilihan dari siswa
+        </h2>
+        <p class="font-['Source_Serif_4',serif] text-base text-[var(--ink-soft)] mt-2 max-w-xl">
+          Beberapa karya yang mewakili semangat berkarya siswa SMPI Yambu'ul Qur'an sepanjang tahun ajaran ini.
+        </p>
+      </div>
+
+      <!-- Editorial Numbered Entries -->
+      <div class="space-y-6">
+        {featuredKarya.map((item, index) => {
+          const numStr = (index + 1 < 10 ? '0' : '') + (index + 1);
+          return (
+            <article class="grid grid-cols-[44px_1fr] md:grid-cols-[56px_1fr] gap-4 md:gap-6 py-6 border-t border-[var(--rule)] first:border-t-0 items-start group">
+              <!-- Number Index -->
+              <span class="font-['Fraunces',serif] italic text-2xl md:text-3xl text-[var(--gold)] leading-none select-none">
+                {numStr}
+              </span>
+
+              <!-- Content Summary -->
+              <div>
+                <div class="flex items-baseline gap-2.5 flex-wrap mb-1">
+                  <h3 class="font-['Fraunces',serif] font-semibold text-lg md:text-xl text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors m-0">
+                    <a href={`${basePath}/karya/${item.id}`} class="no-underline">
+                      {item.data.title}
+                    </a>
+                  </h3>
+                  <span class={`mono text-[0.72rem] italic font-medium ${
+                    item.data.category === 'puisi' ? 'text-[var(--crimson)]' :
+                    item.data.category === 'cerpen' ? 'text-[var(--sage)]' :
+                    item.data.category === 'ilmiah' ? 'text-[var(--gold)]' :
+                    'text-[var(--ink-faint)]'
+                  }`}>
+                    {item.data.categoryLabel}
+                  </span>
+                </div>
+
+                <p class="mono text-xs text-[var(--ink-faint)] m-0 mb-2.5">
+                  {item.data.author} {item.data.authorGrade ? `— ${item.data.authorGrade}` : ''}
+                </p>
+
+                <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] m-0 pl-3.5 border-l-2 border-[var(--rule-strong)] leading-relaxed">
+                  "{item.data.description}"
+                </p>
+
+                <div class="mt-3">
+                  <a href={`${basePath}/karya/${item.id}`} class="mono text-xs text-[var(--crimson)] hover:underline inline-flex items-center gap-1 font-medium">
+                    Baca selengkapnya <span>→</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div class="mt-10">
+        <a href={`${basePath}/karya`} class="btn-literary">
+          Lihat semua karya siswa ({allKarya.length} naskah) →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PANGGUNG (THEATRE & MUSIKALISASI) -->
+  <section id="panggung" class="py-14 md:py-16 border-b border-[var(--rule-strong)]">
+    <div class="wrap">
+      <div class="mb-8">
+        <span class="mono text-xs text-[var(--ink-faint)] tracking-widest uppercase block mb-1">
+          Panggung Sastra
+        </span>
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] m-0">
+          Musikalisasi Puisi &amp; Drama
+        </h2>
+        <p class="font-['Source_Serif_4',serif] text-base text-[var(--ink-soft)] mt-2 max-w-xl">
+          Dokumentasi karya panggung — tempat puisi dan naskah drama siswa dihidupkan di depan penonton melalui olah suara, gerak, dan rasa.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Stage Card 1: Musikalisasi -->
+        <div class="flex flex-col group">
+          <div class="scalloped-top aspect-video bg-[var(--paper-deep)] border border-[var(--rule-strong)] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+            <div class="w-12 h-12 rounded-full border border-[var(--crimson)] text-[var(--crimson)] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <span class="mono text-xs text-[var(--ink-soft)]">Video Dokumentasi Musikalisasi</span>
+            <span class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1">Durasi: 04:32 · Panggung Literasi YQ</span>
+          </div>
+          <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] mt-4 mb-1 group-hover:text-[var(--crimson)] transition-colors">
+            Musikalisasi Puisi: "Hujan Bulan Juni"
+          </h3>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] m-0">
+            Persembahan Tim Musikalisasi Sastra, Kelompok A. Diiringi petikan gitar akustik dan gesekan biola santri.
+          </p>
+        </div>
+
+        <!-- Stage Card 2: Pementasan Drama -->
+        <div class="flex flex-col group">
+          <div class="scalloped-top aspect-video bg-[var(--paper-deep)] border border-[var(--rule-strong)] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+            <div class="w-12 h-12 rounded-full border border-[var(--crimson)] text-[var(--crimson)] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <span class="mono text-xs text-[var(--ink-soft)]">Video Rekaman Pementasan Teater</span>
+            <span class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1">Durasi: 22:15 · Teater Terbuka SMPI YQ</span>
+          </div>
+          <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] mt-4 mb-1 group-hover:text-[var(--crimson)] transition-colors">
+            Pementasan Drama Pendek: "Layar Terkembang"
+          </h3>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] m-0">
+            Dokumentasi pementasan teater tahunan siswa mengenai tekad pemuda menyeberangi samudra ilmu dan cita.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <a href={`${basePath}/panggung`} class="btn-literary">
+          Lihat Galeri Panggung Lengkap →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION QUOTES PILIHAN -->
+  {firstQuote && (
+    <section class="py-14 md:py-16 border-b border-[var(--rule-strong)]">
+      <div class="wrap">
+        <div class="mb-4">
+          <span class="mono text-xs text-[var(--ink-faint)] tracking-widest uppercase block mb-1">
+            Mutiara Kata Sastra
+          </span>
+          <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] m-0">
+            Kutipan Pilihan Pekan Ini
+          </h2>
+        </div>
+
+        <QuoteCard 
+          quote={firstQuote.quote}
+          author={firstQuote.author}
+          authorTitle={firstQuote.authorTitle}
+          source={firstQuote.source}
+          category={firstQuote.category}
+          cardId="featured-home-quote"
+        />
+
+        <div class="mt-4">
+          <a href={`${basePath}/quotes`} class="mono text-xs text-[var(--crimson)] hover:underline inline-flex items-center gap-1 font-medium">
+            Jelajahi Arsip Quotes Sastra Lainnya <span>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- SECTION CTA SUBMISI -->
+  <section class="py-16 md:py-20 bg-[var(--paper-card)] border-b border-[var(--rule-strong)] text-center">
+    <div class="wrap max-w-2xl">
+      <div class="w-12 h-12 rounded-full border border-[var(--crimson)] text-[var(--crimson)] flex items-center justify-center mx-auto mb-4 font-['Fraunces',serif] text-lg font-semibold">
+        ❧
+      </div>
+      <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] mb-3">
+        Punya Karya yang Ingin Dimuat?
+      </h2>
+      <p class="font-['Source_Serif_4',serif] italic text-base text-[var(--ink-soft)] leading-relaxed mb-6">
+        Setiap bait puisi, kisah cerpen, naskah drama, maupun karya tulis ilmiah siswa dan guru SMPI Yambu'ul Qur'an berhak mendapatkan ruang apresiasi. Kirimkan naskah Anda untuk dikurasi oleh dewan redaksi.
+      </p>
+      <div class="flex items-center justify-center gap-4 flex-wrap">
+        <a href={`${basePath}/kirim`} class="btn-literary btn-literary-solid">
+          Kirim Naskah ke Redaksi →
+        </a>
+        <a href={`${basePath}/tentang`} class="btn-literary">
+          Panduan Penulisan &amp; Kurasi
+        </a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

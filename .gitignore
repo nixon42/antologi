@@ -1,0 +1,33 @@
+# Build & Dependencies
+node_modules/
+dist/
+.astro/
+.cache/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Impeccable local & mocks
+.impeccable/config.local.json
+.impeccable/review/
+.impeccable/mocks/decision/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

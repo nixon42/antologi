@@ -1,0 +1,249 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AudioPlayer from '../../components/AudioPlayer.astro';
+import ApresiasiButton from '../../components/ApresiasiButton.astro';
+import KomentarSection from '../../components/KomentarSection.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const karyaEntries = await getCollection('karya');
+  return karyaEntries.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const formattedDate = entry.data.publishDate.toLocaleDateString('id-ID', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+// Category badge color class
+const categoryColor = 
+  entry.data.category === 'puisi' ? 'text-[var(--crimson)] border-[var(--crimson)]' :
+  entry.data.category === 'cerpen' ? 'text-[var(--sage)] border-[var(--sage)]' :
+  entry.data.category === 'ilmiah' ? 'text-[var(--gold)] border-[var(--gold)]' :
+  entry.data.category === 'drama' ? 'text-[var(--crimson-soft)] border-[var(--crimson-soft)]' :
+  'text-[var(--ink-soft)] border-[var(--rule-strong)]';
+---
+
+<Layout 
+  title={`${entry.data.title} — Ruang Sastra SMPI YQ`}
+  description={entry.data.description}
+  type="article"
+>
+  <article class="wrap py-12 md:py-16">
+    
+    <!-- Top Breadcrumb & Category Bar -->
+    <nav class="flex items-center gap-2 mono text-xs text-[var(--ink-faint)] mb-6 uppercase tracking-wider flex-wrap" aria-label="Breadcrumb">
+      <a href={`${basePath}/`} class="no-underline hover:text-[var(--crimson)]">Beranda</a>
+      <span>/</span>
+      <a href={`${basePath}/karya`} class="no-underline hover:text-[var(--crimson)]">Pojok Baca</a>
+      <span>/</span>
+      <span class="text-[var(--ink)] font-medium">{entry.data.categoryLabel}</span>
+    </nav>
+
+    <!-- Reading Well Header (65-75ch) -->
+    <header class="reading-well mb-10 pb-8 border-b border-[var(--rule-strong)]">
+      <div class="mb-3">
+        <span class={`mono text-xs px-2.5 py-1 rounded-full border ${categoryColor} uppercase font-medium inline-block`}>
+          {entry.data.categoryLabel}
+        </span>
+        {entry.data.volume && (
+          <span class="mono text-xs text-[var(--gold)] ml-2 font-medium">
+            · {entry.data.volume}
+          </span>
+        )}
+      </div>
+
+      <h1 class="font-['Fraunces',serif] font-semibold text-3xl md:text-4xl lg:text-5xl text-[var(--ink)] leading-tight m-0 mb-4">
+        {entry.data.title}
+      </h1>
+
+      <p class="font-['Source_Serif_4',serif] italic text-base md:text-lg text-[var(--ink-soft)] leading-relaxed m-0 mb-6">
+        {entry.data.description}
+      </p>
+
+      <!-- Byline & Author Credentials -->
+      <div class="flex items-center justify-between gap-4 py-3 border-t border-[var(--rule)] flex-wrap text-xs mono text-[var(--ink-faint)]">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-full bg-[var(--paper-deep)] border border-[var(--rule-strong)] flex items-center justify-center font-['Fraunces',serif] font-semibold text-sm text-[var(--crimson)]">
+            {entry.data.author.charAt(0)}
+          </span>
+          <div>
+            <strong class="text-sm font-semibold text-[var(--ink)] block font-['Fraunces',serif]">{entry.data.author}</strong>
+            <span>{entry.data.authorGrade || 'Penulis Ruang Sastra'}</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <time datetime={entry.data.publishDate.toISOString()}>{formattedDate}</time>
+          {entry.data.readingTime && (
+            <span>· ± {entry.data.readingTime} Menit Baca</span>
+          )}
+        </div>
+      </div>
+    </header>
+
+    <!-- SPECIFIC CATEGORY FEATURE BLOCKS -->
+
+    <!-- 1. Scientific Paper (Karya Tulis Ilmiah) Abstract Block -->
+    {entry.data.category === 'ilmiah' && entry.data.abstract && (
+      <div class="reading-well academic-abstract">
+        <div class="flex items-center justify-between gap-2 border-b border-[var(--rule-strong)] pb-2 mb-3">
+          <h4 class="mono text-xs uppercase tracking-widest text-[var(--crimson)] m-0 font-semibold">
+            Abstrak
+          </h4>
+          {entry.data.supervisor && (
+            <span class="mono text-[0.72rem] text-[var(--ink-faint)] italic">
+              {entry.data.supervisor}
+            </span>
+          )}
+        </div>
+        <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed m-0 italic mb-4">
+          {entry.data.abstract}
+        </p>
+        {entry.data.keywords && (
+          <div class="mono text-xs text-[var(--ink-faint)] pt-2 border-t border-[var(--rule)]">
+            <strong class="text-[var(--ink)] font-semibold">Kata Kunci:</strong> {entry.data.keywords.join(', ')}
+          </div>
+        )}
+      </div>
+    )}
+
+    <!-- 2. Poetry & Prose Audio Musikalisasi Player -->
+    {entry.data.category === 'puisi' && entry.data.audioUrl && (
+      <div class="reading-well">
+        <AudioPlayer 
+          audioUrl={entry.data.audioUrl} 
+          title={`Musikalisasi: ${entry.data.title}`} 
+          author={entry.data.author}
+        />
+      </div>
+    )}
+
+    <!-- 3. Theatre / Drama Characters and Setting Panel -->
+    {entry.data.category === 'drama' && (
+      <div class="reading-well my-8 p-5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded-sm">
+        <div class="flex items-center justify-between mb-3 border-b border-[var(--rule-strong)] pb-2">
+          <h4 class="mono text-xs uppercase tracking-wider text-[var(--crimson)] m-0 font-semibold">
+            Keterangan Panggung &amp; Durasi
+          </h4>
+          {entry.data.duration && (
+            <span class="mono text-xs text-[var(--ink)] font-medium">{entry.data.duration}</span>
+          )}
+        </div>
+        {entry.data.stageSetting && (
+          <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] italic m-0 mb-3">
+            <strong>Latar Suasana:</strong> {entry.data.stageSetting}
+          </p>
+        )}
+        {entry.data.characters && (
+          <div>
+            <span class="mono text-[0.72rem] uppercase tracking-wider text-[var(--ink-faint)] block mb-1">Daftar Tokoh:</span>
+            <ul class="list-disc list-inside text-xs font-['Source_Serif_4',serif] text-[var(--ink-soft)] space-y-1 m-0 p-0">
+              {entry.data.characters.map(char => (
+                <li>{char}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    )}
+
+    <!-- 4. Anthology Contributors Panel -->
+    {entry.data.category === 'antologi' && entry.data.contributors && (
+      <div class="reading-well my-8 p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+        <h4 class="mono text-xs uppercase tracking-wider text-[var(--gold)] m-0 mb-2 font-semibold">
+          Kontributor Antologi
+        </h4>
+        <div class="flex flex-wrap gap-2 text-xs mono text-[var(--ink-soft)]">
+          {entry.data.contributors.map(c => (
+            <span class="px-2.5 py-1 rounded bg-[var(--paper-deep)] border border-[var(--rule)]">
+              {c}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- MAIN BODY CONTENT -->
+    <div class="reading-well reading-content prose prose-stone max-w-none text-base md:text-[1.0625rem] leading-[1.8] text-[var(--ink)]">
+      <Content />
+    </div>
+
+    <!-- Fleuron Section Divider -->
+    <div class="fleuron-divider">❧</div>
+
+    <!-- Tags Row -->
+    <div class="reading-well flex items-center justify-between gap-4 flex-wrap pb-6 border-b border-[var(--rule)]">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="mono text-xs text-[var(--ink-faint)]">Kategori &amp; Tagar:</span>
+        {entry.data.tags.map(tag => (
+          <a href={`${basePath}/karya?tag=${encodeURIComponent(tag)}`} class="mono text-xs px-2.5 py-1 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)] hover:text-[var(--crimson)] no-underline transition-colors">
+            #{tag}
+          </a>
+        ))}
+      </div>
+
+      <!-- Social Share Buttons -->
+      <div class="flex items-center gap-2 text-xs mono">
+        <button id="share-copy-btn" class="px-2.5 py-1 rounded border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--crimson)] transition-colors cursor-pointer">
+          Salin Tautan
+        </button>
+        <button id="share-wa-btn" class="px-2.5 py-1 rounded border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-green-700 transition-colors cursor-pointer">
+          WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <!-- Apresiasi / Clap Component -->
+    <div class="reading-well">
+      <ApresiasiButton karyaId={entry.id} />
+    </div>
+
+    <!-- Reader Discussion & Comments -->
+    <div class="reading-well">
+      <KomentarSection karyaId={entry.id} />
+    </div>
+
+    <!-- Return Link -->
+    <div class="reading-well text-center pt-8">
+      <a href={`${basePath}/karya`} class="btn-literary">
+        ← Kembali ke Pojok Baca
+      </a>
+    </div>
+
+  </article>
+
+  <script>
+    // Share Buttons Logic
+    const copyBtn = document.getElementById('share-copy-btn');
+    const waBtn = document.getElementById('share-wa-btn');
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          copyBtn.textContent = 'Tersalin!';
+          setTimeout(() => { copyBtn.textContent = 'Salin Tautan'; }, 2000);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }
+
+    if (waBtn) {
+      waBtn.addEventListener('click', () => {
+        const text = encodeURIComponent(`Mari membaca "${document.title}" di Ruang Sastra SMPI Yambu'ul Qur'an: ${window.location.href}`);
+        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      });
+    }
+  </script>
+</Layout>

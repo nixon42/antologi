@@ -1,0 +1,153 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
+import { getCollection } from 'astro:content';
+
+const allDrama = await getCollection('karya', ({ data }) => data.category === 'drama');
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout 
+  title="Panggung Sastra & Teater — Ruang Sastra SMPI YQ"
+  description="Dokumentasi pementasan drama teater dan musikalisasi puisi siswa-siswi SMPI Yambu'ul Qur'an."
+>
+  <div class="wrap py-12 md:py-16">
+    
+    <!-- Header -->
+    <header class="mb-10 pb-6 border-b border-[var(--rule-strong)]">
+      <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-2 uppercase tracking-wider">
+        <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
+        <span>/</span>
+        <span>Panggung Sastra</span>
+      </div>
+      <h1 class="font-['Fraunces',serif] font-semibold text-3xl md:text-4xl text-[var(--ink)] m-0">
+        Panggung Seni, Musikalisasi &amp; Lakon
+      </h1>
+      <p class="font-['Source_Serif_4',serif] italic text-base md:text-lg text-[var(--ink-soft)] mt-3 max-w-2xl leading-relaxed">
+        Tempat karya sastra tidak lagi berdiam di atas kertas putih, melainkan melompat ke atas panggung berwujud nada, gerak, dan tutur lisan santri.
+      </p>
+    </header>
+
+    <!-- Pementasan Unggulan / Featured Video Showcase -->
+    <section class="mb-16">
+      <div class="mb-6 flex items-baseline justify-between flex-wrap gap-2">
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] m-0">
+          Dokumentasi Pementasan Teater &amp; Video
+        </h2>
+        <span class="mono text-xs text-[var(--ink-faint)]">Panggung Terbuka 2026</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Video Card 1 -->
+        <article class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm flex flex-col justify-between">
+          <div>
+            <div class="scalloped-top aspect-video bg-[var(--paper-deep)] border border-[var(--rule)] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden mb-4 group cursor-pointer">
+              <div class="w-14 h-14 rounded-full border border-[var(--crimson)] text-[var(--crimson)] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform bg-[var(--paper)]">
+                <svg class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <span class="mono text-xs text-[var(--ink-soft)] font-medium">Klik untuk Memutar Rekaman Video</span>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1">Format: 1080p HD · Durasi: 22 Menit</span>
+            </div>
+
+            <span class="mono text-[0.72rem] text-[var(--crimson)] uppercase tracking-wider font-medium">Lakon Teater Santri</span>
+            <h3 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] mt-1 mb-2">
+              Layar Terkembang di Tepian Harapan
+            </h3>
+            <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed m-0 mb-4">
+              Pementasan drama satu babak yang memotret pergulatan batin pemuda santri antara melanjutkan mimpi seni peran atau tunduk pada rutinitas. Penuh dialog menyentuh dan nalar kritis.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-[var(--rule)] flex items-center justify-between">
+            <span class="mono text-xs text-[var(--ink-faint)]">Sutradara: Ust. Fauzi</span>
+            <a href={`${basePath}/karya/naskah-drama-layar-terkembang`} class="btn-literary !py-1 !px-3 !text-xs">
+              Baca Naskah Teater →
+            </a>
+          </div>
+        </article>
+
+        <!-- Video Card 2 -->
+        <article class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm flex flex-col justify-between">
+          <div>
+            <div class="scalloped-top aspect-video bg-[var(--paper-deep)] border border-[var(--rule)] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden mb-4 group cursor-pointer">
+              <div class="w-14 h-14 rounded-full border border-[var(--crimson)] text-[var(--crimson)] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform bg-[var(--paper)]">
+                <svg class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <span class="mono text-xs text-[var(--ink-soft)] font-medium">Klik untuk Memutar Rekaman Video</span>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1">Format: 1080p HD · Durasi: 04:32</span>
+            </div>
+
+            <span class="mono text-[0.72rem] text-[var(--sage)] uppercase tracking-wider font-medium">Musikalisasi Puisi</span>
+            <h3 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] mt-1 mb-2">
+              Hujan Bulan Juni &amp; Bait Senja
+            </h3>
+            <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed m-0 mb-4">
+              Kolaborasi grup musikalisasi sastra SMPI Yambu'ul Qur'an memadukan petikan gambus, gitar akustik, dan bait-bait puisi Sapardi Djoko Damono yang diaransemen ulang secara agamis.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-[var(--rule)] flex items-center justify-between">
+            <span class="mono text-xs text-[var(--ink-faint)]">Vokal: Anisa &amp; Nada</span>
+            <a href={`${basePath}/karya/jejak-di-ujung-pena`} class="btn-literary !py-1 !px-3 !text-xs">
+              Dengar Versi Audio →
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Audio Player Showcase -->
+    <section class="mb-16">
+      <div class="mb-6">
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] m-0">
+          Audio Sastra &amp; Pembacaan Puisi
+        </h2>
+        <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] mt-1">
+          Dengarkan lantunan sajak yang direkam langsung dari bilik studio literasi sekolah:
+        </p>
+      </div>
+
+      <AudioPlayer 
+        audioUrl="https://ia800905.us.archive.org/19/items/audio-poetry-sample/poetry-ambient.mp3"
+        title="Pembacaan Sajak: Jejak di Ujung Pena"
+        author="Anisa Rahmawati (Kelas XI) — Musik Latar oleh Sanggar Nada YQ"
+      />
+    </section>
+
+    <!-- Naskah Drama Terkumpul -->
+    <section>
+      <div class="mb-6 flex items-baseline justify-between flex-wrap gap-2">
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] m-0">
+          Koleksi Naskah Lakon &amp; Naskah Drama
+        </h2>
+        <a href={`${basePath}/karya?kategori=drama`} class="mono text-xs text-[var(--crimson)] hover:underline">
+          Lihat Semua Naskah Drama →
+        </a>
+      </div>
+
+      <div class="space-y-4">
+        {allDrama.map(drama => (
+          <div class="p-5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-sm flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <span class="mono text-[0.72rem] text-[var(--crimson)] uppercase tracking-wider block mb-1">
+                {drama.data.duration || 'Naskah Lakon'}
+              </span>
+              <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">
+                <a href={`${basePath}/karya/${drama.id}`} class="no-underline hover:text-[var(--crimson)] transition-colors">
+                  {drama.data.title}
+                </a>
+              </h3>
+              <p class="mono text-xs text-[var(--ink-faint)] mt-1 m-0">
+                Oleh {drama.data.author} · {drama.data.characters?.length || 3} Karakter Tokoh
+              </p>
+            </div>
+            <a href={`${basePath}/karya/${drama.id}`} class="btn-literary !py-1.5 !px-3 !text-xs">
+              Buka Tata Naskah →
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+
+  </div>
+</Layout>

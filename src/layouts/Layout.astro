@@ -1,0 +1,369 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+
+const {
+  title = "Ruang Sastra — SMPI Yambu'ul Qur'an",
+  description = "Portal Literasi & Apresiasi Karya — Wadah publikasi karya tulis ilmiah, puisi & prosa, cerpen, antologi, naskah drama, dan quotes santri SMPI Yambu'ul Qur'an.",
+  image = "/images/og-ruang-sastra.png",
+  type = "website",
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://yambuu-quran.github.io');
+const currentPath = Astro.url.pathname;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- OpenGraph / Social Metadata -->
+  <meta property="og:type" content={type} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:site_name" content="Ruang Sastra SMPI Yambu'ul Qur'an" />
+  <meta property="og:image" content={image} />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={image} />
+
+  <!-- Favicon Monogram -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23efeae0' stroke='%237c2d26' stroke-width='6'/><text x='50' y='62' font-family='serif' font-size='42' font-weight='bold' fill='%237c2d26' text-anchor='middle'>YQ</text></svg>" />
+
+  <!-- Theme & Reader Font Early Script (Prevents FOUC) -->
+  <script is:inline>
+    (function() {
+      const savedTheme = localStorage.getItem('rs_theme') || 'paper';
+      const savedFont = localStorage.getItem('rs_font') || 'serif';
+      const savedSize = localStorage.getItem('rs_size') || '17';
+
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else if (savedTheme === 'sepia') {
+        document.documentElement.setAttribute('data-theme', 'sepia');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+
+      if (savedFont === 'sans') {
+        document.documentElement.setAttribute('data-font', 'sans');
+      }
+      document.documentElement.style.setProperty('--reader-font-size', (savedSize / 16) + 'rem');
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- Reading Progress Bar (for articles) -->
+  <div id="reading-progress-bar" class="fixed top-0 left-0 h-1 bg-[var(--crimson)] z-50 w-0 transition-all duration-75" aria-hidden="true"></div>
+
+  <!-- Masthead Header -->
+  <header class="sticky top-0 z-40 bg-[var(--paper)]/95 backdrop-blur-sm border-b border-[var(--rule-strong)] transition-colors duration-200">
+    <div class="wrap py-3.5 flex items-center justify-between gap-4 flex-wrap">
+      
+      <!-- Brand & Monogram -->
+      <a href={`${basePath}/`} class="flex items-center gap-3.5 no-underline group">
+        <div class="w-10 h-10 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-semibold text-sm text-[var(--crimson)] group-hover:bg-[var(--crimson)] group-hover:text-[var(--paper)] transition-colors duration-200 flex-shrink-0" aria-label="Logo Monogram Yambu'ul Qur'an">
+          YQ
+        </div>
+        <div>
+          <span class="block font-['Fraunces',serif] font-semibold text-xl leading-none text-[var(--ink)]">
+            Ruang <span class="italic font-normal text-[var(--crimson)]">Sastra</span>
+          </span>
+          <span class="block mono text-[0.72rem] text-[var(--ink-faint)] mt-1 tracking-wider">
+            SMPI Yambu'ul Qur'an
+          </span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center gap-5 text-[0.9rem] text-[var(--ink-soft)] font-medium flex-wrap" aria-label="Navigasi Utama">
+        <a href={`${basePath}/#tentang`} class="no-underline hover:text-[var(--crimson)] transition-colors py-1 border-b border-transparent hover:border-[var(--crimson)]">
+          Tentang
+        </a>
+        <a href={`${basePath}/karya`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/karya') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
+          Pojok Baca
+        </a>
+        <a href={`${basePath}/#karya-pilihan`} class="no-underline hover:text-[var(--crimson)] transition-colors py-1 border-b border-transparent hover:border-[var(--crimson)]">
+          Karya Pilihan
+        </a>
+        <a href={`${basePath}/panggung`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/panggung') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
+          Panggung
+        </a>
+        <a href={`${basePath}/quotes`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/quotes') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
+          Quotes
+        </a>
+        <a href={`${basePath}/kirim`} class="btn-literary !py-1.5 !px-3 !text-xs !font-medium">
+          Kirim Karya
+        </a>
+      </nav>
+
+      <!-- Reader Controls & Search Action -->
+      <div class="flex items-center gap-2">
+        <!-- Search Trigger Button -->
+        <button id="search-modal-trigger" class="p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors" title="Cari Karya Sastra & Penulis (Ctrl+K)" aria-label="Buka Pencarian">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </button>
+
+        <!-- Theme Mode Toggle Dropdown / Cycle -->
+        <button id="theme-cycle-button" class="p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors text-xs mono flex items-center gap-1.5" title="Ganti Mode Tampilan (Kertas / Sepia / Gelap)" aria-label="Ganti Tema">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <span id="theme-label" class="hidden sm:inline">Kertas</span>
+        </button>
+
+        <!-- Font Size Adjuster -->
+        <div class="flex items-center border border-[var(--rule-strong)] rounded text-xs mono">
+          <button id="font-dec-button" class="px-2 py-1 hover:bg-[var(--paper-deep)] transition-colors" title="Perkecil Ukuran Teks">A-</button>
+          <button id="font-inc-button" class="px-2 py-1 hover:bg-[var(--paper-deep)] border-l border-[var(--rule-strong)] transition-colors" title="Perbesar Ukuran Teks">A+</button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Slot Content -->
+  <main id="main-content" class="min-h-[75vh]">
+    <slot />
+  </main>
+
+  <!-- Search Modal Dialog Component -->
+  <div id="search-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Pencarian Karya">
+    <div class="bg-[var(--paper)] border border-[var(--rule-strong)] w-full max-w-xl rounded shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-4 border-b border-[var(--rule-strong)] flex items-center gap-3">
+        <svg class="w-5 h-5 text-[var(--ink-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input 
+          id="search-input" 
+          type="search" 
+          placeholder="Cari judul, puisi, cerpen, penulis, atau kata kunci..." 
+          class="w-full bg-transparent border-none outline-none text-[var(--ink)] font-['Source_Serif_4',serif] text-base placeholder:text-[var(--ink-faint)] placeholder:italic"
+          autocomplete="off"
+        />
+        <button id="close-search-button" class="text-xs mono p-1 text-[var(--ink-faint)] hover:text-[var(--ink)]">
+          ESC
+        </button>
+      </div>
+      <div id="search-results" class="max-h-96 overflow-y-auto p-4 space-y-2">
+        <p class="text-xs text-[var(--ink-faint)] mono text-center py-6">Ketik minimal 2 huruf untuk mulai mencari karya...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Literary Colophon Footer -->
+  <footer class="border-t border-[var(--rule-strong)] bg-[var(--paper)] mt-24 py-12 text-[var(--ink-faint)] font-['IBM_Plex_Mono',monospace] text-xs transition-colors">
+    <div class="wrap space-y-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-full border border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-semibold text-xs text-[var(--crimson)]">YQ</span>
+            <span class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)]">Ruang Sastra</span>
+          </div>
+          <p class="text-[0.82rem] leading-relaxed max-w-md font-['Source_Serif_4',serif] italic text-[var(--ink-soft)]">
+            "Di sini, tulisan bukan sekadar susunan huruf, dan panggung bukan sekadar tempat berakting. Portal ini adalah ruang apresiasi tempat para siswa mengasah nalar kritis, merajut imajinasi, dan menuangkan gagasan."
+          </p>
+          <p class="text-[0.72rem] text-[var(--ink-faint)]">
+            Portal Literasi SMPI Yambu'ul Qur'an · Berbasis Git &amp; GitHub Pages
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-[var(--ink)] text-xs uppercase tracking-wider mb-3">Ragam Karya</h4>
+          <ul class="space-y-2 list-none p-0 m-0 text-[0.78rem]">
+            <li><a href={`${basePath}/karya?kategori=ilmiah`} class="hover:text-[var(--crimson)] transition-colors">Karya Tulis Ilmiah</a></li>
+            <li><a href={`${basePath}/karya?kategori=puisi`} class="hover:text-[var(--crimson)] transition-colors">Puisi &amp; Prosa</a></li>
+            <li><a href={`${basePath}/karya?kategori=cerpen`} class="hover:text-[var(--crimson)] transition-colors">Cerpen Santri</a></li>
+            <li><a href={`${basePath}/karya?kategori=drama`} class="hover:text-[var(--crimson)] transition-colors">Naskah Lakon Drama</a></li>
+            <li><a href={`${basePath}/karya?kategori=antologi`} class="hover:text-[var(--crimson)] transition-colors">Antologi Bersama</a></li>
+            <li><a href={`${basePath}/quotes`} class="hover:text-[var(--crimson)] transition-colors">Kutipan / Quotes</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-[var(--ink)] text-xs uppercase tracking-wider mb-3">Redaksi &amp; Akses</h4>
+          <ul class="space-y-2 list-none p-0 m-0 text-[0.78rem]">
+            <li><a href={`${basePath}/#tentang`} class="hover:text-[var(--crimson)] transition-colors">Tentang Portal</a></li>
+            <li><a href={`${basePath}/kirim`} class="hover:text-[var(--crimson)] transition-colors">Kirim Naskah Baru</a></li>
+            <li><a href={`${basePath}/panggung`} class="hover:text-[var(--crimson)] transition-colors">Panggung Teater</a></li>
+            <li><a href={`${basePath}/sitemap-index.xml`} class="hover:text-[var(--crimson)] transition-colors">Peta Situs (Sitemap)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-[var(--rule)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[0.72rem]">
+        <p>© Ekstrakurikuler Literatur &amp; Sastra — SMPI Yambu'ul Qur'an. Hak cipta setiap karya tetap menjadi milik penulisnya.</p>
+        <p class="text-right">Dicetak di Ruang Sastra · Versi 1.0.0</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Client Interaction Scripts -->
+  <script>
+    // Theme Switcher Cycle: Paper -> Sepia -> Dark -> Paper
+    const themes = ['paper', 'sepia', 'dark'];
+    const themeLabels = { paper: 'Kertas', sepia: 'Sepia', dark: 'Malam' };
+    const themeButton = document.getElementById('theme-cycle-button');
+    const themeLabel = document.getElementById('theme-label');
+
+    function updateThemeUI(theme) {
+      if (themeLabel) themeLabel.textContent = themeLabels[theme] || 'Kertas';
+    }
+
+    if (themeButton) {
+      themeButton.addEventListener('click', () => {
+        const currentTheme = localStorage.getItem('rs_theme') || 'paper';
+        const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+        const nextTheme = themes[nextIndex];
+
+        if (nextTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (nextTheme === 'sepia') {
+          document.documentElement.setAttribute('data-theme', 'sepia');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+
+        localStorage.setItem('rs_theme', nextTheme);
+        updateThemeUI(nextTheme);
+      });
+      updateThemeUI(localStorage.getItem('rs_theme') || 'paper');
+    }
+
+    // Font Sizing Controls
+    let currentSize = parseInt(localStorage.getItem('rs_size') || '17', 10);
+    const fontInc = document.getElementById('font-inc-button');
+    const fontDec = document.getElementById('font-dec-button');
+
+    function setFontSize(size) {
+      currentSize = Math.max(14, Math.min(22, size));
+      document.documentElement.style.setProperty('--reader-font-size', (currentSize / 16) + 'rem');
+      localStorage.setItem('rs_size', currentSize.toString());
+    }
+
+    if (fontInc) fontInc.addEventListener('click', () => setFontSize(currentSize + 1));
+    if (fontDec) fontDec.addEventListener('click', () => setFontSize(currentSize - 1));
+
+    // Reading Progress Indicator
+    window.addEventListener('scroll', () => {
+      const progressBar = document.getElementById('reading-progress-bar');
+      if (!progressBar) return;
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      progressBar.style.width = scrolled + '%';
+    });
+
+    // Search Modal Controls (Ctrl+K or Button)
+    const searchModal = document.getElementById('search-modal');
+    const searchTrigger = document.getElementById('search-modal-trigger');
+    const searchClose = document.getElementById('close-search-button');
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+
+    function openSearch() {
+      if (!searchModal) return;
+      searchModal.classList.remove('hidden');
+      searchModal.classList.add('flex');
+      setTimeout(() => searchInput?.focus(), 50);
+    }
+
+    function closeSearch() {
+      if (!searchModal) return;
+      searchModal.classList.add('hidden');
+      searchModal.classList.remove('flex');
+    }
+
+    if (searchTrigger) searchTrigger.addEventListener('click', openSearch);
+    if (searchClose) searchClose.addEventListener('click', closeSearch);
+
+    searchModal?.addEventListener('click', (e) => {
+      if (e.target === searchModal) closeSearch();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openSearch();
+      } else if (e.key === 'Escape') {
+        closeSearch();
+      }
+    });
+
+    // Fetch search index and listen to input
+    let searchIndex = null;
+    async function loadSearchIndex() {
+      if (!searchIndex) {
+        try {
+          const res = await fetch(`${import.meta.env.BASE_URL}search-index.json`);
+          if (res.ok) searchIndex = await res.json();
+        } catch (e) {
+          console.warn('Index pencarian belum tersedia:', e);
+        }
+      }
+      return searchIndex || [];
+    }
+
+    searchInput?.addEventListener('input', async (e) => {
+      const query = (e.target as HTMLInputElement).value.trim().toLowerCase();
+      const resultsContainer = document.getElementById('search-results');
+      if (!resultsContainer) return;
+
+      if (query.length < 2) {
+        resultsContainer.innerHTML = '<p class="text-xs text-[var(--ink-faint)] mono text-center py-6">Ketik minimal 2 huruf untuk mulai mencari karya...</p>';
+        return;
+      }
+
+      const items = await loadSearchIndex();
+      const matched = items.filter(item => 
+        item.title.toLowerCase().includes(query) ||
+        item.author.toLowerCase().includes(query) ||
+        (item.description && item.description.toLowerCase().includes(query)) ||
+        (item.tags && item.tags.some(t => t.toLowerCase().includes(query)))
+      );
+
+      if (matched.length === 0) {
+        resultsContainer.innerHTML = `<p class="text-xs text-[var(--ink-faint)] mono text-center py-6">Tidak ditemukan karya yang cocok dengan "${query}".</p>`;
+        return;
+      }
+
+      resultsContainer.innerHTML = matched.map(item => `
+        <a href="${item.url}" class="block p-3 rounded hover:bg-[var(--paper-deep)] border-b border-[var(--rule)] no-underline group transition-colors">
+          <div class="flex items-center justify-between gap-2">
+            <h5 class="text-sm font-semibold text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors m-0 font-['Fraunces',serif]">
+              ${item.title}
+            </h5>
+            <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)]">
+              ${item.categoryLabel}
+            </span>
+          </div>
+          <p class="text-xs text-[var(--ink-soft)] italic m-0 mt-1 line-clamp-1 font-['Source_Serif_4',serif]">
+            ${item.author} — ${item.description || ''}
+          </p>
+        </a>
+      `).join('');
+    });
+  </script>
+</body>
+</html>

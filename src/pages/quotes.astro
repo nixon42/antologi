@@ -1,0 +1,184 @@
+---
+import Layout from '../layouts/Layout.astro';
+import QuoteCard from '../components/QuoteCard.astro';
+import { getCollection } from 'astro:content';
+
+const allQuotes = await getCollection('quotes');
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout 
+  title="Quotes & Mutiara Kata Sastra — Ruang Sastra SMPI YQ"
+  description="Kumpulan mutiara kata, renungan puitik, dan kutipan inspiratif karya santri dan pembina SMPI Yambu'ul Qur'an."
+>
+  <div class="wrap py-12 md:py-16">
+    
+    <!-- Header -->
+    <header class="mb-10 pb-6 border-b border-[var(--rule-strong)]">
+      <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-2 uppercase tracking-wider">
+        <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
+        <span>/</span>
+        <span>Quotes Sastra</span>
+      </div>
+      <h1 class="font-['Fraunces',serif] font-semibold text-3xl md:text-4xl text-[var(--ink)] m-0">
+        Quotes &amp; Mutiara Kata Sastra
+      </h1>
+      <p class="font-['Source_Serif_4',serif] italic text-base md:text-lg text-[var(--ink-soft)] mt-3 max-w-2xl leading-relaxed">
+        Pilihan petikan berbobot dari bait puisi, lakon drama, dan esai siswa. Dapat disalin atau diunduh langsung sebagai kartu grafis untuk dibagikan.
+      </p>
+    </header>
+
+    <!-- Quotes Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      {allQuotes.map((q, idx) => (
+        <QuoteCard 
+          quote={q.data.quote}
+          author={q.data.author}
+          authorTitle={q.data.authorTitle}
+          source={q.data.source}
+          category={q.data.category}
+          cardId={`quote-grid-${idx}`}
+        />
+      ))}
+    </div>
+
+    <!-- STUDIO KUTIPAN KUSTOM (INTERACTIVE CARD CREATOR) -->
+    <section class="p-8 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm my-12">
+      <div class="mb-6">
+        <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider block mb-1">Studio Kreatif</span>
+        <h2 class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] m-0">
+          Buat Kartu Kutipan Sastra Anda Sendiri
+        </h2>
+        <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] mt-1">
+          Ketik mutiara kata atau bait favorit Anda, sesuaikan gayanya, lalu unduh kartu gambar beresolusi tinggi.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <!-- Editor Controls -->
+        <div class="space-y-4">
+          <div>
+            <label for="custom-quote-text" class="block mono text-xs text-[var(--ink-soft)] mb-1">Isi Kutipan / Sajak *</label>
+            <textarea 
+              id="custom-quote-text" 
+              rows="4" 
+              class="w-full p-3 bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--ink)] rounded text-sm outline-none focus:border-[var(--crimson)] font-['Fraunces',serif] italic"
+              placeholder="Tuliskan kata-kata mutiara Anda di sini..."
+            >Keberanian menulis adalah langkah pertama membuka jendela peradaban.</textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="custom-author" class="block mono text-xs text-[var(--ink-soft)] mb-1">Nama Penulis *</label>
+              <input 
+                type="text" 
+                id="custom-author" 
+                class="w-full p-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--ink)] rounded text-sm outline-none focus:border-[var(--crimson)] font-['Fraunces',serif]"
+                value="Santri SMPI Yambu'ul Qur'an"
+              />
+            </div>
+            <div>
+              <label for="custom-source" class="block mono text-xs text-[var(--ink-soft)] mb-1">Keterangan / Sumber</label>
+              <input 
+                type="text" 
+                id="custom-source" 
+                class="w-full p-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--ink)] rounded text-sm outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] italic"
+                value="Pojok Literasi 2026"
+              />
+            </div>
+          </div>
+
+          <button id="download-custom-card-btn" class="btn-literary btn-literary-solid !w-full !py-2.5 text-sm cursor-pointer mt-2">
+            Unduh Kartu Gambar (PNG) ↓
+          </button>
+        </div>
+
+        <!-- Live Preview Canvas Box -->
+        <div>
+          <span class="mono text-xs text-[var(--ink-faint)] block mb-2 uppercase">Pratinjau Kartu:</span>
+          <div 
+            id="custom-card-preview" 
+            class="p-8 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-sm relative overflow-hidden shadow-sm"
+          >
+            <div class="absolute -right-4 -bottom-6 text-[7rem] text-[var(--rule)] select-none pointer-events-none opacity-40 font-['Fraunces',serif]">
+              ❧
+            </div>
+            <div class="flex items-center justify-between gap-4 mb-5 pb-3 border-b border-[var(--rule)]">
+              <span class="mono text-[0.72rem] tracking-widest uppercase text-[var(--crimson)] font-medium">
+                Mutiara Kata
+              </span>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
+                Ruang Sastra · SMPI YQ
+              </span>
+            </div>
+            <p id="preview-quote" class="font-['Fraunces',serif] italic font-normal text-xl text-[var(--ink)] leading-relaxed mb-6">
+              "Keberanian menulis adalah langkah pertama membuka jendela peradaban."
+            </p>
+            <footer class="flex items-baseline justify-between flex-wrap gap-2 pt-2">
+              <cite id="preview-author" class="not-italic font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] block">
+                Santri SMPI Yambu'ul Qur'an
+              </cite>
+              <span id="preview-source" class="font-['Source_Serif_4',serif] italic text-xs text-[var(--ink-soft)]">
+                Pojok Literasi 2026
+              </span>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    import { toPng } from 'html-to-image';
+    import confetti from 'canvas-confetti';
+
+    const inputQuote = document.getElementById('custom-quote-text') as HTMLTextAreaElement;
+    const inputAuthor = document.getElementById('custom-author') as HTMLInputElement;
+    const inputSource = document.getElementById('custom-source') as HTMLInputElement;
+
+    const previewQuote = document.getElementById('preview-quote');
+    const previewAuthor = document.getElementById('preview-author');
+    const previewSource = document.getElementById('preview-source');
+    const previewBox = document.getElementById('custom-card-preview');
+
+    const downloadBtn = document.getElementById('download-custom-card-btn');
+
+    function updatePreview() {
+      if (previewQuote && inputQuote) previewQuote.textContent = `"${inputQuote.value || '...'}"`;
+      if (previewAuthor && inputAuthor) previewAuthor.textContent = inputAuthor.value || 'Anonim';
+      if (previewSource && inputSource) previewSource.textContent = inputSource.value || '';
+    }
+
+    inputQuote?.addEventListener('input', updatePreview);
+    inputAuthor?.addEventListener('input', updatePreview);
+    inputSource?.addEventListener('input', updatePreview);
+
+    downloadBtn?.addEventListener('click', async () => {
+      if (!previewBox) return;
+      downloadBtn.textContent = 'Membuat Kartu Gambar...';
+
+      try {
+        const dataUrl = await toPng(previewBox, { quality: 0.95, pixelRatio: 2 });
+        const a = document.createElement('a');
+        a.download = `kartu-kutipan-sastra.png`;
+        a.href = dataUrl;
+        a.click();
+
+        confetti({
+          particleCount: 30,
+          spread: 70,
+          origin: { y: 0.7 },
+          colors: ['#7c2d26', '#a6813c', '#6c7d5f']
+        });
+
+        downloadBtn.textContent = 'Kartu Berhasil Diunduh!';
+        setTimeout(() => { downloadBtn.textContent = 'Unduh Kartu Gambar (PNG) ↓'; }, 2500);
+      } catch (err) {
+        console.error(err);
+        downloadBtn.textContent = 'Gagal Mengunduh';
+        setTimeout(() => { downloadBtn.textContent = 'Unduh Kartu Gambar (PNG) ↓'; }, 2000);
+      }
+    });
+  </script>
+</Layout>

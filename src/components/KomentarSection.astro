@@ -1,0 +1,147 @@
+---
+interface Props {
+  karyaId: string;
+}
+
+const { karyaId } = Astro.props;
+---
+
+<section class="komentar-section my-12 pt-8 border-t border-[var(--rule-strong)]">
+  <div class="mb-6 flex items-baseline justify-between flex-wrap gap-2">
+    <div>
+      <h3 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
+        Ruang Diskusi &amp; Catatan Pembaca
+      </h3>
+      <p class="font-['Source_Serif_4',serif] italic text-xs text-[var(--ink-soft)] mt-1">
+        Tinggalkan ulasan, tafsir, atau sapaan hangat untuk penulis karya ini.
+      </p>
+    </div>
+    <span id="comment-count-badge" class="mono text-xs text-[var(--ink-faint)]">
+      0 Catatan
+    </span>
+  </div>
+
+  <!-- Form Kirim Komentar -->
+  <form id="comment-form" data-karya-id={karyaId} class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm space-y-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="comment-author" class="block mono text-xs text-[var(--ink-soft)] mb-1">Nama Lengkap / Samaran *</label>
+        <input 
+          type="text" 
+          id="comment-author" 
+          required 
+          placeholder="Misal: Ahmad / Penikmat Puisi" 
+          class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--ink)] rounded-sm text-sm outline-none focus:border-[var(--crimson)]"
+        />
+      </div>
+      <div>
+        <label for="comment-role" class="block mono text-xs text-[var(--ink-soft)] mb-1">Peran / Status</label>
+        <select 
+          id="comment-role" 
+          class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--ink)] rounded-sm text-sm outline-none focus:border-[var(--crimson)]"
+        >
+          <option value="Siswa">Siswa SMPI YQ</option>
+          <option value="Guru / Pembina">Guru / Pembina Sastra</option>
+          <option value="Orang Tua">Orang Tua Siswa</option>
+          <option value="Alumni">Alumni</option>
+          <option value="Pembaca Umum">Pembaca Umum</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label for="comment-message" class="block mono text-xs text-[var(--ink-soft)] mb-1">Ulasan / Tanggapan *</label>
+      <textarea 
+        id="comment-message" 
+        required 
+        rows="3" 
+        placeholder="Tuliskan apresiasi atau tanggapan Anda..." 
+        class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--ink)] rounded-sm text-sm outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+      ></textarea>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <span id="comment-status" class="mono text-xs text-[var(--ink-faint)]"></span>
+      <button type="submit" class="btn-literary !py-2 !px-5 text-sm cursor-pointer">
+        Kirim Catatan
+      </button>
+    </div>
+  </form>
+
+  <!-- Comments Stream Container -->
+  <div id="comments-list" class="space-y-4">
+    <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-4">Memuat catatan pembaca...</p>
+  </div>
+</section>
+
+<script>
+  import { getDaftarKomentar, kirimKomentar, type KomentarKarya } from '../lib/firebase';
+
+  const form = document.getElementById('comment-form') as HTMLFormElement;
+  const listContainer = document.getElementById('comments-list');
+  const countBadge = document.getElementById('comment-count-badge');
+  const statusSpan = document.getElementById('comment-status');
+
+  if (form && listContainer) {
+    const karyaId = form.dataset.karyaId || 'default';
+
+    function renderComments(comments: KomentarKarya[]) {
+      if (!listContainer) return;
+      if (countBadge) countBadge.textContent = `${comments.length} Catatan`;
+
+      if (comments.length === 0) {
+        listContainer.innerHTML = '<p class="mono text-xs text-[var(--ink-faint)] italic text-center py-6">Belum ada catatan untuk karya ini. Jadilah yang pertama menuliskan apresiasi!</p>';
+        return;
+      }
+
+      listContainer.innerHTML = comments.map(c => `
+        <article class="p-4 bg-[var(--paper-card)] border-l-2 border-[var(--crimson)] rounded-r-sm space-y-1.5">
+          <div class="flex items-baseline justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-2">
+              <strong class="font-['Fraunces',serif] font-semibold text-sm text-[var(--ink)]">${c.nama}</strong>
+              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">${c.peran || 'Pembaca'}</span>
+            </div>
+            <time class="mono text-[0.68rem] text-[var(--ink-faint)]">${new Date(c.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</time>
+          </div>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] m-0 leading-relaxed">${c.pesan}</p>
+        </article>
+      `).join('');
+    }
+
+    // Load existing
+    getDaftarKomentar(karyaId).then(renderComments);
+
+    // Handle submit
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const authorInput = document.getElementById('comment-author') as HTMLInputElement;
+      const roleSelect = document.getElementById('comment-role') as HTMLSelectElement;
+      const messageText = document.getElementById('comment-message') as HTMLTextAreaElement;
+
+      if (!authorInput.value || !messageText.value) return;
+
+      if (statusSpan) statusSpan.textContent = 'Mengirim...';
+
+      try {
+        await kirimKomentar(karyaId, {
+          nama: authorInput.value.trim(),
+          peran: roleSelect.value,
+          pesan: messageText.value.trim(),
+        });
+
+        // Reset
+        messageText.value = '';
+        if (statusSpan) {
+          statusSpan.textContent = 'Catatan berhasil dimuat!';
+          setTimeout(() => { if (statusSpan) statusSpan.textContent = ''; }, 3000);
+        }
+
+        // Re-fetch
+        const updated = await getDaftarKomentar(karyaId);
+        renderComments(updated);
+      } catch (err) {
+        if (statusSpan) statusSpan.textContent = 'Gagal mengirim catatan.';
+      }
+    });
+  }
+</script>

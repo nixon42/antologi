@@ -1,0 +1,170 @@
+---
+interface Props {
+  quote: string;
+  author: string;
+  authorTitle?: string;
+  source?: string;
+  category?: string;
+  cardId?: string;
+}
+
+const {
+  quote,
+  author,
+  authorTitle,
+  source,
+  category = "Kutipan Sastra",
+  cardId = `quote-${Math.random().toString(36).substring(2, 9)}`,
+} = Astro.props;
+---
+
+<div class="quote-card-wrapper my-6 group" id={`wrapper-${cardId}`}>
+  <!-- Rendered Exportable Card Box -->
+  <div 
+    id={cardId} 
+    class="p-7 md:p-9 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm relative overflow-hidden transition-all duration-300 hover:shadow-md"
+  >
+    <!-- Background Watermark Fleuron -->
+    <div class="absolute -right-4 -bottom-6 text-[7rem] text-[var(--rule)] select-none pointer-events-none opacity-40 font-['Fraunces',serif]" aria-hidden="true">
+      ❧
+    </div>
+
+    <!-- Header Category & Brand -->
+    <div class="flex items-center justify-between gap-4 mb-5 pb-3 border-b border-[var(--rule)]">
+      <span class="mono text-[0.72rem] tracking-widest uppercase text-[var(--crimson)] font-medium">
+        {category}
+      </span>
+      <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
+        Ruang Sastra · SMPI YQ
+      </span>
+    </div>
+
+    <!-- Quote Body in Fraunces Italic -->
+    <blockquote class="m-0 p-0 relative z-10">
+      <p class="font-['Fraunces',serif] italic font-normal text-lg md:text-xl text-[var(--ink)] leading-relaxed mb-6">
+        "{quote}"
+      </p>
+      
+      <footer class="flex items-baseline justify-between flex-wrap gap-2 pt-2">
+        <div>
+          <cite class="not-italic font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] block">
+            {author}
+          </cite>
+          {authorTitle && (
+            <span class="mono text-[0.75rem] text-[var(--ink-faint)] block mt-0.5">
+              {authorTitle}
+            </span>
+          )}
+        </div>
+        {source && (
+          <span class="font-['Source_Serif_4',serif] italic text-xs text-[var(--ink-soft)]">
+            {source}
+          </span>
+        )}
+      </footer>
+    </blockquote>
+  </div>
+
+  <!-- Action Bar: Copy Text & Download as Image -->
+  <div class="flex items-center justify-end gap-2 mt-2.5 text-xs mono">
+    <!-- Copy Text Button -->
+    <button 
+      type="button"
+      class="copy-quote-btn flex items-center gap-1.5 px-3 py-1.5 rounded border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] transition-colors cursor-pointer"
+      data-quote={quote}
+      data-author={author}
+      data-source={source || ''}
+      title="Salin teks kutipan ke papan klip"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+      </svg>
+      <span class="btn-text">Salin Teks</span>
+    </button>
+
+    <!-- Download Image Button -->
+    <button 
+      type="button"
+      class="download-quote-btn flex items-center gap-1.5 px-3 py-1.5 rounded border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--gold)] hover:border-[var(--gold)] transition-colors cursor-pointer"
+      data-target-id={cardId}
+      data-author={author}
+      title="Unduh sebagai kartu gambar media sosial"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+      </svg>
+      <span class="btn-text">Unduh Kartu</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  import confetti from 'canvas-confetti';
+  import { toPng } from 'html-to-image';
+
+  // Copy Quote Event Listener
+  document.querySelectorAll('.copy-quote-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const button = e.currentTarget as HTMLButtonElement;
+      const quote = button.dataset.quote || '';
+      const author = button.dataset.author || '';
+      const source = button.dataset.source ? ` (${button.dataset.source})` : '';
+      const textToCopy = `"${quote}"\n\n— ${author}${source}\n(Dikutip dari Ruang Sastra SMPI Yambu'ul Qur'an)`;
+
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        const span = button.querySelector('.btn-text');
+        if (span) span.textContent = 'Tersalin!';
+        
+        // Fire confetti
+        confetti({
+          particleCount: 25,
+          spread: 60,
+          origin: { y: 0.8 },
+          colors: ['#7c2d26', '#a6813c', '#6c7d5f']
+        });
+
+        setTimeout(() => {
+          if (span) span.textContent = 'Salin Teks';
+        }, 2000);
+      } catch (err) {
+        console.error('Gagal menyalin kutipan:', err);
+      }
+    });
+  });
+
+  // Download Quote as Image Card
+  document.querySelectorAll('.download-quote-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const button = e.currentTarget as HTMLButtonElement;
+      const targetId = button.dataset.targetId;
+      const author = button.dataset.author || 'sastra';
+      if (!targetId) return;
+
+      const card = document.getElementById(targetId);
+      if (!card) return;
+
+      const span = button.querySelector('.btn-text');
+      if (span) span.textContent = 'Memproses...';
+
+      try {
+        const dataUrl = await toPng(card, { quality: 0.95, pixelRatio: 2 });
+        const link = document.createElement('a');
+        link.download = `kutipan-${author.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+        link.href = dataUrl;
+        link.click();
+
+        if (span) span.textContent = 'Terunduh!';
+        setTimeout(() => {
+          if (span) span.textContent = 'Unduh Kartu';
+        }, 2000);
+      } catch (err) {
+        console.error('Gagal mengekspor kartu:', err);
+        if (span) span.textContent = 'Gagal';
+        setTimeout(() => {
+          if (span) span.textContent = 'Unduh Kartu';
+        }, 2000);
+      }
+    });
+  });
+</script>

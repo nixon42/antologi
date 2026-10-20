@@ -1,0 +1,83 @@
+---
+interface Props {
+  karyaId: string;
+}
+
+const { karyaId } = Astro.props;
+---
+
+<div class="apresiasi-container my-10 py-6 border-y border-[var(--rule)] flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="space-y-1 text-center sm:text-left">
+    <h4 class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] m-0">
+      Sampaikan Apresiasi untuk Penulis
+    </h4>
+    <p class="font-['Source_Serif_4',serif] italic text-xs text-[var(--ink-soft)] m-0">
+      Setiap tepuk tangan adalah dorongan semangat bagi santri &amp; siswa untuk terus berkarya.
+    </p>
+  </div>
+
+  <div class="relative flex items-center gap-3">
+    <button 
+      id="clap-button"
+      data-karya-id={karyaId}
+      class="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] hover:bg-[var(--crimson)] hover:text-[var(--paper)] transition-all duration-200 cursor-pointer select-none active:scale-95"
+      aria-label="Beri Tepuk Tangan untuk Karya Ini"
+    >
+      <span class="text-lg group-hover:scale-125 transition-transform duration-200">👏</span>
+      <span class="font-['Fraunces',serif] font-semibold text-sm">Tepuk Tangan</span>
+      <span 
+        id="clap-count" 
+        class="mono text-xs px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink)] group-hover:bg-[var(--crimson-soft)] group-hover:text-white transition-colors"
+      >
+        0
+      </span>
+    </button>
+
+    <!-- Floating +1 Particle Anchor -->
+    <div id="particle-anchor" class="absolute -top-6 left-1/2 -translate-x-1/2 pointer-events-none"></div>
+  </div>
+</div>
+
+<script>
+  import { getApresiasiCount, tambahApresiasi } from '../lib/firebase';
+  import confetti from 'canvas-confetti';
+
+  const clapBtn = document.getElementById('clap-button');
+  const clapCountSpan = document.getElementById('clap-count');
+  const particleAnchor = document.getElementById('particle-anchor');
+
+  if (clapBtn && clapCountSpan) {
+    const karyaId = clapBtn.dataset.karyaId || 'default';
+
+    // Initial load
+    getApresiasiCount(karyaId).then(count => {
+      clapCountSpan.textContent = count.toString();
+    });
+
+    clapBtn.addEventListener('click', async () => {
+      // Optimistic UI update
+      const current = parseInt(clapCountSpan.textContent || '0', 10);
+      clapCountSpan.textContent = (current + 1).toString();
+
+      // Show floating +1
+      if (particleAnchor) {
+        const floatSpan = document.createElement('span');
+        floatSpan.textContent = '+1 👏';
+        floatSpan.className = 'absolute -top-4 text-xs font-bold text-[var(--crimson)] opacity-100 transition-all duration-700 transform -translate-y-4';
+        particleAnchor.appendChild(floatSpan);
+        setTimeout(() => floatSpan.remove(), 700);
+      }
+
+      // Small confetti
+      confetti({
+        particleCount: 15,
+        spread: 45,
+        origin: { y: 0.7 },
+        colors: ['#7c2d26', '#a6813c']
+      });
+
+      // Save to Firebase or LocalStorage
+      await tambahApresiasi(karyaId);
+    });
+  }
+</script>

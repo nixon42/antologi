@@ -1,0 +1,243 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allKarya = await getCollection('karya');
+
+// Sort by date desc
+const sortedKarya = allKarya.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Get URL query params
+const categories = [
+  { slug: 'semua', label: 'Semua Karya' },
+  { slug: 'ilmiah', label: 'Karya Tulis Ilmiah' },
+  { slug: 'puisi', label: 'Puisi & Prosa' },
+  { slug: 'cerpen', label: 'Cerpen' },
+  { slug: 'drama', label: 'Naskah Drama' },
+  { slug: 'antologi', label: 'Antologi' },
+];
+---
+
+<Layout 
+  title="Pojok Baca Literatur — Ruang Sastra SMPI Yambu'ul Qur'an"
+  description="Jelajahi seluruh karya tulis ilmiah, puisi, prosa, cerpen, antologi, dan naskah drama karya siswa SMPI Yambu'ul Qur'an."
+>
+  <div class="wrap py-12 md:py-16">
+    
+    <!-- Header -->
+    <header class="mb-10 pb-6 border-b border-[var(--rule-strong)]">
+      <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-2 uppercase tracking-wider">
+        <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
+        <span>/</span>
+        <span>Pojok Baca</span>
+      </div>
+      <h1 class="font-['Fraunces',serif] font-semibold text-3xl md:text-4xl text-[var(--ink)] m-0">
+        Pojok Baca Literatur
+      </h1>
+      <p class="font-['Source_Serif_4',serif] italic text-base md:text-lg text-[var(--ink-soft)] mt-3 max-w-2xl leading-relaxed">
+        Ruang terbuka tempat setiap goresan pena santri dan siswa diabadikan. Dari riset ilmiah hingga untaian sajak liris.
+      </p>
+    </header>
+
+    <!-- Filter Tabs & Controls -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-[var(--rule)]">
+      <!-- Category Filter Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0" id="category-filter-bar">
+        {categories.map((cat, idx) => (
+          <button 
+            type="button"
+            class={`category-tab-btn px-4 py-2 text-xs md:text-sm mono rounded-full border transition-all cursor-pointer whitespace-nowrap ${
+              idx === 0 
+                ? 'bg-[var(--crimson)] text-[var(--paper)] border-[var(--crimson)] font-medium active' 
+                : 'border-[var(--rule-strong)] text-[var(--ink-soft)] hover:border-[var(--crimson)] hover:text-[var(--ink)]'
+            }`}
+            data-category={cat.slug}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Quick Search / Filter Input -->
+      <div class="relative min-w-[240px]">
+        <input 
+          type="search" 
+          id="karya-filter-input" 
+          placeholder="Saring judul atau penulis..." 
+          class="w-full px-3.5 py-2 pl-9 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+        />
+        <svg class="w-4 h-4 text-[var(--ink-faint)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Karya Feed List -->
+    <div class="space-y-6" id="karya-list-container">
+      {sortedKarya.map((item, index) => {
+        const numStr = (index + 1 < 10 ? '0' : '') + (index + 1);
+        const formattedDate = item.data.publishDate.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+
+        return (
+          <article 
+            class="karya-entry-item grid grid-cols-[44px_1fr] md:grid-cols-[56px_1fr] gap-4 md:gap-6 py-6 border-b border-[var(--rule)] last:border-b-0 items-start group"
+            data-category={item.data.category}
+            data-title={item.data.title.toLowerCase()}
+            data-author={item.data.author.toLowerCase()}
+          >
+            <!-- Editorial Index -->
+            <span class="font-['Fraunces',serif] italic text-2xl md:text-3xl text-[var(--gold)] leading-none select-none">
+              {numStr}
+            </span>
+
+            <div>
+              <!-- Meta & Category Row -->
+              <div class="flex items-baseline gap-2.5 flex-wrap mb-1.5">
+                <h2 class="font-['Fraunces',serif] font-semibold text-xl md:text-2xl text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors m-0">
+                  <a href={`${basePath}/karya/${item.id}`} class="no-underline">
+                    {item.data.title}
+                  </a>
+                </h2>
+                <span class={`mono text-[0.72rem] italic font-medium ${
+                  item.data.category === 'puisi' ? 'text-[var(--crimson)]' :
+                  item.data.category === 'cerpen' ? 'text-[var(--sage)]' :
+                  item.data.category === 'ilmiah' ? 'text-[var(--gold)]' :
+                  item.data.category === 'drama' ? 'text-[var(--crimson-soft)]' :
+                  'text-[var(--ink-faint)]'
+                }`}>
+                  {item.data.categoryLabel}
+                </span>
+              </div>
+
+              <!-- Author & Time Meta -->
+              <p class="mono text-xs text-[var(--ink-faint)] m-0 mb-3 flex items-center gap-2 flex-wrap">
+                <span class="font-medium text-[var(--ink-soft)]">{item.data.author}</span>
+                {item.data.authorGrade && <span>· {item.data.authorGrade}</span>}
+                <span>· {formattedDate}</span>
+                {item.data.readingTime && <span>· ± {item.data.readingTime} Menit Baca</span>}
+              </p>
+
+              <!-- Excerpt / Description -->
+              <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] m-0 pl-3.5 border-l-2 border-[var(--rule-strong)] leading-relaxed mb-4">
+                "{item.data.description}"
+              </p>
+
+              <!-- Tags and Read Action -->
+              <div class="flex items-center justify-between gap-4 flex-wrap pt-1">
+                <div class="flex flex-wrap gap-1.5">
+                  {item.data.tags.map(tag => (
+                    <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+
+                <a href={`${basePath}/karya/${item.id}`} class="btn-literary !py-1.5 !px-3 !text-xs">
+                  Baca Karya Lengkap →
+                </a>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <!-- Empty State (Hidden by default) -->
+    <div id="empty-state" class="hidden text-center py-16 border border-dashed border-[var(--rule-strong)] rounded my-8">
+      <span class="text-3xl text-[var(--gold)] block mb-2 font-['Fraunces',serif]">❧</span>
+      <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">Tidak Ada Karya yang Cocok</h3>
+      <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] mt-1">
+        Coba ganti kata kunci pencarian atau pilih kategori lain.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    // Client-side Category & Text Filtering
+    const tabs = document.querySelectorAll('.category-tab-btn');
+    const items = document.querySelectorAll('.karya-entry-item');
+    const searchInput = document.getElementById('karya-filter-input') as HTMLInputElement;
+    const emptyState = document.getElementById('empty-state');
+
+    let currentCategory = 'semua';
+    let searchQuery = '';
+
+    // Check URL parameters for ?kategori=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramCat = urlParams.get('kategori');
+    if (paramCat) {
+      currentCategory = paramCat;
+      tabs.forEach(t => {
+        const cat = (t as HTMLButtonElement).dataset.category;
+        if (cat === paramCat) {
+          t.classList.add('bg-[var(--crimson)]', 'text-[var(--paper)]', 'border-[var(--crimson)]', 'font-medium', 'active');
+          t.classList.remove('border-[var(--rule-strong)]', 'text-[var(--ink-soft)]');
+        } else {
+          t.classList.remove('bg-[var(--crimson)]', 'text-[var(--paper)]', 'border-[var(--crimson)]', 'font-medium', 'active');
+          t.classList.add('border-[var(--rule-strong)]', 'text-[var(--ink-soft)]');
+        }
+      });
+    }
+
+    function applyFilter() {
+      let visibleCount = 0;
+
+      items.forEach(el => {
+        const item = el as HTMLElement;
+        const itemCat = item.dataset.category || '';
+        const itemTitle = item.dataset.title || '';
+        const itemAuthor = item.dataset.author || '';
+
+        const matchesCat = (currentCategory === 'semua') || (itemCat === currentCategory);
+        const matchesQuery = !searchQuery || 
+          itemTitle.includes(searchQuery) || 
+          itemAuthor.includes(searchQuery);
+
+        if (matchesCat && matchesQuery) {
+          item.style.display = 'grid';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      if (emptyState) {
+        if (visibleCount === 0) {
+          emptyState.classList.remove('hidden');
+        } else {
+          emptyState.classList.add('hidden');
+        }
+      }
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        tabs.forEach(t => {
+          t.classList.remove('bg-[var(--crimson)]', 'text-[var(--paper)]', 'border-[var(--crimson)]', 'font-medium', 'active');
+          t.classList.add('border-[var(--rule-strong)]', 'text-[var(--ink-soft)]');
+        });
+
+        const target = e.currentTarget as HTMLButtonElement;
+        target.classList.add('bg-[var(--crimson)]', 'text-[var(--paper)]', 'border-[var(--crimson)]', 'font-medium', 'active');
+        target.classList.remove('border-[var(--rule-strong)]', 'text-[var(--ink-soft)]');
+
+        currentCategory = target.dataset.category || 'semua';
+        applyFilter();
+      });
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = (e.target as HTMLInputElement).value.trim().toLowerCase();
+      applyFilter();
+    });
+
+    applyFilter();
+  </script>
+</Layout>
