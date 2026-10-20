@@ -1,10 +1,15 @@
 -- ==========================================================
 -- RUANG SASTRA — SMPI YAMBU'UL QUR'AN
--- Skema Database & Storage Supabase Lengkap
--- Salin dan jalankan seluruh SQL ini di: Supabase Dashboard > SQL Editor > New query
+-- Skema Database & Storage Supabase Lengkap (Idempotent / Aman Dijalankan Berulang Kali)
+-- ==========================================================
+-- INSTRUKSI:
+-- 1. Buka Supabase Dashboard project Anda (https://supabase.com/dashboard)
+-- 2. Pilih menu "SQL Editor" di bilah sisi kiri
+-- 3. Klik "New query"
+-- 4. Tempel seluruh isi skrip ini lalu klik "Run" (atau Ctrl+Enter)
 -- ==========================================================
 
--- 1. TABEL KARYA LITERATUR (Ilmiah, Puisi, Cerpen, Antologi, Drama)
+-- 1. TABEL KARYA LITERATUR (Ilmiah, Puisi, Cerpen, Antologi, Drama, Quotes)
 CREATE TABLE IF NOT EXISTS public.karya (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
@@ -91,31 +96,47 @@ ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.apresiasi ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.komentar ENABLE ROW LEVEL SECURITY;
 
--- Izinkan publik membaca karya berstatus published
+-- 1. Policies Karya
+DROP POLICY IF EXISTS "Public Read Published Karya" ON public.karya;
 CREATE POLICY "Public Read Published Karya" ON public.karya
   FOR SELECT USING (status = 'published');
 
--- Izinkan publik/siswa mengirim karya baru
+DROP POLICY IF EXISTS "Public Insert Karya" ON public.karya;
 CREATE POLICY "Public Insert Karya" ON public.karya
   FOR INSERT WITH CHECK (true);
 
--- Izinkan publik membaca dan menambah quotes
+DROP POLICY IF EXISTS "Public Update Karya" ON public.karya;
+CREATE POLICY "Public Update Karya" ON public.karya
+  FOR UPDATE USING (true);
+
+-- 2. Policies Quotes
+DROP POLICY IF EXISTS "Public Read Quotes" ON public.quotes;
 CREATE POLICY "Public Read Quotes" ON public.quotes
   FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Insert Quotes" ON public.quotes;
 CREATE POLICY "Public Insert Quotes" ON public.quotes
   FOR INSERT WITH CHECK (true);
 
--- Izinkan publik membaca dan mengupdate apresiasi (claps)
+-- 3. Policies Apresiasi (Claps)
+DROP POLICY IF EXISTS "Public Select Apresiasi" ON public.apresiasi;
 CREATE POLICY "Public Select Apresiasi" ON public.apresiasi
   FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Insert Apresiasi" ON public.apresiasi;
 CREATE POLICY "Public Insert Apresiasi" ON public.apresiasi
   FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public Update Apresiasi" ON public.apresiasi;
 CREATE POLICY "Public Update Apresiasi" ON public.apresiasi
   FOR UPDATE USING (true);
 
--- Izinkan publik membaca dan menambah komentar
+-- 4. Policies Komentar
+DROP POLICY IF EXISTS "Public Read Komentar" ON public.komentar;
 CREATE POLICY "Public Read Komentar" ON public.komentar
   FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Insert Komentar" ON public.komentar;
 CREATE POLICY "Public Insert Komentar" ON public.komentar
   FOR INSERT WITH CHECK (true);
 
@@ -126,20 +147,47 @@ CREATE POLICY "Public Insert Komentar" ON public.komentar
 -- Buat bucket penyimpanan foto/audio publik jika belum ada
 INSERT INTO storage.buckets (id, name, public) 
 VALUES ('karya-media', 'karya-media', true)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET public = true;
 
 -- Kebijakan akses storage publik
+DROP POLICY IF EXISTS "Public Access Storage" ON storage.objects;
 CREATE POLICY "Public Access Storage" ON storage.objects
   FOR SELECT USING (bucket_id = 'karya-media');
 
+DROP POLICY IF EXISTS "Public Upload Storage" ON storage.objects;
 CREATE POLICY "Public Upload Storage" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id = 'karya-media');
 
 -- ==========================================================
 -- REALTIME SUBSCRIPTIONS
 -- ==========================================================
--- Aktifkan replikasi real-time untuk tabel apresiasi, komentar, dan karya
-ALTER PUBLICATION supabase_realtime ADD TABLE public.apresiasi;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.komentar;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.karya;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.quotes;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'apresiasi'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.apresiasi;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'komentar'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.komentar;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'karya'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.karya;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'quotes'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.quotes;
+  END IF;
+END $$;

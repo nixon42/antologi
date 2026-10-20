@@ -12,6 +12,9 @@ export default defineConfig({
     mdx(),
     sitemap(),
   ],
+  vite: {
+    envPrefix: ['PUBLIC_', 'NEXT_PUBLIC_'],
+  },
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
