@@ -1,0 +1,507 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout 
+  title="Studio Redaksi & Live Editor — Ruang Sastra SMPI YQ"
+  description="Ruang kerja redaksi untuk menulis, menyunting, mengunggah foto, dan mempublikasikan karya sastra secara real-time ke Supabase."
+>
+  <div class="wrap py-10 md:py-14">
+    
+    <!-- Header -->
+    <header class="mb-8 pb-5 border-b border-[var(--rule-strong)] flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-1.5 uppercase tracking-wider">
+          <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
+          <span>/</span>
+          <span>Studio Redaksi</span>
+        </div>
+        <h1 class="font-['Fraunces',serif] font-semibold text-2xl md:text-4xl text-[var(--ink)] m-0">
+          Studio Redaksi &amp; Live Editor
+        </h1>
+        <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] mt-1.5">
+          Tulis naskah baru, unggah foto sampul ke Supabase Storage, atau sunting karya secara langsung.
+        </p>
+      </div>
+
+      <!-- Supabase Connection Indicator -->
+      <div id="supabase-status-badge" class="mono text-xs px-3 py-1.5 rounded-full border border-[var(--rule-strong)] bg-[var(--paper-card)] flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="status-dot"></span>
+        <span id="status-text">Memeriksa Supabase...</span>
+      </div>
+    </header>
+
+    <!-- Studio Navigation Tabs: [Editor Baru / Edit] vs [Daftar Naskah] -->
+    <div class="flex items-center gap-2 mb-8 border-b border-[var(--rule)] pb-3">
+      <button id="tab-editor-btn" class="mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors">
+        Tulis / Sunting Naskah
+      </button>
+      <button id="tab-list-btn" class="mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors">
+        Kelola Naskah Tersimpan (<span id="saved-count">0</span>)
+      </button>
+    </div>
+
+    <!-- VIEW 1: LIVE EDITOR STUDIO (Split screen on desktop) -->
+    <section id="view-editor" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      
+      <!-- Left Column: Input Form -->
+      <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
+          <h2 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">Formulir Naskah</h2>
+          <button id="btn-reset-form" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] underline cursor-pointer">
+            Kosongkan Form
+          </button>
+        </div>
+
+        <input type="hidden" id="edit-id" />
+        <input type="hidden" id="edit-slug" />
+
+        <!-- Judul -->
+        <div>
+          <label for="editor-title" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Judul Karya *</label>
+          <input 
+            type="text" 
+            id="editor-title" 
+            placeholder="Misal: Senja di Pelataran Pesantren" 
+            class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Fraunces',serif]"
+          />
+        </div>
+
+        <!-- Penulis & Kelas -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="editor-author" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Nama Penulis *</label>
+            <input 
+              type="text" 
+              id="editor-author" 
+              placeholder="Misal: Ahmad Santoso" 
+              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+            />
+          </div>
+          <div>
+            <label for="editor-grade" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kelas / Jabatan</label>
+            <input 
+              type="text" 
+              id="editor-grade" 
+              placeholder="Misal: Kelas XI-B" 
+              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+            />
+          </div>
+        </div>
+
+        <!-- Kategori & Status -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="editor-category" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kategori *</label>
+            <select id="editor-category" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
+              <option value="puisi">Puisi &amp; Prosa</option>
+              <option value="cerpen">Cerpen</option>
+              <option value="ilmiah">Karya Tulis Ilmiah</option>
+              <option value="drama">Naskah Drama</option>
+              <option value="antologi">Antologi</option>
+            </select>
+          </div>
+          <div>
+            <label for="editor-status" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Status Publikasi</label>
+            <select id="editor-status" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
+              <option value="published">Tayang (Published)</option>
+              <option value="draft">Draf (Draft)</option>
+              <option value="menunggu_kurasi">Menunggu Kurasi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sinopsis / Deskripsi Singkat -->
+        <div>
+          <label for="editor-desc" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Sinopsis / Pengantar *</label>
+          <textarea 
+            id="editor-desc" 
+            rows="2" 
+            placeholder="Petikan atau ringkasan 1-2 kalimat..." 
+            class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] italic"
+          ></textarea>
+        </div>
+
+        <!-- UPLOAD FOTO KE SUPABASE STORAGE -->
+        <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded">
+          <label class="block mono text-xs uppercase text-[var(--crimson)] mb-1.5 font-semibold">
+            Unggah Foto Sampul ke Supabase Storage
+          </label>
+          <div class="flex items-center gap-3">
+            <input 
+              type="file" 
+              id="editor-photo-file" 
+              accept="image/*"
+              class="block w-full text-xs mono text-[var(--ink-soft)] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-[var(--crimson)] file:text-xs file:mono file:bg-transparent file:text-[var(--crimson)] hover:file:bg-[var(--crimson)] hover:file:text-[var(--paper)] cursor-pointer"
+            />
+          </div>
+          <input 
+            type="url" 
+            id="editor-photo-url" 
+            placeholder="Atau tempel URL gambar eksternal di sini..." 
+            class="w-full mt-2 px-3 py-1.5 bg-[var(--paper-card)] border border-[var(--rule)] rounded text-xs mono text-[var(--ink-soft)] outline-none"
+          />
+          <span id="photo-upload-status" class="mono text-[0.68rem] text-[var(--ink-faint)] block mt-1"></span>
+        </div>
+
+        <!-- Isi Naskah Lengkap (Markdown) -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="editor-content" class="block mono text-xs uppercase text-[var(--ink-soft)]">
+              Isi Naskah (Markdown) *
+            </label>
+            <span class="mono text-[0.68rem] text-[var(--ink-faint)]">Mendukung ## Heading, *italic*, > kutipan</span>
+          </div>
+          <textarea 
+            id="editor-content" 
+            rows="12" 
+            placeholder="Tuliskan bait puisi atau naskah lakon Anda di sini..." 
+            class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] leading-relaxed"
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-4 border-t border-[var(--rule)] flex items-center justify-between flex-wrap gap-3">
+          <button id="btn-save-supabase" class="btn-literary btn-literary-solid !py-2.5 !px-5 text-xs md:text-sm cursor-pointer">
+            Simpan ke Supabase DB ⚡
+          </button>
+          <button id="btn-download-md" class="btn-literary !py-2.5 !px-4 text-xs mono cursor-pointer">
+            Ekspor .md (Git) ↓
+          </button>
+        </div>
+
+        <div id="editor-alert" class="mono text-xs hidden p-3 rounded border"></div>
+      </div>
+
+      <!-- Right Column: Live Real-time Preview in Ruang Sastra Style -->
+      <div class="sticky top-20 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+          <span class="mono text-xs text-[var(--ink-faint)] uppercase tracking-wider font-semibold">
+            Live Preview (Pratinjau Nyata)
+          </span>
+          <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">
+            Otomatis Memperbarui Saat Mengetik
+          </span>
+        </div>
+
+        <div id="live-preview-box" class="p-8 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-sm shadow-sm space-y-6 min-h-[500px]">
+          <!-- Preview Header -->
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span id="prev-category-badge" class="mono text-[0.68rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-medium">
+                Puisi &amp; Prosa
+              </span>
+              <span id="prev-status-badge" class="mono text-[0.68rem] text-[var(--ink-faint)]">
+                · Draf Pratinjau
+              </span>
+            </div>
+
+            <h2 id="prev-title" class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] leading-tight m-0 mb-3">
+              Judul Karya Anda
+            </h2>
+
+            <p id="prev-desc" class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] leading-relaxed m-0 pl-3 border-l-2 border-[var(--rule-strong)]">
+              "Petikan atau sinopsis karya akan tampil di sini..."
+            </p>
+
+            <div class="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--rule)] mono text-xs text-[var(--ink-faint)]">
+              <span id="prev-author" class="font-medium text-[var(--ink)]">Nama Penulis</span>
+              <span id="prev-grade">· Kelas</span>
+            </div>
+          </div>
+
+          <!-- Preview Cover Photo if any -->
+          <div id="prev-photo-container" class="hidden aspect-video bg-[var(--paper-deep)] rounded overflow-hidden border border-[var(--rule)]">
+            <img id="prev-photo-img" src="" alt="Sampul Karya" class="w-full h-full object-cover" />
+          </div>
+
+          <!-- Preview Content Body -->
+          <div id="prev-body" class="font-['Source_Serif_4',serif] text-base leading-[1.8] text-[var(--ink)] whitespace-pre-line border-t border-[var(--rule)] pt-4">
+            Isi naskah karya akan tampil di sini secara langsung saat Anda mengetik di formulir sebelah kiri.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW 2: LIST OF SAVED WORKS IN SUPABASE -->
+    <section id="view-list" class="hidden space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
+        <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
+          Naskah yang Tersimpan di Supabase
+        </h2>
+        <button id="btn-refresh-list" class="mono text-xs px-3 py-1.5 rounded border border-[var(--rule-strong)] hover:border-[var(--crimson)] text-[var(--ink-soft)] cursor-pointer">
+          Segarkan Data ⟳
+        </button>
+      </div>
+
+      <div id="saved-works-table" class="space-y-3">
+        <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat data dari Supabase...</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    import { 
+      isSupabaseConfigured, 
+      simpanKarya, 
+      fetchAllKaryaSupabase, 
+      uploadFotoKarya, 
+      type KaryaInput 
+    } from '../../lib/supabase';
+    import confetti from 'canvas-confetti';
+
+    // Status Indicator
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+
+    if (isSupabaseConfigured) {
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+      if (statusText) statusText.textContent = 'Supabase Terhubung ✓';
+    } else {
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+      if (statusText) statusText.textContent = 'Mode Offline (LocalStorage)';
+    }
+
+    // Tab Switching
+    const tabEditorBtn = document.getElementById('tab-editor-btn');
+    const tabListBtn = document.getElementById('tab-list-btn');
+    const viewEditor = document.getElementById('view-editor');
+    const viewList = document.getElementById('view-list');
+
+    tabEditorBtn?.addEventListener('click', () => {
+      tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors';
+      tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
+      viewEditor?.classList.remove('hidden');
+      viewList?.classList.add('hidden');
+    });
+
+    tabListBtn?.addEventListener('click', () => {
+      tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors';
+      tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
+      viewList?.classList.remove('hidden');
+      viewEditor?.classList.add('hidden');
+      loadSavedWorks();
+    });
+
+    // Form Elements
+    const titleInput = document.getElementById('editor-title') as HTMLInputElement;
+    const authorInput = document.getElementById('editor-author') as HTMLInputElement;
+    const gradeInput = document.getElementById('editor-grade') as HTMLInputElement;
+    const categorySelect = document.getElementById('editor-category') as HTMLSelectElement;
+    const statusSelect = document.getElementById('editor-status') as HTMLSelectElement;
+    const descInput = document.getElementById('editor-desc') as HTMLTextAreaElement;
+    const contentInput = document.getElementById('editor-content') as HTMLTextAreaElement;
+    const photoFileInput = document.getElementById('editor-photo-file') as HTMLInputElement;
+    const photoUrlInput = document.getElementById('editor-photo-url') as HTMLInputElement;
+    const uploadStatus = document.getElementById('photo-upload-status');
+    const editIdInput = document.getElementById('edit-id') as HTMLInputElement;
+    const editSlugInput = document.getElementById('edit-slug') as HTMLInputElement;
+
+    // Preview Elements
+    const prevTitle = document.getElementById('prev-title');
+    const prevDesc = document.getElementById('prev-desc');
+    const prevAuthor = document.getElementById('prev-author');
+    const prevGrade = document.getElementById('prev-grade');
+    const prevBody = document.getElementById('prev-body');
+    const prevCatBadge = document.getElementById('prev-category-badge');
+    const prevPhotoBox = document.getElementById('prev-photo-container');
+    const prevPhotoImg = document.getElementById('prev-photo-img') as HTMLImageElement;
+
+    // Live update preview
+    function updateLivePreview() {
+      if (prevTitle) prevTitle.textContent = titleInput.value.trim() || 'Judul Karya Anda';
+      if (prevDesc) prevDesc.textContent = `"${descInput.value.trim() || 'Petikan atau sinopsis karya akan tampil di sini...'}"`;
+      if (prevAuthor) prevAuthor.textContent = authorInput.value.trim() || 'Nama Penulis';
+      if (prevGrade) prevGrade.textContent = gradeInput.value.trim() ? `· ${gradeInput.value.trim()}` : '';
+      if (prevBody) prevBody.textContent = contentInput.value.trim() || 'Isi naskah karya akan tampil di sini secara langsung saat Anda mengetik...';
+      
+      if (prevCatBadge) {
+        prevCatBadge.textContent = categorySelect.options[categorySelect.selectedIndex]?.text || 'Sastra';
+      }
+
+      const imgUrl = photoUrlInput.value.trim();
+      if (imgUrl && prevPhotoBox && prevPhotoImg) {
+        prevPhotoImg.src = imgUrl;
+        prevPhotoBox.classList.remove('hidden');
+      } else if (prevPhotoBox) {
+        prevPhotoBox.classList.add('hidden');
+      }
+    }
+
+    [titleInput, authorInput, gradeInput, categorySelect, descInput, contentInput, photoUrlInput].forEach(el => {
+      el?.addEventListener('input', updateLivePreview);
+    });
+
+    // Handle File Upload to Supabase Storage
+    photoFileInput?.addEventListener('change', async () => {
+      if (!photoFileInput.files || !photoFileInput.files[0]) return;
+      const file = photoFileInput.files[0];
+      if (uploadStatus) uploadStatus.textContent = 'Mengunggah ke Supabase Storage...';
+
+      try {
+        const publicUrl = await uploadFotoKarya(file);
+        photoUrlInput.value = publicUrl;
+        updateLivePreview();
+        if (uploadStatus) {
+          uploadStatus.textContent = 'Foto berhasil diunggah ke Supabase!';
+          uploadStatus.className = 'mono text-[0.68rem] text-emerald-600 block mt-1';
+        }
+      } catch (err: any) {
+        if (uploadStatus) {
+          uploadStatus.textContent = 'Gagal unggah foto: ' + (err.message || 'Error');
+          uploadStatus.className = 'mono text-[0.68rem] text-rose-600 block mt-1';
+        }
+      }
+    });
+
+    // Save to Supabase
+    const saveBtn = document.getElementById('btn-save-supabase');
+    const alertBox = document.getElementById('editor-alert');
+
+    saveBtn?.addEventListener('click', async () => {
+      if (!titleInput.value || !authorInput.value || !contentInput.value) {
+        alert('Harap isi Judul, Penulis, dan Isi Naskah terlebih dahulu.');
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Menyimpan ke Supabase...';
+
+      const payload: KaryaInput = {
+        id: editIdInput.value || undefined,
+        slug: editSlugInput.value || undefined,
+        title: titleInput.value.trim(),
+        description: descInput.value.trim(),
+        author: authorInput.value.trim(),
+        author_grade: gradeInput.value.trim(),
+        category: categorySelect.value,
+        content: contentInput.value.trim(),
+        cover_image_url: photoUrlInput.value.trim() || undefined,
+        status: statusSelect.value as any,
+      };
+
+      try {
+        const res = await simpanKarya(payload);
+        if (res.success) {
+          confetti({ particleCount: 30, spread: 60, origin: { y: 0.7 } });
+          if (alertBox) {
+            alertBox.textContent = res.message;
+            alertBox.className = 'mono text-xs p-3 rounded border border-emerald-600 bg-emerald-50 text-emerald-900 block';
+            setTimeout(() => alertBox.classList.add('hidden'), 4000);
+          }
+        }
+      } catch (e: any) {
+        if (alertBox) {
+          alertBox.textContent = 'Gagal menyimpan: ' + e.message;
+          alertBox.className = 'mono text-xs p-3 rounded border border-rose-600 bg-rose-50 text-rose-900 block';
+        }
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Simpan ke Supabase DB ⚡';
+      }
+    });
+
+    // Download as Markdown
+    const dlMdBtn = document.getElementById('btn-download-md');
+    dlMdBtn?.addEventListener('click', () => {
+      const slug = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'naskah';
+      const mdContent = `---
+title: "${titleInput.value.replace(/"/g, '\\"')}"
+description: "${descInput.value.replace(/"/g, '\\"')}"
+author: "${authorInput.value.replace(/"/g, '\\"')}"
+authorGrade: "${gradeInput.value.replace(/"/g, '\\"')}"
+category: "${categorySelect.value}"
+categoryLabel: "${categorySelect.options[categorySelect.selectedIndex]?.text || 'Sastra'}"
+publishDate: ${new Date().toISOString().split('T')[0]}
+featured: false
+tags: ["${categorySelect.options[categorySelect.selectedIndex]?.text || 'Sastra'}"]
+${photoUrlInput.value ? `coverImage: "${photoUrlInput.value}"\n` : ''}---
+
+${contentInput.value}
+`;
+
+      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${slug}.md`;
+      a.click();
+    });
+
+    // Reset Form
+    document.getElementById('btn-reset-form')?.addEventListener('click', () => {
+      editIdInput.value = '';
+      editSlugInput.value = '';
+      titleInput.value = '';
+      authorInput.value = '';
+      gradeInput.value = '';
+      descInput.value = '';
+      contentInput.value = '';
+      photoUrlInput.value = '';
+      updateLivePreview();
+    });
+
+    // Load Saved Works in View 2
+    const worksContainer = document.getElementById('saved-works-table');
+    const savedCountBadge = document.getElementById('saved-count');
+
+    async function loadSavedWorks() {
+      if (!worksContainer) return;
+      worksContainer.innerHTML = '<p class="mono text-xs text-[var(--ink-faint)] italic text-center py-6">Mengambil data dari Supabase...</p>';
+
+      const list = await fetchAllKaryaSupabase();
+      if (savedCountBadge) savedCountBadge.textContent = list.length.toString();
+
+      if (list.length === 0) {
+        worksContainer.innerHTML = '<p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Belum ada karya tersimpan di Supabase. Mulai buat karya baru di tab editor!</p>';
+        return;
+      }
+
+      worksContainer.innerHTML = list.map((k: any) => `
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase">${k.category_label || k.category}</span>
+              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">${k.status || 'published'}</span>
+            </div>
+            <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">${k.title}</h3>
+            <p class="mono text-xs text-[var(--ink-faint)] m-0 mt-0.5">Oleh ${k.author} ${k.author_grade ? `(${k.author_grade})` : ''}</p>
+          </div>
+          <button class="btn-edit-item btn-literary !py-1 !px-3 !text-xs cursor-pointer" data-id="${k.id || ''}" data-slug="${k.slug || ''}">
+            Sunting Naskah ✎
+          </button>
+        </div>
+      `).join('');
+
+      // Attach edit button listeners
+      document.querySelectorAll('.btn-edit-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const targetSlug = b.dataset.slug;
+          const found = list.find((item: any) => item.slug === targetSlug);
+          if (found) {
+            editIdInput.value = found.id || '';
+            editSlugInput.value = found.slug || '';
+            titleInput.value = found.title || '';
+            authorInput.value = found.author || '';
+            gradeInput.value = found.author_grade || '';
+            categorySelect.value = found.category || 'puisi';
+            statusSelect.value = found.status || 'published';
+            descInput.value = found.description || '';
+            contentInput.value = found.content || '';
+            photoUrlInput.value = found.cover_image_url || '';
+            updateLivePreview();
+
+            // Switch to editor view
+            tabEditorBtn?.click();
+          }
+        });
+      });
+    }
+
+    document.getElementById('btn-refresh-list')?.addEventListener('click', loadSavedWorks);
+  </script>
+</Layout>

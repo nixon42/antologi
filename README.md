@@ -55,13 +55,15 @@ Situs ini menerapkan prinsip **Zero Fragility (Ketahanan Tanpa Ketergantungan)**
   - Simpan gambar sampul di `src/assets/images/` atau `public/images/`.
   - Astro secara otomatis mengompresi dan mengonversi gambar ke format modern **WebP/AVIF** saat build.
 
-### 2. Pilihan Pendamping Dinamis: Firebase Integration
-- Disediakan modul siap pakai `src/lib/firebase.ts` untuk fitur interaktif real-time:
-  - **Apresiasi / Tepuk Tangan Pembaca (Claps 👏)**: Menghitung dukungan pembaca secara real-time di Cloud Firestore.
-  - **Ruang Diskusi & Catatan Pembaca**: Kolom komentar langsung di bawah karya.
-  - **Formulir Submisi Karya Siswa**: Siswa dapat mengirimkan naskah baru secara online melalui halaman `/kirim`.
-  - **Firebase Storage**: Mengunggah foto sampul langsung dari browser.
-- **Graceful Fallback**: Jika kredensial Firebase belum diisi di `.env`, seluruh fitur di atas otomatis beralih menggunakan **LocalStorage**, sehingga blog tetap berjalan 100% tanpa error!
+### 2. Pilihan Pendamping Dinamis: Supabase Integration (Database & File Storage Gratis)
+- Disediakan modul siap pakai `src/lib/supabase.ts` untuk fitur interaktif real-time:
+  - **Studio Redaksi & Live Editor (`/admin`)**: Halaman khusus menulis, mengedit naskah dengan **Live Preview** seketika saat mengetik, dan unggah foto langsung dari browser!
+  - **Supabase Storage**: Mengunggah foto sampul langsung dari browser ke bucket publik `karya-media`.
+  - **Apresiasi / Tepuk Tangan Pembaca (Claps 👏)**: Menghitung dukungan pembaca secara real-time dengan sinkronisasi otomatis (*live reload/subscription*).
+  - **Ruang Diskusi & Catatan Pembaca**: Kolom komentar langsung di bawah karya dengan *realtime listener*.
+  - **Formulir Submisi Karya Siswa (`/kirim`)**: Siswa dapat mengirimkan naskah baru secara online.
+  - **Skema SQL Siap Pakai**: File `supabase-schema.sql` siap dijalankan di Supabase SQL Editor dalam 1 klik.
+- **Graceful Fallback**: Jika kredensial Supabase belum diisi di `.env`, seluruh fitur di atas otomatis beralih menggunakan **LocalStorage**, sehingga blog tetap berjalan 100% tanpa error!
 
 ---
 

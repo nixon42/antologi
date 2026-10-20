@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Astro (Static Site Generator) + Markdown/MDX Collections + Tailwind CSS with custom literary CSS design tokens + Client Islands for interactive reader features + Firebase Client SDK companion (Firestore & Storage ready). Hosted on GitHub Pages via GitHub Actions.
+Astro (Static Site Generator) + Markdown/MDX Collections + Supabase (PostgreSQL Database & S3 File Storage) + Custom literary CSS design tokens + Client Islands for interactive reader features. Hosted on GitHub Pages via GitHub Actions.
 
 ## Users
 
@@ -39,8 +39,8 @@ Bukan sekadar blog generik, Ruang Sastra adalah media penerbitan literatur sekol
   6. *Quotes / Kutipan Sastra*: Mutiara kata dengan penyusun, sumber karya, tombol salin teks, serta generator kartu kutipan visual yang siap diunduh/dibagikan ke media sosial.
 - **Basis Data & Media**:
   - *Arsitektur Inti (Git-backed)*: File Markdown/MDX di `src/content/`. 100% aman, gratis, terindeks git, performa instan tanpa database delay.
-  - *Kompatibilitas Eksternal (Firebase)*: Modul `src/lib/firebase.ts` terintegrasi untuk fitur dinamis (apresiasi/tepuk tangan pembaca, komentar, dan antrean submisi online) yang otomatis aktif bila kredensial Firebase Environment Variables disetel.
-  - *Penyimpanan Foto/Media*: Aset lokal terkompresi otomatis (`src/assets/images/` via pipeline gambar Astro WebP/AVIF modern) serta dukungan URL eksternal (Firebase Storage / Cloudinary).
+  - *Database & Storage Online (Supabase)*: Modul `src/lib/supabase.ts` terintegrasi penuh dengan PostgreSQL Database dan File Storage gratis Supabase untuk live editing dari web, upload foto instan, tepuk tangan/claps real-time, dan komentar pembaca.
+  - *Penyimpanan Foto/Media*: Upload langsung dari halaman web ke Supabase Storage bucket `karya-media`, plus dukungan aset lokal gambar Astro WebP/AVIF modern.
 - **Fitur Navigasi & Pencarian**:
   - Pencarian cepat di sisi klien (*instant search*) berdasarkan judul, pengarang, dan kategori/tag.
   - Filter kategori dan tag literatur.

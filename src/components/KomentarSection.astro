@@ -75,7 +75,7 @@ const { karyaId } = Astro.props;
 </section>
 
 <script>
-  import { getDaftarKomentar, kirimKomentar, type KomentarKarya } from '../lib/firebase';
+  import { getDaftarKomentar, kirimKomentar, subscribeKomentar, type KomentarKarya } from '../lib/supabase';
 
   const form = document.getElementById('comment-form') as HTMLFormElement;
   const listContainer = document.getElementById('comments-list');
@@ -84,9 +84,11 @@ const { karyaId } = Astro.props;
 
   if (form && listContainer) {
     const karyaId = form.dataset.karyaId || 'default';
+    let currentComments: KomentarKarya[] = [];
 
     function renderComments(comments: KomentarKarya[]) {
       if (!listContainer) return;
+      currentComments = comments;
       if (countBadge) countBadge.textContent = `${comments.length} Catatan`;
 
       if (comments.length === 0) {
@@ -101,7 +103,7 @@ const { karyaId } = Astro.props;
               <strong class="font-['Fraunces',serif] font-semibold text-sm text-[var(--ink)]">${c.nama}</strong>
               <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">${c.peran || 'Pembaca'}</span>
             </div>
-            <time class="mono text-[0.68rem] text-[var(--ink-faint)]">${new Date(c.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</time>
+            <time class="mono text-[0.68rem] text-[var(--ink-faint)]">${new Date(c.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</time>
           </div>
           <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] m-0 leading-relaxed">${c.pesan}</p>
         </article>
@@ -110,6 +112,12 @@ const { karyaId } = Astro.props;
 
     // Load existing
     getDaftarKomentar(karyaId).then(renderComments);
+
+    // Real-time Live Listener (Live Reload comments without refreshing!)
+    subscribeKomentar(karyaId, (newComment) => {
+      currentComments.unshift(newComment);
+      renderComments(currentComments);
+    });
 
     // Handle submit
     form.addEventListener('submit', async (e) => {

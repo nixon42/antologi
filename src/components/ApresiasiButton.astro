@@ -39,7 +39,7 @@ const { karyaId } = Astro.props;
 </div>
 
 <script>
-  import { getApresiasiCount, tambahApresiasi } from '../lib/firebase';
+  import { getApresiasiCount, tambahApresiasi, subscribeApresiasi } from '../lib/supabase';
   import confetti from 'canvas-confetti';
 
   const clapBtn = document.getElementById('clap-button');
@@ -52,6 +52,11 @@ const { karyaId } = Astro.props;
     // Initial load
     getApresiasiCount(karyaId).then(count => {
       clapCountSpan.textContent = count.toString();
+    });
+
+    // Real-time live subscription (Live Reload / sync)
+    subscribeApresiasi(karyaId, (newCount) => {
+      clapCountSpan.textContent = newCount.toString();
     });
 
     clapBtn.addEventListener('click', async () => {
@@ -76,7 +81,7 @@ const { karyaId } = Astro.props;
         colors: ['#7c2d26', '#a6813c']
       });
 
-      // Save to Firebase or LocalStorage
+      // Save to Supabase or LocalStorage
       await tambahApresiasi(karyaId);
     });
   }

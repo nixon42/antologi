@@ -185,7 +185,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   </div>
 
   <script>
-    import { submitKaryaSiswa, uploadFotoKarya } from '../lib/firebase';
+    import { simpanKarya, uploadFotoKarya } from '../lib/supabase';
     import confetti from 'canvas-confetti';
 
     const form = document.getElementById('submission-form') as HTMLFormElement;
@@ -214,21 +214,21 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         try {
           let fotoUrl = '';
           if (fileInput.files && fileInput.files[0]) {
-            if (statusMsg) statusMsg.textContent = 'Mengunggah foto sampul...';
+            if (statusMsg) statusMsg.textContent = 'Mengunggah foto sampul ke Supabase Storage...';
             fotoUrl = await uploadFotoKarya(fileInput.files[0]);
           }
 
-          if (statusMsg) statusMsg.textContent = 'Menyimpan naskah ke redaksi...';
+          if (statusMsg) statusMsg.textContent = 'Menyimpan naskah ke database...';
 
-          const res = await submitKaryaSiswa({
-            judul: title,
-            penulis: author,
-            kelas: grade,
-            kategori: category,
-            abstrakAtauPengantar: abstract,
-            isiKarya: body,
-            kontakPenulis: contact,
-            fotoSampulUrl: fotoUrl,
+          const res = await simpanKarya({
+            title,
+            author,
+            author_grade: grade,
+            category,
+            description: abstract,
+            content: body,
+            cover_image_url: fotoUrl,
+            status: 'menunggu_kurasi',
           });
 
           if (res.success) {
