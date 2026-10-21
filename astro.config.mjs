@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://antologi.ueeee.my.id',
+  site: 'https://sastra.ueeee.my.id',
   base: process.env.BASE_PATH || '/',
   output: 'static',
   integrations: [
