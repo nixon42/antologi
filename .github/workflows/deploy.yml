@@ -33,8 +33,8 @@ jobs:
       - name: Build Astro Static Site
         run: bun run build
         env:
-          # Automatically set BASE_PATH to repository name if hosted as project page (unless custom domain or overridden)
-          BASE_PATH: ${{ secrets.BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          # Custom domain serves at root /
+          BASE_PATH: ${{ secrets.BASE_PATH || '/' }}
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL || 'https://vjcllwgikivvvyxrvylx.supabase.co' }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_a2DtzC-gZLrp5gdSpPbB3A_JrWVTWwU' }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://vjcllwgikivvvyxrvylx.supabase.co' }}

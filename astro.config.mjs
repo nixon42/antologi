@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://yambuu-quran.github.io',
+  site: 'https://antologi.ueeee.my.id',
   base: process.env.BASE_PATH || '/',
   output: 'static',
   integrations: [
