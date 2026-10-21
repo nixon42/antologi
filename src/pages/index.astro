@@ -45,6 +45,18 @@ const countAntologi = allKarya.filter(k => k.data.category === 'antologi').lengt
         <a href={`${basePath}/kirim`} class="btn-literary">
           Kirim Naskah Karya
         </a>
+        <a 
+          href="https://api.whatsapp.com/send?text=Mari%20membaca%20karya%20literasi%2C%20puisi%2C%20cerpen%2C%20dan%20karya%20ilmiah%20santri%20di%20Ruang%20Sastra%20SMPI%20Yambu%27ul%20Qur%27an%3A%20https%3A%2F%2Fsastra.ueeee.my.id%2F" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="btn-literary btn-literary-ghost flex items-center gap-2 !text-xs !py-2.5 !px-3.5"
+          title="Bagikan Portal ini ke WhatsApp"
+        >
+          <svg class="w-4 h-4 text-emerald-600" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.075-2.008-.472-1.674-.697-2.736-2.42-2.82-2.531-.083-.112-.676-.902-.676-1.722 0-.82.426-1.223.578-1.391.144-.16.315-.2.42-.2.106 0 .21.002.302.007.098.005.228-.037.356.271.134.321.458 1.116.498 1.198.04.082.067.177.013.285-.054.108-.082.176-.162.27-.08.096-.169.213-.241.286-.08.081-.164.169-.071.328.094.16.417.688.895 1.114.615.548 1.133.717 1.293.797.16.08.254.071.348-.038.094-.109.404-.472.512-.633.108-.16.216-.134.364-.08.148.054.945.446 1.107.527.162.081.27.121.31.189.04.068.04.394-.104.799z"/>
+          </svg>
+          <span>Bagikan ke WA</span>
+        </a>
       </div>
     </div>
   </section>

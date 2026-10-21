@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <style>
+      .bg { fill: #efeae0; }
+      .card { fill: #f6f2e8; stroke: #7c2d26; stroke-width: 2; }
+      .inner-border { fill: none; stroke: rgba(28, 36, 25, 0.15); stroke-width: 1; stroke-dasharray: 6 4; }
+      .gold-fleuron { fill: #a6813c; font-family: 'Georgia', serif; font-size: 26px; }
+      .mono-tag { font-family: 'DejaVu Sans Mono', 'Courier New', monospace; font-size: 14px; fill: #7c2d26; font-weight: bold; letter-spacing: 3px; }
+      .brand-main { font-family: 'DejaVu Serif', 'Georgia', serif; font-size: 78px; font-weight: 700; fill: #1c2419; }
+      .brand-accent { fill: #7c2d26; font-style: italic; font-weight: normal; }
+      .school-name { font-family: 'DejaVu Serif', 'Georgia', serif; font-size: 28px; fill: #4c5445; letter-spacing: 2px; }
+      .desc-text { font-family: 'DejaVu Serif', 'Georgia', serif; font-size: 22px; font-style: italic; fill: #5c6455; }
+      .categories { font-family: 'DejaVu Sans Mono', 'Courier New', monospace; font-size: 15px; fill: #7c8271; letter-spacing: 1.5px; }
+      .url-badge { font-family: 'DejaVu Sans Mono', monospace; font-size: 16px; font-weight: bold; fill: #7c2d26; }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="630" class="bg" />
+
+  <!-- Outer Double Border -->
+  <rect x="24" y="24" width="1152" height="582" class="card" rx="4" />
+  <rect x="36" y="36" width="1128" height="558" class="inner-border" rx="2" />
+
+  <!-- Corner Fleuron Accents -->
+  <text x="48" y="62" class="gold-fleuron">❧</text>
+  <text x="1136" y="62" class="gold-fleuron" text-anchor="end">❧</text>
+  <text x="48" y="582" class="gold-fleuron">❧</text>
+  <text x="1136" y="582" class="gold-fleuron" text-anchor="end">❧</text>
+
+  <!-- Monogram Logo -->
+  <g transform="translate(600, 115)">
+    <circle cx="0" cy="0" r="42" fill="#efeae0" stroke="#7c2d26" stroke-width="3" />
+    <text x="0" y="14" font-family="'DejaVu Serif', Georgia, serif" font-size="34" font-weight="bold" fill="#7c2d26" text-anchor="middle">YQ</text>
+  </g>
+
+  <!-- Super-headline Tag -->
+  <rect x="410" y="180" width="380" height="30" rx="15" fill="rgba(124, 45, 38, 0.08)" stroke="rgba(124, 45, 38, 0.25)" />
+  <text x="600" y="200" class="mono-tag" text-anchor="middle">PORTAL LITERASI SANTRI</text>
+
+  <!-- Main Headline -->
+  <text x="600" y="285" class="brand-main" text-anchor="middle">
+    Ruang <tspan class="brand-accent">Sastra</tspan>
+  </text>
+
+  <!-- School Institution -->
+  <text x="600" y="335" class="school-name" text-anchor="middle">
+    SMPI YAMBU'UL QUR'AN
+  </text>
+
+  <!-- Editorial Fleuron Divider -->
+  <line x1="420" y1="365" x2="550" y2="365" stroke="rgba(166, 129, 60, 0.5)" stroke-width="1.5" />
+  <text x="600" y="373" class="gold-fleuron" text-anchor="middle">✦ ✦ ✦</text>
+  <line x1="650" y1="365" x2="780" y2="365" stroke="rgba(166, 129, 60, 0.5)" stroke-width="1.5" />
+
+  <!-- Description -->
+  <text x="600" y="420" class="desc-text" text-anchor="middle">
+    "Wadah publikasi karya ilmiah, estetika puisi, cerpen, drama &amp; kearifan kata."
+  </text>
+
+  <!-- 6 Formats Capsule Bar -->
+  <text x="600" y="475" class="categories" text-anchor="middle">
+    KARYA ILMIAH  ·  PUISI &amp; PROSA  ·  CERPEN  ·  ANTOLOGI  ·  DRAMA  ·  QUOTES
+  </text>
+
+  <!-- URL Badge at Bottom -->
+  <g transform="translate(600, 535)">
+    <rect x="-140" y="-18" width="280" height="34" rx="17" fill="#efeae0" stroke="#7c2d26" stroke-width="1.5" />
+    <text x="0" y="4" class="url-badge" text-anchor="middle">sastra.ueeee.my.id</text>
+  </g>
+</svg>
