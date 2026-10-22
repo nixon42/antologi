@@ -215,10 +215,22 @@ export function subscribeKomentar(karyaId: string, callback: (newComment: Koment
 // 3. UNGGAH FOTO & MEDIA KE SUPABASE STORAGE
 // ==========================================================
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    if (typeof FileReader === 'undefined') {
+      return resolve('');
+    }
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string) || '');
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function uploadFotoKarya(file: File): Promise<string> {
   if (supabase) {
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
       const filePath = `sampul/${fileName}`;
 
@@ -230,28 +242,28 @@ export async function uploadFotoKarya(file: File): Promise<string> {
         });
 
       if (error) {
-        throw error;
+        console.warn('[Supabase Storage] Gagal unggah foto, beralih ke fallback Data URL:', error.message);
+        return await fileToDataUrl(file);
       }
 
-      // Ambil Public URL foto
-      const { data: publicUrlData } = supabase.storage
-        .from('karya-media')
-        .getPublicUrl(data.path);
+      if (data?.path) {
+        // Ambil Public URL foto
+        const { data: publicUrlData } = supabase.storage
+          .from('karya-media')
+          .getPublicUrl(data.path);
 
-      return publicUrlData.publicUrl;
+        if (publicUrlData?.publicUrl) {
+          return publicUrlData.publicUrl;
+        }
+      }
     } catch (e: any) {
-      console.error('[Supabase Storage] Gagal unggah foto:', e.message || e);
-      throw e;
+      console.warn('[Supabase Storage] Exception saat unggah foto, beralih ke fallback Data URL:', e?.message || e);
+      return await fileToDataUrl(file);
     }
   }
 
   // Fallback Local Data URL (untuk pratinjau browser saat offline/kredensial kosong)
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+  return fileToDataUrl(file);
 }
 
 // ==========================================================

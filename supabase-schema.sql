@@ -157,14 +157,23 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('karya-media', 'karya-media', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
+-- Kebijakan akses bucket publik (agar anon client dapat memverifikasi bucket saat upload)
+DROP POLICY IF EXISTS "Public Select Buckets" ON storage.buckets;
+CREATE POLICY "Public Select Buckets" ON storage.buckets
+  FOR SELECT TO public USING (true);
+
 -- Kebijakan akses storage publik
 DROP POLICY IF EXISTS "Public Access Storage" ON storage.objects;
 CREATE POLICY "Public Access Storage" ON storage.objects
-  FOR SELECT USING (bucket_id = 'karya-media');
+  FOR SELECT TO public USING (bucket_id = 'karya-media');
 
 DROP POLICY IF EXISTS "Public Upload Storage" ON storage.objects;
 CREATE POLICY "Public Upload Storage" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'karya-media');
+  FOR INSERT TO public WITH CHECK (bucket_id = 'karya-media');
+
+DROP POLICY IF EXISTS "Public Update Storage" ON storage.objects;
+CREATE POLICY "Public Update Storage" ON storage.objects
+  FOR UPDATE TO public USING (bucket_id = 'karya-media');
 
 -- ==========================================================
 -- REALTIME SUBSCRIPTIONS
