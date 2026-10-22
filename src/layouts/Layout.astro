@@ -93,73 +93,110 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   <div id="reading-progress-bar" class="fixed top-0 left-0 h-1 bg-[var(--crimson)] z-50 w-0 transition-all duration-75" aria-hidden="true"></div>
 
   <!-- Masthead Header: Sleek, compact on mobile, majestic on desktop -->
-  <header class="sticky top-0 z-40 bg-[var(--paper)]/95 backdrop-blur-sm border-b border-[var(--rule-strong)] transition-colors duration-200">
-    <div class="wrap py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
+  <header class="sticky top-0 z-40 bg-[var(--paper)]/95 backdrop-blur-md border-b border-[var(--rule-strong)] transition-colors duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[4.25rem] flex items-center justify-between gap-4 lg:gap-8">
       
       <!-- Brand & Monogram -->
-      <a href={`${basePath}/`} class="flex items-center gap-2.5 sm:gap-3.5 no-underline group flex-shrink-0">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-semibold text-xs sm:text-sm text-[var(--crimson)] group-hover:bg-[var(--crimson)] group-hover:text-[var(--paper)] transition-colors duration-200 flex-shrink-0" aria-label="Logo Monogram Yambu'ul Qur'an">
+      <a href={`${basePath}/`} class="flex items-center gap-3 no-underline group flex-shrink-0" aria-label="Ruang Sastra — SMPI Yambu'ul Qur'an">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-bold text-sm text-[var(--crimson)] group-hover:bg-[var(--crimson)] group-hover:text-[var(--paper)] transition-all duration-200 shadow-inner flex-shrink-0">
           YQ
         </div>
-        <div>
-          <span class="block font-['Fraunces',serif] font-semibold text-base sm:text-xl leading-none text-[var(--ink)]">
+        <div class="flex flex-col">
+          <span class="font-['Fraunces',serif] font-semibold text-lg sm:text-xl leading-none text-[var(--ink)] tracking-tight">
             Ruang <span class="italic font-normal text-[var(--crimson)]">Sastra</span>
           </span>
-          <span class="hidden sm:block mono text-[0.72rem] text-[var(--ink-faint)] mt-1 tracking-wider">
+          <span class="hidden sm:block mono text-[0.66rem] uppercase tracking-widest text-[var(--ink-faint)] mt-1 font-medium">
             SMPI Yambu'ul Qur'an
           </span>
         </div>
       </a>
 
-      <!-- Desktop Navigation Links (hidden on mobile) -->
-      <nav class="hidden md:flex items-center gap-4 lg:gap-5 text-[0.88rem] text-[var(--ink-soft)] font-medium" aria-label="Navigasi Utama">
-        <a href={`${basePath}/#tentang`} class="no-underline hover:text-[var(--crimson)] transition-colors py-1 border-b border-transparent hover:border-[var(--crimson)]">
-          Tentang
-        </a>
-        <a href={`${basePath}/karya`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/karya') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
+      <!-- Desktop Navigation Links (Clean, Serif, Never Wraps) -->
+      <nav class="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-['Source_Serif_4',serif]" aria-label="Navigasi Utama">
+        <a 
+          href={`${basePath}/karya`} 
+          class={`no-underline whitespace-nowrap py-1 transition-colors relative font-medium ${currentPath.includes('/karya') ? 'text-[var(--crimson)] font-semibold border-b-2 border-[var(--crimson)]' : 'text-[var(--ink)] hover:text-[var(--crimson)] border-b-2 border-transparent hover:border-[var(--crimson)]'}`}
+        >
           Pojok Baca
         </a>
-        <a href={`${basePath}/#karya-pilihan`} class="no-underline hover:text-[var(--crimson)] transition-colors py-1 border-b border-transparent hover:border-[var(--crimson)]">
+        <a 
+          href={`${basePath}/#karya-pilihan`} 
+          class="no-underline whitespace-nowrap py-1 text-[var(--ink)] hover:text-[var(--crimson)] transition-colors font-medium border-b-2 border-transparent hover:border-[var(--crimson)]"
+        >
           Karya Pilihan
         </a>
-        <a href={`${basePath}/panggung`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/panggung') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
-          Panggung
+        <a 
+          href={`${basePath}/panggung`} 
+          class={`no-underline whitespace-nowrap py-1 transition-colors relative font-medium ${currentPath.includes('/panggung') ? 'text-[var(--crimson)] font-semibold border-b-2 border-[var(--crimson)]' : 'text-[var(--ink)] hover:text-[var(--crimson)] border-b-2 border-transparent hover:border-[var(--crimson)]'}`}
+        >
+          Panggung Sastra
         </a>
-        <a href={`${basePath}/quotes`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/quotes') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
+        <a 
+          href={`${basePath}/quotes`} 
+          class={`no-underline whitespace-nowrap py-1 transition-colors relative font-medium ${currentPath.includes('/quotes') ? 'text-[var(--crimson)] font-semibold border-b-2 border-[var(--crimson)]' : 'text-[var(--ink)] hover:text-[var(--crimson)] border-b-2 border-transparent hover:border-[var(--crimson)]'}`}
+        >
           Quotes
         </a>
-        <a href={`${basePath}/kirim`} class="btn-literary !py-1 !px-3 !text-xs !font-medium">
-          Kirim Karya
+        <a 
+          href={`${basePath}/#tentang`} 
+          class="no-underline whitespace-nowrap py-1 text-[var(--ink)] hover:text-[var(--crimson)] transition-colors font-medium border-b-2 border-transparent hover:border-[var(--crimson)]"
+        >
+          Tentang
         </a>
       </nav>
 
-      <!-- Reader Controls & Mobile Toggle -->
-      <div class="flex items-center gap-1 sm:gap-2">
+      <!-- Right Utility Group + CTA -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <!-- Search Trigger Button -->
-        <button id="search-modal-trigger" class="p-1.5 sm:p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors" title="Cari Karya Sastra & Penulis (Ctrl+K)" aria-label="Buka Pencarian">
-          <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button 
+          id="search-modal-trigger" 
+          class="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full border border-[var(--rule-strong)] hover:border-[var(--crimson)] bg-[var(--paper-card)] text-[var(--ink-soft)] hover:text-[var(--crimson)] transition-colors text-xs mono cursor-pointer shadow-2xs" 
+          title="Cari Karya Sastra & Penulis (Ctrl+K)" 
+          aria-label="Buka Pencarian"
+        >
+          <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
+          <span class="hidden xl:inline text-[0.72rem] text-[var(--ink-faint)]">Cari...</span>
+          <kbd class="hidden xl:inline px-1 py-0.2 bg-[var(--paper-deep)] border border-[var(--rule)] rounded text-[0.62rem] text-[var(--ink-faint)]">⌘K</kbd>
         </button>
 
         <!-- Theme Mode Toggle Dropdown / Cycle -->
-        <button id="theme-cycle-button" class="p-1.5 sm:p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors text-xs mono flex items-center gap-1" title="Ganti Mode Tampilan (Kertas / Sepia / Gelap)" aria-label="Ganti Tema">
-          <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button 
+          id="theme-cycle-button" 
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-[var(--rule-strong)] hover:border-[var(--crimson)] bg-[var(--paper-card)] text-[var(--ink-soft)] hover:text-[var(--crimson)] transition-colors text-xs mono cursor-pointer shadow-2xs" 
+          title="Ganti Mode Tampilan (Kertas / Sepia / Tinta Malam)" 
+          aria-label="Ganti Tema"
+        >
+          <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
           </svg>
-          <span id="theme-label" class="hidden lg:inline text-[0.72rem]">Kertas</span>
+          <span id="theme-label" class="hidden xl:inline text-[0.72rem]">Kertas</span>
         </button>
 
         <!-- Font Size Adjuster (Desktop Only) -->
-        <div class="hidden sm:flex items-center border border-[var(--rule-strong)] rounded text-xs mono">
-          <button id="font-dec-button" class="px-2 py-1 hover:bg-[var(--paper-deep)] transition-colors" title="Perkecil Ukuran Teks">A-</button>
-          <button id="font-inc-button" class="px-2 py-1 hover:bg-[var(--paper-deep)] border-l border-[var(--rule-strong)] transition-colors" title="Perbesar Ukuran Teks">A+</button>
+        <div class="hidden lg:flex items-center rounded-full border border-[var(--rule-strong)] bg-[var(--paper-card)] px-1 py-0.5 text-xs mono shadow-2xs">
+          <button id="font-dec-button" class="px-2 py-0.5 hover:text-[var(--crimson)] text-[var(--ink-soft)] transition-colors cursor-pointer text-[0.72rem] font-medium" title="Perkecil Ukuran Teks">A-</button>
+          <span class="w-[1px] h-3 bg-[var(--rule-strong)]"></span>
+          <button id="font-inc-button" class="px-2 py-0.5 hover:text-[var(--crimson)] text-[var(--ink-soft)] transition-colors cursor-pointer text-[0.72rem] font-medium" title="Perbesar Ukuran Teks">A+</button>
         </div>
+
+        <!-- Vertical Divider (Desktop) -->
+        <span class="hidden md:block w-[1px] h-5 bg-[var(--rule-strong)] mx-0.5"></span>
+
+        <!-- Kirim Karya Solid CTA -->
+        <a 
+          href={`${basePath}/kirim`} 
+          class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[var(--crimson)] hover:bg-[var(--crimson-soft)] text-[var(--paper)] text-xs mono font-semibold tracking-wide transition-all shadow-xs whitespace-nowrap no-underline cursor-pointer"
+        >
+          <span>Kirim Karya</span>
+          <span class="text-xs">→</span>
+        </a>
 
         <!-- Mobile Menu Toggle Button (Hamburger / Close) -->
         <button 
           id="mobile-menu-toggle"
-          class="md:hidden p-1.5 text-[var(--ink)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors"
+          class="md:hidden p-2 text-[var(--ink)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors"
           aria-label="Buka Menu Navigasi"
           aria-expanded="false"
         >
@@ -184,10 +221,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           <span>Beranda</span>
           <span class="mono text-xs text-[var(--ink-faint)]">⌂</span>
         </a>
-        <a href={`${basePath}/#tentang`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
-          <span>Tentang Portal</span>
-          <span class="mono text-xs text-[var(--ink-faint)]">❧</span>
-        </a>
         <a href={`${basePath}/karya`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
           <span>Pojok Baca (Arsip Karya)</span>
           <span class="mono text-xs text-[var(--crimson)]">Katalog</span>
@@ -203,6 +236,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <a href={`${basePath}/quotes`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
           <span>Quotes &amp; Mutiara Kata</span>
           <span class="mono text-xs text-[var(--ink-faint)]">“ ”</span>
+        </a>
+        <a href={`${basePath}/#tentang`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Tentang Portal</span>
+          <span class="mono text-xs text-[var(--ink-faint)]">❧</span>
         </a>
       </nav>
 
