@@ -426,7 +426,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     } from '../../lib/supabase';
     import confetti from 'canvas-confetti';
 
-    const basePath = (window as any).location.pathname.includes('/antologi') ? '/antologi' : '';
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     // Elements
     const authBarrier = document.getElementById('auth-guard-barrier');

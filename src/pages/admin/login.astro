@@ -123,7 +123,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const alertBox = document.getElementById('login-alert');
     const quickFillBtn = document.getElementById('btn-quick-fill');
 
-    const basePath = (window as any).location.pathname.includes('/antologi') ? '/antologi' : '';
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     // Check if already authenticated
     getAdminUser().then(user => {
