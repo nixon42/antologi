@@ -92,27 +92,27 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   <!-- Reading Progress Bar (for articles) -->
   <div id="reading-progress-bar" class="fixed top-0 left-0 h-1 bg-[var(--crimson)] z-50 w-0 transition-all duration-75" aria-hidden="true"></div>
 
-  <!-- Masthead Header -->
+  <!-- Masthead Header: Sleek, compact on mobile, majestic on desktop -->
   <header class="sticky top-0 z-40 bg-[var(--paper)]/95 backdrop-blur-sm border-b border-[var(--rule-strong)] transition-colors duration-200">
-    <div class="wrap py-3.5 flex items-center justify-between gap-4 flex-wrap">
+    <div class="wrap py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
       
       <!-- Brand & Monogram -->
-      <a href={`${basePath}/`} class="flex items-center gap-3.5 no-underline group">
-        <div class="w-10 h-10 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-semibold text-sm text-[var(--crimson)] group-hover:bg-[var(--crimson)] group-hover:text-[var(--paper)] transition-colors duration-200 flex-shrink-0" aria-label="Logo Monogram Yambu'ul Qur'an">
+      <a href={`${basePath}/`} class="flex items-center gap-2.5 sm:gap-3.5 no-underline group flex-shrink-0">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-semibold text-xs sm:text-sm text-[var(--crimson)] group-hover:bg-[var(--crimson)] group-hover:text-[var(--paper)] transition-colors duration-200 flex-shrink-0" aria-label="Logo Monogram Yambu'ul Qur'an">
           YQ
         </div>
         <div>
-          <span class="block font-['Fraunces',serif] font-semibold text-xl leading-none text-[var(--ink)]">
+          <span class="block font-['Fraunces',serif] font-semibold text-base sm:text-xl leading-none text-[var(--ink)]">
             Ruang <span class="italic font-normal text-[var(--crimson)]">Sastra</span>
           </span>
-          <span class="block mono text-[0.72rem] text-[var(--ink-faint)] mt-1 tracking-wider">
+          <span class="hidden sm:block mono text-[0.72rem] text-[var(--ink-faint)] mt-1 tracking-wider">
             SMPI Yambu'ul Qur'an
           </span>
         </div>
       </a>
 
-      <!-- Navigation Links -->
-      <nav class="flex items-center gap-5 text-[0.9rem] text-[var(--ink-soft)] font-medium flex-wrap" aria-label="Navigasi Utama">
+      <!-- Desktop Navigation Links (hidden on mobile) -->
+      <nav class="hidden md:flex items-center gap-4 lg:gap-5 text-[0.88rem] text-[var(--ink-soft)] font-medium" aria-label="Navigasi Utama">
         <a href={`${basePath}/#tentang`} class="no-underline hover:text-[var(--crimson)] transition-colors py-1 border-b border-transparent hover:border-[var(--crimson)]">
           Tentang
         </a>
@@ -128,35 +128,103 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <a href={`${basePath}/quotes`} class={`no-underline hover:text-[var(--crimson)] transition-colors py-1 ${currentPath.includes('/quotes') ? 'text-[var(--crimson)] border-b border-[var(--crimson)] font-semibold' : ''}`}>
           Quotes
         </a>
-        <a href={`${basePath}/kirim`} class="btn-literary !py-1.5 !px-3 !text-xs !font-medium">
+        <a href={`${basePath}/kirim`} class="btn-literary !py-1 !px-3 !text-xs !font-medium">
           Kirim Karya
         </a>
       </nav>
 
-      <!-- Reader Controls & Search Action -->
-      <div class="flex items-center gap-2">
+      <!-- Reader Controls & Mobile Toggle -->
+      <div class="flex items-center gap-1 sm:gap-2">
         <!-- Search Trigger Button -->
-        <button id="search-modal-trigger" class="p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors" title="Cari Karya Sastra & Penulis (Ctrl+K)" aria-label="Buka Pencarian">
+        <button id="search-modal-trigger" class="p-1.5 sm:p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors" title="Cari Karya Sastra & Penulis (Ctrl+K)" aria-label="Buka Pencarian">
           <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </button>
 
         <!-- Theme Mode Toggle Dropdown / Cycle -->
-        <button id="theme-cycle-button" class="p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors text-xs mono flex items-center gap-1.5" title="Ganti Mode Tampilan (Kertas / Sepia / Gelap)" aria-label="Ganti Tema">
+        <button id="theme-cycle-button" class="p-1.5 sm:p-2 text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors text-xs mono flex items-center gap-1" title="Ganti Mode Tampilan (Kertas / Sepia / Gelap)" aria-label="Ganti Tema">
           <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
           </svg>
-          <span id="theme-label" class="hidden sm:inline">Kertas</span>
+          <span id="theme-label" class="hidden lg:inline text-[0.72rem]">Kertas</span>
         </button>
 
-        <!-- Font Size Adjuster -->
-        <div class="flex items-center border border-[var(--rule-strong)] rounded text-xs mono">
+        <!-- Font Size Adjuster (Desktop Only) -->
+        <div class="hidden sm:flex items-center border border-[var(--rule-strong)] rounded text-xs mono">
           <button id="font-dec-button" class="px-2 py-1 hover:bg-[var(--paper-deep)] transition-colors" title="Perkecil Ukuran Teks">A-</button>
           <button id="font-inc-button" class="px-2 py-1 hover:bg-[var(--paper-deep)] border-l border-[var(--rule-strong)] transition-colors" title="Perbesar Ukuran Teks">A+</button>
         </div>
+
+        <!-- Mobile Menu Toggle Button (Hamburger / Close) -->
+        <button 
+          id="mobile-menu-toggle"
+          class="md:hidden p-1.5 text-[var(--ink)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors"
+          aria-label="Buka Menu Navigasi"
+          aria-expanded="false"
+        >
+          <svg id="hamburger-icon" class="w-5 h-5" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <svg id="close-icon" class="w-5 h-5 hidden" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       </div>
 
+    </div>
+
+    <!-- Mobile Drawer Menu (Collapsible, Sleek, Literary) -->
+    <div 
+      id="mobile-menu-drawer" 
+      class="hidden md:hidden bg-[var(--paper-card)] border-t border-[var(--rule)] px-4 py-4 space-y-3 shadow-xl transition-all"
+    >
+      <nav class="flex flex-col space-y-1.5 text-sm font-medium" aria-label="Navigasi Mobile">
+        <a href={`${basePath}/`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Beranda</span>
+          <span class="mono text-xs text-[var(--ink-faint)]">⌂</span>
+        </a>
+        <a href={`${basePath}/#tentang`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Tentang Portal</span>
+          <span class="mono text-xs text-[var(--ink-faint)]">❧</span>
+        </a>
+        <a href={`${basePath}/karya`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Pojok Baca (Arsip Karya)</span>
+          <span class="mono text-xs text-[var(--crimson)]">Katalog</span>
+        </a>
+        <a href={`${basePath}/#karya-pilihan`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Karya Pilihan Redaksi</span>
+          <span class="mono text-xs text-[var(--gold)]">★</span>
+        </a>
+        <a href={`${basePath}/panggung`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Panggung Sastra &amp; Teater</span>
+          <span class="mono text-xs text-[var(--ink-faint)]">▶</span>
+        </a>
+        <a href={`${basePath}/quotes`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+          <span>Quotes &amp; Mutiara Kata</span>
+          <span class="mono text-xs text-[var(--ink-faint)]">“ ”</span>
+        </a>
+      </nav>
+
+      <div class="border-t border-[var(--rule)] pt-3 flex items-center justify-between gap-2">
+        <!-- Font Size for Mobile in Drawer -->
+        <div class="flex items-center gap-2">
+          <span class="mono text-[0.72rem] text-[var(--ink-faint)]">Ukuran Teks:</span>
+          <div class="flex items-center border border-[var(--rule-strong)] rounded text-xs mono">
+            <button id="font-dec-button-m" class="px-2 py-0.5 hover:bg-[var(--paper-deep)]">A-</button>
+            <button id="font-inc-button-m" class="px-2 py-0.5 hover:bg-[var(--paper-deep)] border-l border-[var(--rule-strong)]">A+</button>
+          </div>
+        </div>
+
+        <a href={`${basePath}/admin`} class="mono text-xs text-[var(--crimson)] font-semibold no-underline hover:underline flex items-center gap-1">
+          <span>Studio Redaksi</span>
+          <span>✎</span>
+        </a>
+      </div>
+
+      <a href={`${basePath}/kirim`} class="btn-literary btn-literary-solid !w-full !py-2.5 !text-center text-xs block no-underline mt-2">
+        Kirim Naskah Baru →
+      </a>
     </div>
   </header>
 
@@ -225,6 +293,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <li><a href={`${basePath}/#tentang`} class="hover:text-[var(--crimson)] transition-colors">Tentang Portal</a></li>
             <li><a href={`${basePath}/kirim`} class="hover:text-[var(--crimson)] transition-colors">Kirim Naskah Baru</a></li>
             <li><a href={`${basePath}/admin`} class="hover:text-[var(--crimson)] transition-colors font-semibold text-[var(--crimson)]">Studio Redaksi &amp; Live Editor ✎</a></li>
+            <li><a href={`${basePath}/admin/login`} class="hover:text-[var(--crimson)] transition-colors">Masuk Redaksi (Login)</a></li>
             <li><a href={`${basePath}/panggung`} class="hover:text-[var(--crimson)] transition-colors">Panggung Teater</a></li>
             <li><a href={`${basePath}/sitemap-index.xml`} class="hover:text-[var(--crimson)] transition-colors">Peta Situs (Sitemap)</a></li>
           </ul>
@@ -275,6 +344,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     let currentSize = parseInt(localStorage.getItem('rs_size') || '17', 10);
     const fontInc = document.getElementById('font-inc-button');
     const fontDec = document.getElementById('font-dec-button');
+    const fontIncM = document.getElementById('font-inc-button-m');
+    const fontDecM = document.getElementById('font-dec-button-m');
 
     function setFontSize(size: number) {
       currentSize = Math.max(14, Math.min(22, size));
@@ -284,6 +355,40 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     if (fontInc) fontInc.addEventListener('click', () => setFontSize(currentSize + 1));
     if (fontDec) fontDec.addEventListener('click', () => setFontSize(currentSize - 1));
+    if (fontIncM) fontIncM.addEventListener('click', () => setFontSize(currentSize + 1));
+    if (fontDecM) fontDecM.addEventListener('click', () => setFontSize(currentSize - 1));
+
+    // Mobile Navigation Drawer Toggle
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const mobileDrawer = document.getElementById('mobile-menu-drawer');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    mobileToggle?.addEventListener('click', () => {
+      const isExpanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+      const willExpand = !isExpanded;
+      mobileToggle.setAttribute('aria-expanded', willExpand.toString());
+
+      if (willExpand) {
+        mobileDrawer?.classList.remove('hidden');
+        hamburgerIcon?.classList.add('hidden');
+        closeIcon?.classList.remove('hidden');
+      } else {
+        mobileDrawer?.classList.add('hidden');
+        hamburgerIcon?.classList.remove('hidden');
+        closeIcon?.classList.add('hidden');
+      }
+    });
+
+    // Close mobile menu on link click
+    mobileDrawer?.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileDrawer?.classList.add('hidden');
+        mobileToggle?.setAttribute('aria-expanded', 'false');
+        hamburgerIcon?.classList.remove('hidden');
+        closeIcon?.classList.add('hidden');
+      });
+    });
 
     // Reading Progress Indicator
     window.addEventListener('scroll', () => {
@@ -389,7 +494,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             </span>
           </div>
           <p class="text-xs text-[var(--ink-soft)] italic m-0 mt-1 line-clamp-1 font-['Source_Serif_4',serif]">
-            ${item.author} — ${item.description || ''}
+            ${item.description || item.author}
           </p>
         </a>
       `).join('');

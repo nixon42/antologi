@@ -118,6 +118,12 @@ When modifying this repository, you **MUST NEVER violate** these 6 invariants:
 - **Never commit `.env` to Git.** `.gitignore` must continue to ignore `.env*` except `.env.example`.
 - Secrets for CI/CD must be set via `gh secret set` or GitHub repository settings.
 
+### 🔴 Invariant 7: Direct Continuous Delivery & Git Hygiene
+- The project is deployed on GitHub Pages with Supabase (PostgreSQL & Storage).
+- **Always run `git pull origin main` before editing code.**
+- **Commit changes cleanly and push directly to `main` upon task completion.**
+- **All visual and interactive designs MUST strictly follow `/impeccable` design standards** (Warm Paper `#efeae0`, Crimson `#7c2d26`, Antique Gold `#a6813c`, Deep Charcoal `#1c2419`, Fraunces, Source Serif 4, IBM Plex Mono, no generic SaaS gradients/cards).
+
 ---
 
 ## 5. Repository Directory Blueprint

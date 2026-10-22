@@ -99,7 +99,7 @@ ALTER TABLE public.komentar ENABLE ROW LEVEL SECURITY;
 -- 1. Policies Karya
 DROP POLICY IF EXISTS "Public Read Published Karya" ON public.karya;
 CREATE POLICY "Public Read Published Karya" ON public.karya
-  FOR SELECT USING (status = 'published');
+  FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Public Insert Karya" ON public.karya;
 CREATE POLICY "Public Insert Karya" ON public.karya
@@ -108,6 +108,10 @@ CREATE POLICY "Public Insert Karya" ON public.karya
 DROP POLICY IF EXISTS "Public Update Karya" ON public.karya;
 CREATE POLICY "Public Update Karya" ON public.karya
   FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Public Delete Karya" ON public.karya;
+CREATE POLICY "Public Delete Karya" ON public.karya
+  FOR DELETE USING (true);
 
 -- 2. Policies Quotes
 DROP POLICY IF EXISTS "Public Read Quotes" ON public.quotes;
@@ -130,6 +134,10 @@ CREATE POLICY "Public Insert Apresiasi" ON public.apresiasi
 DROP POLICY IF EXISTS "Public Update Apresiasi" ON public.apresiasi;
 CREATE POLICY "Public Update Apresiasi" ON public.apresiasi
   FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Public Delete Karya" ON public.karya;
+CREATE POLICY "Public Delete Karya" ON public.karya
+  FOR DELETE USING (true);
 
 -- 4. Policies Komentar
 DROP POLICY IF EXISTS "Public Read Komentar" ON public.komentar;

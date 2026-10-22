@@ -5,289 +5,464 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <Layout 
-  title="Studio Redaksi & Live Editor — Ruang Sastra SMPI YQ"
-  description="Ruang kerja redaksi untuk menulis, menyunting, mengunggah foto, dan mempublikasikan karya sastra secara real-time ke Supabase."
+  title="Studio Redaksi & Manajemen Karya — Ruang Sastra SMPI YQ"
+  description="Pusat kerja dewan redaksi untuk mengurasi kiriman naskah santri, mengelola karya terpublikasi, dan menyunting literatur secara real-time ke Supabase."
 >
-  <div class="wrap py-10 md:py-14">
+  <div class="wrap py-8 md:py-12">
     
-    <!-- Header -->
-    <header class="mb-8 pb-5 border-b border-[var(--rule-strong)] flex items-center justify-between gap-4 flex-wrap">
-      <div>
-        <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-1.5 uppercase tracking-wider">
-          <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
-          <span>/</span>
-          <span>Studio Redaksi</span>
-        </div>
-        <h1 class="font-['Fraunces',serif] font-semibold text-2xl md:text-4xl text-[var(--ink)] m-0">
-          Studio Redaksi &amp; Live Editor
-        </h1>
-        <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] mt-1.5">
-          Tulis naskah baru, unggah foto sampul ke Supabase Storage, atau sunting karya secara langsung.
-        </p>
+    <!-- AUTH GUARD BARRIER (Shown when not authenticated) -->
+    <div id="auth-guard-barrier" class="hidden text-center py-16 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm p-8 my-6">
+      <div class="w-12 h-12 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-bold text-base text-[var(--crimson)] mx-auto mb-3">
+        YQ
       </div>
-
-      <!-- Supabase Connection Indicator -->
-      <div id="supabase-status-badge" class="mono text-xs px-3 py-1.5 rounded-full border border-[var(--rule-strong)] bg-[var(--paper-card)] flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="status-dot"></span>
-        <span id="status-text">Memeriksa Supabase...</span>
+      <h2 class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] m-0">
+        Akses Khusus Dewan Redaksi
+      </h2>
+      <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] mt-2 max-w-md mx-auto">
+        Anda harus masuk terlebih dahulu dengan akun redaksi atau Supabase Auth untuk mengakses panel kurasi dan studio penulisan.
+      </p>
+      <div class="mt-6 flex items-center justify-center gap-4">
+        <a href={`${basePath}/admin/login`} class="btn-literary btn-literary-solid !py-2.5 !px-5 text-sm no-underline">
+          Masuk ke Studio Redaksi →
+        </a>
+        <a href={`${basePath}/`} class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] no-underline">
+          Kembali ke Beranda
+        </a>
       </div>
-    </header>
-
-    <!-- Studio Navigation Tabs: [Editor Baru / Edit] vs [Daftar Naskah] -->
-    <div class="flex items-center gap-2 mb-8 border-b border-[var(--rule)] pb-3">
-      <button id="tab-editor-btn" class="mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors">
-        Tulis / Sunting Naskah
-      </button>
-      <button id="tab-list-btn" class="mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors">
-        Kelola Naskah Tersimpan (<span id="saved-count">0</span>)
-      </button>
     </div>
 
-    <!-- VIEW 1: LIVE EDITOR STUDIO (Split screen on desktop) -->
-    <section id="view-editor" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+    <!-- MAIN ADMIN DASHBOARD (Protected Content) -->
+    <div id="admin-dashboard" class="space-y-8">
       
-      <!-- Left Column: Input Form -->
-      <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
-          <h2 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">Formulir Naskah</h2>
-          <button id="btn-reset-form" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] underline cursor-pointer">
-            Kosongkan Form
+      <!-- Top Header -->
+      <header class="pb-6 border-b border-[var(--rule-strong)] flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-1.5 uppercase tracking-wider">
+            <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
+            <span>/</span>
+            <span>Studio Redaksi &amp; Kurasi</span>
+          </div>
+          <h1 class="font-['Fraunces',serif] font-semibold text-2xl md:text-4xl text-[var(--ink)] m-0">
+            Studio Redaksi &amp; Manajemen Karya
+          </h1>
+          <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] mt-1.5">
+            Kurasi kiriman naskah santri, kelola karya terpublikasi, atau terbitkan karya sastra baru ke Supabase.
+          </p>
+        </div>
+
+        <!-- Redaksi User Badge & Controls -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <div id="supabase-status-badge" class="mono text-xs px-3 py-1.5 rounded-full border border-[var(--rule-strong)] bg-[var(--paper-card)] flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
+            <span id="status-text">Supabase Aktif ⚡</span>
+          </div>
+
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded-full mono text-xs text-[var(--ink)]">
+            <span class="w-2 h-2 rounded-full bg-[var(--crimson)]"></span>
+            <span id="admin-user-email">redaksi@yq.sch.id</span>
+            <button id="btn-logout" class="ml-2 text-[var(--crimson)] hover:underline font-semibold cursor-pointer" title="Keluar dari sesi redaksi">
+              Keluar
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- STATS OVERVIEW STRIP -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Antrean Kiriman -->
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--crimson)] rounded-sm relative overflow-hidden">
+          <div class="mono text-[0.68rem] text-[var(--crimson)] uppercase tracking-wider font-semibold">Antrean Kiriman Santri</div>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-submissions" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--crimson)]">0</span>
+            <span class="mono text-xs text-[var(--crimson)] font-medium">Perlu Kurasi</span>
+          </div>
+          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Naskah dari siswa yang menunggu persetujuan</p>
+        </div>
+
+        <!-- Terpublikasi -->
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+          <div class="mono text-[0.68rem] text-[var(--sage)] uppercase tracking-wider font-semibold">Karya Terpublikasi</div>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-published" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
+            <span class="mono text-xs text-[var(--sage)] font-medium">Tayang</span>
+          </div>
+          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Dapat dibaca oleh publik di Pojok Baca</p>
+        </div>
+
+        <!-- Draf -->
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+          <div class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-wider font-semibold">Draf Redaksi</div>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-drafts" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
+            <span class="mono text-xs text-[var(--gold)] font-medium">Belum Tayang</span>
+          </div>
+          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Naskah dalam tahap penyuntingan</p>
+        </div>
+
+        <!-- Total Karya -->
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+          <div class="mono text-[0.68rem] text-[var(--ink-faint)] uppercase tracking-wider font-semibold">Total Koleksi Database</div>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-total" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
+            <span class="mono text-xs text-[var(--ink-faint)]">Karya</span>
+          </div>
+          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Keseluruhan naskah tersimpan di Supabase</p>
+        </div>
+      </div>
+
+      <!-- NAVIGATION TABS -->
+      <div class="flex items-center gap-2 border-b border-[var(--rule)] pb-3 flex-wrap">
+        <button 
+          id="tab-btn-submissions" 
+          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors flex items-center gap-1.5"
+        >
+          <span>Antrean Kiriman Santri</span>
+          <span id="badge-submissions" class="px-2 py-0.2 rounded-full bg-white/20 text-xs">0</span>
+        </button>
+
+        <button 
+          id="tab-btn-published" 
+          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5"
+        >
+          <span>Karya Terpublikasi</span>
+          <span id="badge-published" class="px-1.5 py-0.2 rounded-full bg-[var(--paper-deep)] text-xs">0</span>
+        </button>
+
+        <button 
+          id="tab-btn-drafts" 
+          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5"
+        >
+          <span>Draf Redaksi</span>
+          <span id="badge-drafts" class="px-1.5 py-0.2 rounded-full bg-[var(--paper-deep)] text-xs">0</span>
+        </button>
+
+        <button 
+          id="tab-btn-editor" 
+          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5"
+        >
+          <span>Studio Tulis / Sunting Naskah ✎</span>
+        </button>
+
+        <div class="ml-auto">
+          <button id="btn-refresh-all" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer flex items-center gap-1 p-1" title="Segarkan Data dari Supabase">
+            <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Segarkan</span>
           </button>
         </div>
+      </div>
 
-        <input type="hidden" id="edit-id" />
-        <input type="hidden" id="edit-slug" />
-
-        <!-- Judul -->
-        <div>
-          <label for="editor-title" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Judul Karya *</label>
-          <input 
-            type="text" 
-            id="editor-title" 
-            placeholder="Misal: Senja di Pelataran Pesantren" 
-            class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Fraunces',serif]"
-          />
-        </div>
-
-        <!-- Penulis & Kelas -->
-        <div class="grid grid-cols-2 gap-3">
+      <!-- ========================================================== -->
+      <!-- VIEW 1: ANTREAN SUBMISI KIRIMAN SANTRI -->
+      <!-- ========================================================== -->
+      <section id="view-submissions" class="tab-view space-y-4">
+        <div class="flex items-center justify-between pb-2">
           <div>
-            <label for="editor-author" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Nama Penulis *</label>
-            <input 
-              type="text" 
-              id="editor-author" 
-              placeholder="Misal: Ahmad Santoso" 
-              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
-            />
-          </div>
-          <div>
-            <label for="editor-grade" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kelas / Jabatan</label>
-            <input 
-              type="text" 
-              id="editor-grade" 
-              placeholder="Misal: Kelas XI-B" 
-              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
-            />
+            <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
+              Antrean Kiriman Naskah Siswa
+            </h2>
+            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+              Naskah masuk dari formulir submisi siswa yang membutuhkan kurasi atau penyuntingan dewan redaksi sebelum diterbitkan.
+            </p>
           </div>
         </div>
 
-        <!-- Kategori & Status -->
-        <div class="grid grid-cols-2 gap-3">
+        <div id="submissions-list-container" class="space-y-4">
+          <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat antrean kiriman santri...</p>
+        </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- VIEW 2: KARYA TERPUBLIKASI -->
+      <!-- ========================================================== -->
+      <section id="view-published" class="tab-view hidden space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
           <div>
-            <label for="editor-category" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kategori *</label>
-            <select id="editor-category" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
+            <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
+              Karya Sastra Terpublikasi
+            </h2>
+            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+              Daftar seluruh karya yang sedang tayang di portal Ruang Sastra dan dapat dibaca oleh umum.
+            </p>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex items-center gap-2">
+            <input 
+              type="search" 
+              id="search-published-input" 
+              placeholder="Cari judul / penulis..." 
+              class="px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+            />
+            <select id="filter-published-category" class="px-2.5 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none">
+              <option value="all">Semua Kategori</option>
+              <option value="ilmiah">Karya Ilmiah</option>
               <option value="puisi">Puisi &amp; Prosa</option>
               <option value="cerpen">Cerpen</option>
-              <option value="ilmiah">Karya Tulis Ilmiah</option>
               <option value="drama">Naskah Drama</option>
               <option value="antologi">Antologi</option>
             </select>
           </div>
-          <div>
-            <label for="editor-status" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Status Publikasi</label>
-            <select id="editor-status" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
-              <option value="published">Tayang (Published)</option>
-              <option value="draft">Draf (Draft)</option>
-              <option value="menunggu_kurasi">Menunggu Kurasi</option>
-            </select>
-          </div>
         </div>
 
-        <!-- Sinopsis / Deskripsi Singkat -->
+        <div id="published-list-container" class="space-y-3">
+          <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat karya terpublikasi...</p>
+        </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- VIEW 3: DRAF REDAKSI -->
+      <!-- ========================================================== -->
+      <section id="view-drafts" class="tab-view hidden space-y-4">
         <div>
-          <label for="editor-desc" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Sinopsis / Pengantar *</label>
-          <textarea 
-            id="editor-desc" 
-            rows="2" 
-            placeholder="Petikan atau ringkasan 1-2 kalimat..." 
-            class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] italic"
-          ></textarea>
+          <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
+            Draf Naskah Redaksi
+          </h2>
+          <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+            Naskah yang masih dalam tahap perancangan atau disembunyikan sementara dari penayangan publik.
+          </p>
         </div>
 
-        <!-- UPLOAD FOTO KE SUPABASE STORAGE -->
-        <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded">
-          <label class="block mono text-xs uppercase text-[var(--crimson)] mb-1.5 font-semibold">
-            Unggah Foto Sampul ke Supabase Storage
-          </label>
-          <div class="flex items-center gap-3">
+        <div id="drafts-list-container" class="space-y-3">
+          <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat draf...</p>
+        </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- VIEW 4: STUDIO EDITOR & LIVE PREVIEW -->
+      <!-- ========================================================== -->
+      <section id="view-editor" class="tab-view hidden grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        <!-- Left: Form Editor -->
+        <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0" id="editor-form-title">
+                Tulis Naskah Baru
+              </h2>
+              <span id="editor-mode-badge" class="mono text-[0.65rem] text-[var(--crimson)] uppercase">Karya Baru</span>
+            </div>
+            <button id="btn-reset-form" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] underline cursor-pointer">
+              Kosongkan Form
+            </button>
+          </div>
+
+          <input type="hidden" id="edit-id" />
+          <input type="hidden" id="edit-slug" />
+
+          <!-- Judul -->
+          <div>
+            <label for="editor-title" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Judul Karya *</label>
             <input 
-              type="file" 
-              id="editor-photo-file" 
-              accept="image/*"
-              class="block w-full text-xs mono text-[var(--ink-soft)] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-[var(--crimson)] file:text-xs file:mono file:bg-transparent file:text-[var(--crimson)] hover:file:bg-[var(--crimson)] hover:file:text-[var(--paper)] cursor-pointer"
+              type="text" 
+              id="editor-title" 
+              placeholder="Misal: Senja di Pelataran Pesantren" 
+              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Fraunces',serif]"
             />
           </div>
-          <input 
-            type="url" 
-            id="editor-photo-url" 
-            placeholder="Atau tempel URL gambar eksternal di sini..." 
-            class="w-full mt-2 px-3 py-1.5 bg-[var(--paper-card)] border border-[var(--rule)] rounded text-xs mono text-[var(--ink-soft)] outline-none"
-          />
-          <span id="photo-upload-status" class="mono text-[0.68rem] text-[var(--ink-faint)] block mt-1"></span>
-        </div>
 
-        <!-- Isi Naskah Lengkap (Markdown) -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label for="editor-content" class="block mono text-xs uppercase text-[var(--ink-soft)]">
-              Isi Naskah (Markdown) *
-            </label>
-            <span class="mono text-[0.68rem] text-[var(--ink-faint)]">Mendukung ## Heading, *italic*, > kutipan</span>
+          <!-- Penulis & Kelas -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="editor-author" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Nama Penulis *</label>
+              <input 
+                type="text" 
+                id="editor-author" 
+                placeholder="Misal: Ahmad Santoso" 
+                class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              />
+            </div>
+            <div>
+              <label for="editor-grade" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kelas / Jabatan</label>
+              <input 
+                type="text" 
+                id="editor-grade" 
+                placeholder="Misal: Kelas XI-B / Guru Bahasa" 
+                class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              />
+            </div>
           </div>
-          <textarea 
-            id="editor-content" 
-            rows="12" 
-            placeholder="Tuliskan bait puisi atau naskah lakon Anda di sini..." 
-            class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] leading-relaxed"
-          ></textarea>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="pt-4 border-t border-[var(--rule)] flex items-center justify-between flex-wrap gap-3">
-          <button id="btn-save-supabase" class="btn-literary btn-literary-solid !py-2.5 !px-5 text-xs md:text-sm cursor-pointer">
-            Simpan ke Supabase DB ⚡
-          </button>
-          <button id="btn-download-md" class="btn-literary !py-2.5 !px-4 text-xs mono cursor-pointer">
-            Ekspor .md (Git) ↓
-          </button>
-        </div>
+          <!-- Kategori & Status -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="editor-category" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kategori *</label>
+              <select id="editor-category" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
+                <option value="puisi">Puisi &amp; Prosa</option>
+                <option value="cerpen">Cerpen</option>
+                <option value="ilmiah">Karya Tulis Ilmiah</option>
+                <option value="drama">Naskah Drama</option>
+                <option value="antologi">Antologi</option>
+              </select>
+            </div>
+            <div>
+              <label for="editor-status" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Status Publikasi</label>
+              <select id="editor-status" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
+                <option value="published">Tayang (Published)</option>
+                <option value="menunggu_kurasi">Menunggu Kurasi</option>
+                <option value="draft">Draf (Draft)</option>
+              </select>
+            </div>
+          </div>
 
-        <div id="editor-alert" class="mono text-xs hidden p-3 rounded border"></div>
-      </div>
-
-      <!-- Right Column: Live Real-time Preview in Ruang Sastra Style -->
-      <div class="sticky top-20 space-y-4">
-        <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
-          <span class="mono text-xs text-[var(--ink-faint)] uppercase tracking-wider font-semibold">
-            Live Preview (Pratinjau Nyata)
-          </span>
-          <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">
-            Otomatis Memperbarui Saat Mengetik
-          </span>
-        </div>
-
-        <div id="live-preview-box" class="p-8 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-sm shadow-sm space-y-6 min-h-[500px]">
-          <!-- Preview Header -->
+          <!-- Sinopsis / Ringkasan -->
           <div>
-            <div class="flex items-center gap-2 mb-2">
-              <span id="prev-category-badge" class="mono text-[0.68rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-medium">
-                Puisi &amp; Prosa
-              </span>
-              <span id="prev-status-badge" class="mono text-[0.68rem] text-[var(--ink-faint)]">
-                · Draf Pratinjau
-              </span>
-            </div>
-
-            <h2 id="prev-title" class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] leading-tight m-0 mb-3">
-              Judul Karya Anda
-            </h2>
-
-            <p id="prev-desc" class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] leading-relaxed m-0 pl-3 border-l-2 border-[var(--rule-strong)]">
-              "Petikan atau sinopsis karya akan tampil di sini..."
-            </p>
-
-            <div class="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--rule)] mono text-xs text-[var(--ink-faint)]">
-              <span id="prev-author" class="font-medium text-[var(--ink)]">Nama Penulis</span>
-              <span id="prev-grade">· Kelas</span>
-            </div>
+            <label for="editor-desc" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Sinopsis / Pengantar *</label>
+            <textarea 
+              id="editor-desc" 
+              rows="2" 
+              placeholder="Petikan atau ringkasan 1-2 kalimat..." 
+              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] italic"
+            ></textarea>
           </div>
 
-          <!-- Preview Cover Photo if any -->
-          <div id="prev-photo-container" class="hidden aspect-video bg-[var(--paper-deep)] rounded overflow-hidden border border-[var(--rule)]">
-            <img id="prev-photo-img" src="" alt="Sampul Karya" class="w-full h-full object-cover" />
+          <!-- Upload Foto ke Supabase Storage -->
+          <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded">
+            <label class="block mono text-xs uppercase text-[var(--crimson)] mb-1.5 font-semibold">
+              Unggah Foto Sampul ke Supabase Storage
+            </label>
+            <div class="flex items-center gap-3">
+              <input 
+                type="file" 
+                id="editor-photo-file" 
+                accept="image/*"
+                class="block w-full text-xs mono text-[var(--ink-soft)] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-[var(--crimson)] file:text-xs file:mono file:bg-transparent file:text-[var(--crimson)] hover:file:bg-[var(--crimson)] hover:file:text-[var(--paper)] cursor-pointer"
+              />
+            </div>
+            <input 
+              type="url" 
+              id="editor-photo-url" 
+              placeholder="Atau tempel URL gambar sampul di sini..." 
+              class="w-full mt-2 px-3 py-1.5 bg-[var(--paper-card)] border border-[var(--rule)] rounded text-xs mono text-[var(--ink-soft)] outline-none"
+            />
+            <span id="photo-upload-status" class="mono text-[0.68rem] text-[var(--ink-faint)] block mt-1"></span>
           </div>
 
-          <!-- Preview Content Body -->
-          <div id="prev-body" class="font-['Source_Serif_4',serif] text-base leading-[1.8] text-[var(--ink)] whitespace-pre-line border-t border-[var(--rule)] pt-4">
-            Isi naskah karya akan tampil di sini secara langsung saat Anda mengetik di formulir sebelah kiri.
+          <!-- Isi Naskah -->
+          <div>
+            <label for="editor-content" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">
+              Isi Naskah Karya * (Mendukung Markdown)
+            </label>
+            <textarea 
+              id="editor-content" 
+              rows="12" 
+              placeholder="Tulis bait puisi, alur cerpen, bab makalah, atau dialog drama..." 
+              class="w-full px-3.5 py-3 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] leading-relaxed"
+            ></textarea>
+          </div>
+
+          <!-- Alert Box -->
+          <div id="editor-alert" class="hidden mono text-xs p-3 rounded border"></div>
+
+          <!-- Actions -->
+          <div class="pt-2 flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <button 
+                id="btn-save-supabase" 
+                class="btn-literary btn-literary-solid !py-2.5 !px-5 text-sm cursor-pointer"
+              >
+                Simpan ke Supabase DB ⚡
+              </button>
+            </div>
+            <button 
+              id="btn-download-md" 
+              class="btn-literary !py-2.5 !px-4 text-xs cursor-pointer"
+              title="Unduh berkas .md untuk dimasukkan ke Git repositori"
+            >
+              Unduh .md ↓
+            </button>
           </div>
         </div>
-      </div>
 
-    </section>
+        <!-- Right: Live Editorial Preview -->
+        <div class="sticky top-20 p-6 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-sm space-y-4 shadow-sm">
+          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+            <span class="mono text-[0.68rem] uppercase tracking-wider text-[var(--gold)] font-semibold">Pratinjau Langsung (Live Preview)</span>
+            <span id="prev-category-badge" class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase">
+              Sastra
+            </span>
+          </div>
 
-    <!-- VIEW 2: LIST OF SAVED WORKS IN SUPABASE -->
-    <section id="view-list" class="hidden space-y-4">
-      <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
-        <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
-          Naskah yang Tersimpan di Supabase
-        </h2>
-        <button id="btn-refresh-list" class="mono text-xs px-3 py-1.5 rounded border border-[var(--rule-strong)] hover:border-[var(--crimson)] text-[var(--ink-soft)] cursor-pointer">
-          Segarkan Data ⟳
-        </button>
-      </div>
+          <div id="prev-photo-container" class="hidden rounded overflow-hidden max-h-48 border border-[var(--rule)]">
+            <img id="prev-photo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23efeae0'/%3E%3C/svg%3E" alt="Sampul Karya" width="400" height="200" class="w-full h-44 object-cover" />
+          </div>
 
-      <div id="saved-works-table" class="space-y-3">
-        <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat data dari Supabase...</p>
-      </div>
-    </section>
+          <h3 id="prev-title" class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] leading-tight m-0">
+            Judul Karya Anda
+          </h3>
 
+          <p id="prev-desc" class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] m-0 leading-relaxed">
+            "Petikan atau sinopsis karya akan tampil di sini..."
+          </p>
+
+          <div class="flex items-center gap-2 pt-1 border-t border-[var(--rule)] mono text-xs text-[var(--ink-faint)]">
+            <span id="prev-author" class="font-semibold text-[var(--ink)] font-['Fraunces',serif]">Nama Penulis</span>
+            <span id="prev-grade">· Kelas</span>
+          </div>
+
+          <div class="border-t border-[var(--rule-strong)] pt-3">
+            <div id="prev-body" class="font-['Source_Serif_4',serif] text-sm text-[var(--ink)] leading-relaxed whitespace-pre-line max-h-72 overflow-y-auto pr-2">
+              Isi naskah karya akan tampil di sini secara langsung saat Anda mengetik...
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
   </div>
 
   <script>
     import { 
-      isSupabaseConfigured, 
-      simpanKarya, 
       fetchAllKaryaSupabase, 
+      simpanKarya, 
+      hapusKarya, 
+      updateStatusKarya, 
       uploadFotoKarya, 
+      getAdminUser, 
+      logoutAdmin,
       type KaryaInput 
     } from '../../lib/supabase';
     import confetti from 'canvas-confetti';
 
-    // Status Indicator
-    const dot = document.getElementById('status-dot');
-    const statusText = document.getElementById('status-text');
+    const basePath = (window as any).location.pathname.includes('/antologi') ? '/antologi' : '';
 
-    if (isSupabaseConfigured) {
-      if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-      if (statusText) statusText.textContent = 'Supabase Terhubung ✓';
-    } else {
-      if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-500';
-      if (statusText) statusText.textContent = 'Mode Offline (LocalStorage)';
-    }
+    // Elements
+    const authBarrier = document.getElementById('auth-guard-barrier');
+    const adminDashboard = document.getElementById('admin-dashboard');
+    const adminUserEmail = document.getElementById('admin-user-email');
+    const logoutBtn = document.getElementById('btn-logout');
 
-    // Tab Switching
-    const tabEditorBtn = document.getElementById('tab-editor-btn');
-    const tabListBtn = document.getElementById('tab-list-btn');
+    // Stats
+    const statSubmissions = document.getElementById('stat-submissions');
+    const statPublished = document.getElementById('stat-published');
+    const statDrafts = document.getElementById('stat-drafts');
+    const statTotal = document.getElementById('stat-total');
+
+    const badgeSubmissions = document.getElementById('badge-submissions');
+    const badgePublished = document.getElementById('badge-published');
+    const badgeDrafts = document.getElementById('badge-drafts');
+
+    // Tabs
+    const tabBtnSubmissions = document.getElementById('tab-btn-submissions');
+    const tabBtnPublished = document.getElementById('tab-btn-published');
+    const tabBtnDrafts = document.getElementById('tab-btn-drafts');
+    const tabBtnEditor = document.getElementById('tab-btn-editor');
+
+    const viewSubmissions = document.getElementById('view-submissions');
+    const viewPublished = document.getElementById('view-published');
+    const viewDrafts = document.getElementById('view-drafts');
     const viewEditor = document.getElementById('view-editor');
-    const viewList = document.getElementById('view-list');
 
-    tabEditorBtn?.addEventListener('click', () => {
-      tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors';
-      if (tabListBtn) tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
-      viewEditor?.classList.remove('hidden');
-      viewList?.classList.add('hidden');
-    });
+    // List Containers
+    const submissionsContainer = document.getElementById('submissions-list-container');
+    const publishedContainer = document.getElementById('published-list-container');
+    const draftsContainer = document.getElementById('drafts-list-container');
 
-    tabListBtn?.addEventListener('click', () => {
-      tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors';
-      if (tabEditorBtn) tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
-      viewList?.classList.remove('hidden');
-      viewEditor?.classList.add('hidden');
-      loadSavedWorks();
-    });
-
-    // Form Elements
+    // Editor Form Inputs
+    const editIdInput = document.getElementById('edit-id') as HTMLInputElement;
+    const editSlugInput = document.getElementById('edit-slug') as HTMLInputElement;
     const titleInput = document.getElementById('editor-title') as HTMLInputElement;
     const authorInput = document.getElementById('editor-author') as HTMLInputElement;
     const gradeInput = document.getElementById('editor-grade') as HTMLInputElement;
@@ -298,10 +473,12 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const photoFileInput = document.getElementById('editor-photo-file') as HTMLInputElement;
     const photoUrlInput = document.getElementById('editor-photo-url') as HTMLInputElement;
     const uploadStatus = document.getElementById('photo-upload-status');
-    const editIdInput = document.getElementById('edit-id') as HTMLInputElement;
-    const editSlugInput = document.getElementById('edit-slug') as HTMLInputElement;
+    const saveBtn = document.getElementById('btn-save-supabase') as HTMLButtonElement | null;
+    const alertBox = document.getElementById('editor-alert');
+    const editorFormTitle = document.getElementById('editor-form-title');
+    const editorModeBadge = document.getElementById('editor-mode-badge');
 
-    // Preview Elements
+    // Preview
     const prevTitle = document.getElementById('prev-title');
     const prevDesc = document.getElementById('prev-desc');
     const prevAuthor = document.getElementById('prev-author');
@@ -311,7 +488,464 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const prevPhotoBox = document.getElementById('prev-photo-container');
     const prevPhotoImg = document.getElementById('prev-photo-img') as HTMLImageElement;
 
-    // Live update preview
+    // Filter & Search
+    const searchPublishedInput = document.getElementById('search-published-input') as HTMLInputElement;
+    const filterPublishedCat = document.getElementById('filter-published-category') as HTMLSelectElement;
+
+    let allWorks: KaryaInput[] = [];
+
+    // 1. Auth Guard Check
+    getAdminUser().then(user => {
+      if (!user) {
+        authBarrier?.classList.remove('hidden');
+        adminDashboard?.classList.add('hidden');
+      } else {
+        authBarrier?.classList.add('hidden');
+        adminDashboard?.classList.remove('hidden');
+        if (adminUserEmail) adminUserEmail.textContent = user.email;
+        loadAllWorks();
+      }
+    });
+
+    logoutBtn?.addEventListener('click', async () => {
+      await logoutAdmin();
+      window.location.href = `${basePath}/admin/login`;
+    });
+
+    // 2. Tab Navigation
+    function switchTab(target: 'submissions' | 'published' | 'drafts' | 'editor') {
+      [tabBtnSubmissions, tabBtnPublished, tabBtnDrafts, tabBtnEditor].forEach(btn => {
+        if (!btn) return;
+        btn.className = 'tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5';
+      });
+
+      [viewSubmissions, viewPublished, viewDrafts, viewEditor].forEach(view => {
+        view?.classList.add('hidden');
+      });
+
+      const activeClass = 'tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors flex items-center gap-1.5';
+
+      if (target === 'submissions') {
+        if (tabBtnSubmissions) tabBtnSubmissions.className = activeClass;
+        viewSubmissions?.classList.remove('hidden');
+      } else if (target === 'published') {
+        if (tabBtnPublished) tabBtnPublished.className = activeClass;
+        viewPublished?.classList.remove('hidden');
+      } else if (target === 'drafts') {
+        if (tabBtnDrafts) tabBtnDrafts.className = activeClass;
+        viewDrafts?.classList.remove('hidden');
+      } else if (target === 'editor') {
+        if (tabBtnEditor) tabBtnEditor.className = activeClass;
+        viewEditor?.classList.remove('hidden');
+      }
+    }
+
+    tabBtnSubmissions?.addEventListener('click', () => switchTab('submissions'));
+    tabBtnPublished?.addEventListener('click', () => switchTab('published'));
+    tabBtnDrafts?.addEventListener('click', () => switchTab('drafts'));
+    tabBtnEditor?.addEventListener('click', () => switchTab('editor'));
+
+    // 3. Load All Works & Render Views
+    async function loadAllWorks() {
+      allWorks = await fetchAllKaryaSupabase();
+      renderStats();
+      renderSubmissions();
+      renderPublished();
+      renderDrafts();
+    }
+
+    function renderStats() {
+      const submissions = allWorks.filter(w => w.status === 'menunggu_kurasi');
+      const published = allWorks.filter(w => !w.status || w.status === 'published');
+      const drafts = allWorks.filter(w => w.status === 'draft');
+
+      if (statSubmissions) statSubmissions.textContent = submissions.length.toString();
+      if (statPublished) statPublished.textContent = published.length.toString();
+      if (statDrafts) statDrafts.textContent = drafts.length.toString();
+      if (statTotal) statTotal.textContent = allWorks.length.toString();
+
+      if (badgeSubmissions) badgeSubmissions.textContent = submissions.length.toString();
+      if (badgePublished) badgePublished.textContent = published.length.toString();
+      if (badgeDrafts) badgeDrafts.textContent = drafts.length.toString();
+    }
+
+    // 3A. Render Submissions (Antrean Kiriman Santri)
+    function renderSubmissions() {
+      if (!submissionsContainer) return;
+      const submissions = allWorks.filter(w => w.status === 'menunggu_kurasi');
+
+      if (submissions.length === 0) {
+        submissionsContainer.innerHTML = `
+          <div class="p-8 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+            <div class="text-2xl text-[var(--gold)] mb-2 font-serif">❧</div>
+            <h4 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">
+              Alhamdulillah, Antrean Bersih!
+            </h4>
+            <p class="font-['Source_Serif_4',serif] italic text-xs text-[var(--ink-soft)] mt-1">
+              Belum ada kiriman naskah santri baru yang menunggu kurasi. Semua karya telah tertangani.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      submissionsContainer.innerHTML = submissions.map((k, idx) => {
+        const contactTag = k.tags?.find(t => t.startsWith('Kontak:')) || '';
+        return `
+          <div class="p-5 bg-[var(--paper-card)] border-2 border-[var(--crimson-subtle)] hover:border-[var(--crimson)] rounded-sm transition-all shadow-sm space-y-3">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2">
+                <span class="mono text-[0.68rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] font-medium uppercase">
+                  ${k.category_label || k.category}
+                </span>
+                <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-semibold">
+                  Menunggu Kurasi
+                </span>
+                ${contactTag ? `<span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">${contactTag}</span>` : ''}
+              </div>
+              <span class="mono text-xs text-[var(--ink-faint)]">Submisi #${idx + 1}</span>
+            </div>
+
+            <div>
+              <h3 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
+                ${k.title}
+              </h3>
+              <p class="mono text-xs text-[var(--ink-faint)] mt-1 mb-0">
+                Oleh <strong class="text-[var(--ink)] font-semibold">${k.author}</strong> ${k.author_grade ? `(${k.author_grade})` : ''}
+              </p>
+            </div>
+
+            <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] bg-[var(--paper)] p-3 rounded border border-[var(--rule)] m-0">
+              "${k.description || 'Tidak ada abstrak/pengantar terlampir.'}"
+            </p>
+
+            <!-- Collapsible Full Content Preview -->
+            <details class="text-xs font-['Source_Serif_4',serif] text-[var(--ink-soft)]">
+              <summary class="mono text-xs text-[var(--crimson)] cursor-pointer hover:underline select-none">
+                Lihat Naskah Penuh ▼
+              </summary>
+              <div class="mt-2 p-3 bg-[var(--paper)] rounded border border-[var(--rule)] whitespace-pre-line leading-relaxed max-h-60 overflow-y-auto">
+                ${k.content}
+              </div>
+            </details>
+
+            <!-- Action Toolbar -->
+            <div class="pt-3 border-t border-[var(--rule)] flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2">
+                <button 
+                  class="btn-approve-submission btn-literary btn-literary-solid !py-1.5 !px-4 !text-xs cursor-pointer flex items-center gap-1.5"
+                  data-slug="${k.slug}"
+                  data-id="${k.id || ''}"
+                >
+                  <span>✓ Setujui &amp; Publikasikan</span>
+                </button>
+                <button 
+                  class="btn-edit-submission btn-literary !py-1.5 !px-3 !text-xs cursor-pointer"
+                  data-slug="${k.slug}"
+                >
+                  <span>✎ Sunting di Editor</span>
+                </button>
+              </div>
+
+              <button 
+                class="btn-delete-submission mono text-xs text-rose-700 hover:text-rose-900 underline cursor-pointer p-1"
+                data-slug="${k.slug}"
+                data-id="${k.id || ''}"
+                data-title="${k.title}"
+              >
+                ✕ Tolak / Hapus Naskah
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach Submissions Listeners
+      document.querySelectorAll('.btn-approve-submission').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug || '';
+          b.disabled = true;
+          b.textContent = 'Menerbitkan...';
+
+          const res = await updateStatusKarya(slug, 'published');
+          if (res.success) {
+            confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
+            await loadAllWorks();
+            switchTab('published');
+          } else {
+            alert(res.message);
+            b.disabled = false;
+            b.textContent = '✓ Setujui & Publikasikan';
+          }
+        });
+      });
+
+      document.querySelectorAll('.btn-edit-submission').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug;
+          loadIntoEditor(slug);
+        });
+      });
+
+      document.querySelectorAll('.btn-delete-submission').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug || '';
+          const id = b.dataset.id || slug;
+          const title = b.dataset.title || 'karya ini';
+
+          if (confirm(`Apakah Anda yakin ingin menolak dan menghapus naskah "${title}"?`)) {
+            await hapusKarya(id);
+            await loadAllWorks();
+          }
+        });
+      });
+    }
+
+    // 3B. Render Published Works (Karya Terpublikasi)
+    function renderPublished() {
+      if (!publishedContainer) return;
+      const q = (searchPublishedInput?.value || '').trim().toLowerCase();
+      const cat = filterPublishedCat?.value || 'all';
+
+      let published = allWorks.filter(w => !w.status || w.status === 'published');
+
+      if (cat !== 'all') {
+        published = published.filter(w => w.category === cat);
+      }
+      if (q) {
+        published = published.filter(w => 
+          w.title.toLowerCase().includes(q) || 
+          w.author.toLowerCase().includes(q)
+        );
+      }
+
+      if (published.length === 0) {
+        publishedContainer.innerHTML = `
+          <div class="p-8 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+            <p class="mono text-xs text-[var(--ink-faint)] italic m-0">Tidak ada karya terpublikasi yang cocok dengan pencarian / filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      publishedContainer.innerHTML = published.map(k => `
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm flex items-center justify-between gap-4 flex-wrap hover:border-[var(--gold)] transition-colors">
+          <div class="flex items-start gap-3.5">
+            ${k.cover_image_url ? `
+              <img src="${k.cover_image_url}" alt="${k.title}" class="w-14 h-14 object-cover rounded border border-[var(--rule)] flex-shrink-0" />
+            ` : `
+              <div class="w-14 h-14 bg-[var(--paper-deep)] border border-[var(--rule)] rounded flex items-center justify-center font-['Fraunces',serif] text-base text-[var(--crimson)] flex-shrink-0">
+                ${k.title.charAt(0)}
+              </div>
+            `}
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] uppercase">
+                  ${k.category_label || k.category}
+                </span>
+                <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
+                  Tayang
+                </span>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] m-0">
+                ${k.title}
+              </h3>
+              <p class="mono text-[0.72rem] text-[var(--ink-faint)] m-0 mt-0.5">
+                Oleh ${k.author} ${k.author_grade ? `(${k.author_grade})` : ''}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <a 
+              href="${basePath}/karya/${k.slug}" 
+              target="_blank" 
+              class="mono text-xs px-2.5 py-1.5 rounded border border-[var(--rule-strong)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] no-underline transition-colors"
+            >
+              Buka di Web ↗
+            </a>
+            <button 
+              class="btn-edit-published btn-literary !py-1.5 !px-3 !text-xs cursor-pointer"
+              data-slug="${k.slug}"
+            >
+              Sunting ✎
+            </button>
+            <button 
+              class="btn-unpublish mono text-xs px-2.5 py-1.5 rounded border border-[var(--rule)] text-[var(--gold)] hover:underline cursor-pointer"
+              data-slug="${k.slug}"
+              title="Kembalikan status menjadi draf naskah"
+            >
+              Ubah ke Draf ↷
+            </button>
+            <button 
+              class="btn-delete-published mono text-xs p-1.5 text-rose-700 hover:text-rose-900 cursor-pointer"
+              data-slug="${k.slug}"
+              data-id="${k.id || ''}"
+              data-title="${k.title}"
+              title="Hapus permanen karya ini"
+            >
+              🗑
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // Listeners
+      document.querySelectorAll('.btn-edit-published').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          loadIntoEditor(b.dataset.slug);
+        });
+      });
+
+      document.querySelectorAll('.btn-unpublish').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug || '';
+          if (confirm('Ubah status karya ini kembali menjadi Draf? (Karya tidak akan tampil di publik)')) {
+            await updateStatusKarya(slug, 'draft');
+            await loadAllWorks();
+          }
+        });
+      });
+
+      document.querySelectorAll('.btn-delete-published').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug || '';
+          const id = b.dataset.id || slug;
+          const title = b.dataset.title || 'karya ini';
+
+          if (confirm(`Hapus permanen karya "${title}" dari database Supabase?`)) {
+            await hapusKarya(id);
+            await loadAllWorks();
+          }
+        });
+      });
+    }
+
+    searchPublishedInput?.addEventListener('input', renderPublished);
+    filterPublishedCat?.addEventListener('change', renderPublished);
+
+    // 3C. Render Drafts (Draf Redaksi)
+    function renderDrafts() {
+      if (!draftsContainer) return;
+      const drafts = allWorks.filter(w => w.status === 'draft');
+
+      if (drafts.length === 0) {
+        draftsContainer.innerHTML = `
+          <div class="p-8 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
+            <p class="mono text-xs text-[var(--ink-faint)] italic m-0">Tidak ada draf yang tersimpan saat ini.</p>
+          </div>
+        `;
+        return;
+      }
+
+      draftsContainer.innerHTML = drafts.map(k => `
+        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase">
+                ${k.category_label || k.category}
+              </span>
+              <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
+                Draf
+              </span>
+            </div>
+            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] m-0">
+              ${k.title}
+            </h3>
+            <p class="mono text-[0.72rem] text-[var(--ink-faint)] m-0 mt-0.5">
+              Oleh ${k.author}
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button 
+              class="btn-publish-draft btn-literary btn-literary-solid !py-1.5 !px-3 !text-xs cursor-pointer"
+              data-slug="${k.slug}"
+            >
+              Tayangkan Sekarang ⚡
+            </button>
+            <button 
+              class="btn-edit-draft btn-literary !py-1.5 !px-3 !text-xs cursor-pointer"
+              data-slug="${k.slug}"
+            >
+              Lanjutkan Sunting ✎
+            </button>
+            <button 
+              class="btn-delete-draft mono text-xs p-1.5 text-rose-700 hover:text-rose-900 cursor-pointer"
+              data-slug="${k.slug}"
+              data-id="${k.id || ''}"
+              data-title="${k.title}"
+            >
+              🗑
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.btn-publish-draft').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug || '';
+          await updateStatusKarya(slug, 'published');
+          confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
+          await loadAllWorks();
+          switchTab('published');
+        });
+      });
+
+      document.querySelectorAll('.btn-edit-draft').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          loadIntoEditor(b.dataset.slug);
+        });
+      });
+
+      document.querySelectorAll('.btn-delete-draft').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const b = e.currentTarget as HTMLButtonElement;
+          const slug = b.dataset.slug || '';
+          const id = b.dataset.id || slug;
+          const title = b.dataset.title || 'karya ini';
+
+          if (confirm(`Hapus draf "${title}"?`)) {
+            await hapusKarya(id);
+            await loadAllWorks();
+          }
+        });
+      });
+    }
+
+    // 4. Load Work into Editor Form
+    function loadIntoEditor(slug?: string) {
+      if (!slug) return;
+      const found = allWorks.find(w => w.slug === slug);
+      if (!found) return;
+
+      editIdInput.value = found.id || '';
+      editSlugInput.value = found.slug || '';
+      titleInput.value = found.title || '';
+      authorInput.value = found.author || '';
+      gradeInput.value = found.author_grade || '';
+      categorySelect.value = found.category || 'puisi';
+      statusSelect.value = found.status || 'published';
+      descInput.value = found.description || '';
+      contentInput.value = found.content || '';
+      photoUrlInput.value = found.cover_image_url || '';
+
+      if (editorFormTitle) editorFormTitle.textContent = `Sunting: "${found.title}"`;
+      if (editorModeBadge) editorModeBadge.textContent = 'Mode Penyuntingan Naskah';
+
+      updateLivePreview();
+      switchTab('editor');
+    }
+
+    // 5. Live Preview
     function updateLivePreview() {
       if (prevTitle) prevTitle.textContent = titleInput.value.trim() || 'Judul Karya Anda';
       if (prevDesc) prevDesc.textContent = `"${descInput.value.trim() || 'Petikan atau sinopsis karya akan tampil di sini...'}"`;
@@ -336,7 +970,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       el?.addEventListener('input', updateLivePreview);
     });
 
-    // Handle File Upload to Supabase Storage
+    // 6. Photo File Upload to Supabase Storage
     photoFileInput?.addEventListener('change', async () => {
       if (!photoFileInput.files || !photoFileInput.files[0]) return;
       const file = photoFileInput.files[0];
@@ -358,13 +992,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
     });
 
-    // Save to Supabase
-    const saveBtn = document.getElementById('btn-save-supabase') as HTMLButtonElement | null;
-    const alertBox = document.getElementById('editor-alert');
-
+    // 7. Save to Supabase
     saveBtn?.addEventListener('click', async () => {
       if (!titleInput.value || !authorInput.value || !contentInput.value) {
-        alert('Harap isi Judul, Penulis, dan Isi Naskah terlebih dahulu.');
+        alert('Harap lengkapi Judul, Penulis, dan Isi Naskah terlebih dahulu.');
         return;
       }
 
@@ -393,6 +1024,12 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             alertBox.className = 'mono text-xs p-3 rounded border border-emerald-600 bg-emerald-50 text-emerald-900 block';
             setTimeout(() => alertBox.classList.add('hidden'), 4000);
           }
+          await loadAllWorks();
+          if (statusSelect.value === 'published') {
+            switchTab('published');
+          } else if (statusSelect.value === 'draft') {
+            switchTab('drafts');
+          }
         }
       } catch (e: any) {
         if (alertBox) {
@@ -405,9 +1042,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
     });
 
-    // Download as Markdown
-    const dlMdBtn = document.getElementById('btn-download-md');
-    dlMdBtn?.addEventListener('click', () => {
+    // 8. Download as Markdown
+    document.getElementById('btn-download-md')?.addEventListener('click', () => {
       const slug = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'naskah';
       const mdContent = `---
 title: "${titleInput.value.replace(/"/g, '\\"')}"
@@ -431,7 +1067,7 @@ ${contentInput.value}
       a.click();
     });
 
-    // Reset Form
+    // 9. Reset Form
     document.getElementById('btn-reset-form')?.addEventListener('click', () => {
       editIdInput.value = '';
       editSlugInput.value = '';
@@ -441,67 +1077,13 @@ ${contentInput.value}
       descInput.value = '';
       contentInput.value = '';
       photoUrlInput.value = '';
+      statusSelect.value = 'published';
+      if (editorFormTitle) editorFormTitle.textContent = 'Tulis Naskah Baru';
+      if (editorModeBadge) editorModeBadge.textContent = 'Karya Baru';
       updateLivePreview();
     });
 
-    // Load Saved Works in View 2
-    const worksContainer = document.getElementById('saved-works-table');
-    const savedCountBadge = document.getElementById('saved-count');
-
-    async function loadSavedWorks() {
-      if (!worksContainer) return;
-      worksContainer.innerHTML = '<p class="mono text-xs text-[var(--ink-faint)] italic text-center py-6">Mengambil data dari Supabase...</p>';
-
-      const list = await fetchAllKaryaSupabase();
-      if (savedCountBadge) savedCountBadge.textContent = list.length.toString();
-
-      if (list.length === 0) {
-        worksContainer.innerHTML = '<p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Belum ada karya tersimpan di Supabase. Mulai buat karya baru di tab editor!</p>';
-        return;
-      }
-
-      worksContainer.innerHTML = list.map((k: any) => `
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase">${k.category_label || k.category}</span>
-              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">${k.status || 'published'}</span>
-            </div>
-            <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">${k.title}</h3>
-            <p class="mono text-xs text-[var(--ink-faint)] m-0 mt-0.5">Oleh ${k.author} ${k.author_grade ? `(${k.author_grade})` : ''}</p>
-          </div>
-          <button class="btn-edit-item btn-literary !py-1 !px-3 !text-xs cursor-pointer" data-id="${k.id || ''}" data-slug="${k.slug || ''}">
-            Sunting Naskah ✎
-          </button>
-        </div>
-      `).join('');
-
-      // Attach edit button listeners
-      document.querySelectorAll('.btn-edit-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const targetSlug = b.dataset.slug;
-          const found = list.find((item: any) => item.slug === targetSlug);
-          if (found) {
-            editIdInput.value = found.id || '';
-            editSlugInput.value = found.slug || '';
-            titleInput.value = found.title || '';
-            authorInput.value = found.author || '';
-            gradeInput.value = found.author_grade || '';
-            categorySelect.value = found.category || 'puisi';
-            statusSelect.value = found.status || 'published';
-            descInput.value = found.description || '';
-            contentInput.value = found.content || '';
-            photoUrlInput.value = found.cover_image_url || '';
-            updateLivePreview();
-
-            // Switch to editor view
-            tabEditorBtn?.click();
-          }
-        });
-      });
-    }
-
-    document.getElementById('btn-refresh-list')?.addEventListener('click', loadSavedWorks);
+    // Refresh All Button
+    document.getElementById('btn-refresh-all')?.addEventListener('click', loadAllWorks);
   </script>
 </Layout>
