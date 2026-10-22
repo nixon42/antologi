@@ -216,10 +216,16 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
         </div>
 
-        <a href={`${basePath}/admin`} class="mono text-xs text-[var(--crimson)] font-semibold no-underline hover:underline flex items-center gap-1">
-          <span>Studio Redaksi</span>
-          <span>✎</span>
-        </a>
+        <div class="flex items-center gap-2">
+          <a href={`${basePath}/admin`} class="mono text-xs text-[var(--crimson)] font-semibold no-underline hover:underline flex items-center gap-1">
+            <span>Studio Redaksi</span>
+            <span>✎</span>
+          </a>
+          <span id="drawer-logout-divider" class="hidden text-[var(--ink-faint)] text-xs">·</span>
+          <a id="drawer-logout-link" href={`${basePath}/admin/login?logout=1`} class="hidden mono text-xs text-[var(--crimson)] hover:underline">
+            Keluar
+          </a>
+        </div>
       </div>
 
       <a href={`${basePath}/kirim`} class="btn-literary btn-literary-solid !w-full !py-2.5 !text-center text-xs block no-underline mt-2">
@@ -294,6 +300,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <li><a href={`${basePath}/kirim`} class="hover:text-[var(--crimson)] transition-colors">Kirim Naskah Baru</a></li>
             <li><a href={`${basePath}/admin`} class="hover:text-[var(--crimson)] transition-colors font-semibold text-[var(--crimson)]">Studio Redaksi &amp; Live Editor ✎</a></li>
             <li><a href={`${basePath}/admin/login`} class="hover:text-[var(--crimson)] transition-colors">Masuk Redaksi (Login)</a></li>
+            <li id="footer-logout-item" class="hidden"><a href={`${basePath}/admin/login?logout=1`} class="text-[var(--crimson)] hover:underline font-semibold">Keluar dari Sesi Redaksi →</a></li>
             <li><a href={`${basePath}/panggung`} class="hover:text-[var(--crimson)] transition-colors">Panggung Teater</a></li>
             <li><a href={`${basePath}/sitemap-index.xml`} class="hover:text-[var(--crimson)] transition-colors">Peta Situs (Sitemap)</a></li>
           </ul>
@@ -499,6 +506,19 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </a>
       `).join('');
     });
+
+    // Tampilkan tombol keluar jika sesi redaksi sedang aktif
+    try {
+      if (typeof window !== 'undefined') {
+        const hasSession = localStorage.getItem('rs_admin_session') || 
+          Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        if (hasSession) {
+          document.getElementById('drawer-logout-divider')?.classList.remove('hidden');
+          document.getElementById('drawer-logout-link')?.classList.remove('hidden');
+          document.getElementById('footer-logout-item')?.classList.remove('hidden');
+        }
+      }
+    } catch {}
   </script>
 </body>
 </html>

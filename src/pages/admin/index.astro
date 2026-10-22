@@ -32,7 +32,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
 
     <!-- MAIN ADMIN DASHBOARD (Protected Content) -->
-    <div id="admin-dashboard" class="space-y-8">
+    <div id="admin-dashboard" class="hidden space-y-8">
       
       <!-- Top Header -->
       <header class="pb-6 border-b border-[var(--rule-strong)] flex items-start justify-between gap-4 flex-wrap">
@@ -60,8 +60,16 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           <div class="flex items-center gap-2 px-3 py-1.5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded-full mono text-xs text-[var(--ink)]">
             <span class="w-2 h-2 rounded-full bg-[var(--crimson)]"></span>
             <span id="admin-user-email">redaksi@yq.sch.id</span>
-            <button id="btn-logout" class="ml-2 text-[var(--crimson)] hover:underline font-semibold cursor-pointer" title="Keluar dari sesi redaksi">
-              Keluar
+            <button 
+              id="btn-logout" 
+              type="button" 
+              class="ml-2 px-2.5 py-0.5 rounded bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--crimson)] hover:bg-[var(--crimson)] hover:text-[var(--paper)] transition-colors font-semibold cursor-pointer flex items-center gap-1" 
+              title="Keluar dari sesi redaksi"
+            >
+              <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              <span>Keluar</span>
             </button>
           </div>
         </div>
@@ -432,7 +440,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const authBarrier = document.getElementById('auth-guard-barrier');
     const adminDashboard = document.getElementById('admin-dashboard');
     const adminUserEmail = document.getElementById('admin-user-email');
-    const logoutBtn = document.getElementById('btn-logout');
+    const logoutBtn = document.getElementById('btn-logout') as HTMLButtonElement | null;
 
     // Stats
     const statSubmissions = document.getElementById('stat-submissions');
@@ -507,9 +515,18 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
     });
 
-    logoutBtn?.addEventListener('click', async () => {
-      await logoutAdmin();
-      window.location.href = `${basePath}/admin/login`;
+    logoutBtn?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (logoutBtn) {
+        logoutBtn.disabled = true;
+        logoutBtn.innerHTML = '<span>Keluar...</span>';
+      }
+      try {
+        await logoutAdmin();
+      } catch (err) {
+        console.warn('Gagal logout:', err);
+      }
+      window.location.replace(`${basePath}/admin/login?logout=1`);
     });
 
     // 2. Tab Navigation

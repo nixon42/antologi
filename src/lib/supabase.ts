@@ -534,19 +534,41 @@ export async function loginAdmin(email: string, password: string): Promise<{ suc
 
   return {
     success: false,
-    message: 'Email atau kata sandi tidak cocok. Gunakan akun Supabase Auth atau akun redaksi resmi sekolah (sastrayq2026).',
+    message: 'Email atau kata sandi tidak cocok. Silakan periksa kembali email dan kata sandi Anda.',
   };
 }
 
 export async function logoutAdmin(): Promise<void> {
-  if (supabase) {
+  // 1. Bersihkan seluruh session lokal secara instan dan menyeluruh
+  if (typeof window !== 'undefined') {
     try {
-      await supabase.auth.signOut();
+      localStorage.removeItem('rs_admin_session');
+      sessionStorage.removeItem('rs_admin_session');
+
+      // Bersihkan seluruh token otentikasi supabase di storage lokal
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('sb-') || k.includes('auth-token') || k.includes('supabase'))) {
+          keysToRemove.push(k);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
     } catch (e) {
-      console.warn('Gagal signout Supabase:', e);
+      console.warn('Gagal membersihkan storage saat logout:', e);
     }
   }
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('rs_admin_session');
+
+  // 2. Signout dari Supabase Client (prioritas lokal lalu network)
+  if (supabase) {
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch (e) {
+      try {
+        await supabase.auth.signOut();
+      } catch (e2) {
+        console.warn('Gagal signout Supabase:', e2);
+      }
+    }
   }
 }

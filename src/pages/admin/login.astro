@@ -25,6 +25,28 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </p>
       </div>
 
+      <!-- Active Session Banner (if already logged in) -->
+      <div id="already-logged-in-banner" class="hidden mb-5 p-3.5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded text-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="mono text-[0.72rem] text-[var(--ink)] font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Sesi Redaksi Aktif:
+          </span>
+          <span id="banner-user-email" class="mono text-[0.72rem] text-[var(--crimson)] font-bold"></span>
+        </div>
+        <p class="text-[0.75rem] text-[var(--ink-soft)] font-['Source_Serif_4',serif] italic m-0">
+          Anda saat ini masih dalam keadaan masuk. Anda dapat langsung membuka Studio Redaksi atau keluar dari sesi ini.
+        </p>
+        <div class="pt-1 flex items-center gap-3">
+          <a href={`${basePath}/admin`} class="btn-literary btn-literary-solid !py-1 !px-3.5 !text-xs no-underline">
+            Ke Studio Redaksi →
+          </a>
+          <button id="btn-banner-logout" type="button" class="mono text-xs text-[var(--crimson)] hover:underline cursor-pointer font-semibold">
+            Keluar dari Sesi
+          </button>
+        </div>
+      </div>
+
       <!-- Alert Box -->
       <div id="login-alert" class="hidden mb-5 p-3 rounded text-xs mono border transition-all"></div>
 
@@ -81,24 +103,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <span class="bg-[var(--paper-card)] px-3 text-[var(--gold)] text-xs relative -top-2.5 font-serif">❧</span>
       </div>
 
-      <!-- Quick Fill / Pedagogy Info -->
-      <div class="p-3 bg-[var(--paper)] border border-[var(--rule)] rounded text-[0.75rem] text-[var(--ink-soft)] space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="mono text-[0.68rem] uppercase font-semibold text-[var(--ink)]">Kredensial Bawaan Sekolah:</span>
-          <button 
-            type="button" 
-            id="btn-quick-fill" 
-            class="mono text-[0.68rem] text-[var(--crimson)] font-semibold hover:underline cursor-pointer"
-          >
-            Gunakan Akun Ini ↗
-          </button>
-        </div>
-        <div class="mono text-[0.7rem] text-[var(--ink-faint)] space-y-0.5">
-          <p class="m-0">Email: <code class="text-[var(--ink)]">redaksi@yq.sch.id</code></p>
-          <p class="m-0">Sandi: <code class="text-[var(--ink)]">sastrayq2026</code></p>
-        </div>
-        <p class="text-[0.7rem] italic m-0 pt-1 text-[var(--ink-faint)]">
-          *Mendukung login akun Supabase Auth resmi atau kredensial dewan redaksi internal sekolah.
+      <!-- Security & Colophon Note (No password exposed) -->
+      <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-[0.75rem] text-[var(--ink-soft)] text-center leading-relaxed">
+        <p class="m-0 text-[var(--ink-faint)] font-['Source_Serif_4',serif] italic">
+          Khusus Dewan Redaksi dan Pembina Literasi SMPI Yambu'ul Qur'an. Hubungi administrator madrasah jika Anda memerlukan akses atau lupa kata sandi.
         </p>
       </div>
 
@@ -113,7 +121,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   </div>
 
   <script>
-    import { loginAdmin, getAdminUser } from '../../lib/supabase';
+    import { loginAdmin, getAdminUser, logoutAdmin } from '../../lib/supabase';
 
     const form = document.getElementById('login-form') as HTMLFormElement;
     const emailInput = document.getElementById('login-email') as HTMLInputElement;
@@ -121,15 +129,37 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const togglePwdBtn = document.getElementById('toggle-pwd-btn');
     const submitBtn = document.getElementById('btn-submit-login') as HTMLButtonElement;
     const alertBox = document.getElementById('login-alert');
-    const quickFillBtn = document.getElementById('btn-quick-fill');
+    const alreadyLoggedInBanner = document.getElementById('already-logged-in-banner');
+    const bannerUserEmail = document.getElementById('banner-user-email');
+    const bannerLogoutBtn = document.getElementById('btn-banner-logout');
 
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-    // Check if already authenticated
-    getAdminUser().then(user => {
-      if (user) {
-        window.location.href = `${basePath}/admin`;
-      }
+    // Check URL parameters for explicit logout
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('logout')) {
+      logoutAdmin().then(() => {
+        showAlert('Anda telah berhasil keluar dari sesi Studio Redaksi.', 'info');
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      });
+    } else {
+      // Check if already authenticated to show active session banner
+      getAdminUser().then(user => {
+        if (user && alreadyLoggedInBanner && bannerUserEmail) {
+          bannerUserEmail.textContent = user.email;
+          alreadyLoggedInBanner.classList.remove('hidden');
+        }
+      });
+    }
+
+    // Logout button from banner
+    bannerLogoutBtn?.addEventListener('click', async () => {
+      if (bannerLogoutBtn) bannerLogoutBtn.textContent = 'Mengeluarkan...';
+      await logoutAdmin();
+      alreadyLoggedInBanner?.classList.add('hidden');
+      showAlert('Anda telah berhasil keluar dari akun redaksi.', 'info');
     });
 
     // Toggle Password Visibility
@@ -141,13 +171,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         pwdInput.type = 'password';
         togglePwdBtn.textContent = 'Lihat Sandi';
       }
-    });
-
-    // Quick fill credentials for convenience
-    quickFillBtn?.addEventListener('click', () => {
-      emailInput.value = 'redaksi@yq.sch.id';
-      pwdInput.value = 'sastrayq2026';
-      showAlert('Kredensial redaksi telah dimasukkan. Silakan klik tombol Masuk.', 'info');
     });
 
     function showAlert(msg: string, type: 'error' | 'success' | 'info') {
