@@ -243,11 +243,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   <script>
     // Theme Switcher Cycle: Paper -> Sepia -> Dark -> Paper
     const themes = ['paper', 'sepia', 'dark'];
-    const themeLabels = { paper: 'Kertas', sepia: 'Sepia', dark: 'Malam' };
+    const themeLabels: Record<string, string> = { paper: 'Kertas', sepia: 'Sepia', dark: 'Malam' };
     const themeButton = document.getElementById('theme-cycle-button');
     const themeLabel = document.getElementById('theme-label');
 
-    function updateThemeUI(theme) {
+    function updateThemeUI(theme: string) {
       if (themeLabel) themeLabel.textContent = themeLabels[theme] || 'Kertas';
     }
 
@@ -276,7 +276,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const fontInc = document.getElementById('font-inc-button');
     const fontDec = document.getElementById('font-dec-button');
 
-    function setFontSize(size) {
+    function setFontSize(size: number) {
       currentSize = Math.max(14, Math.min(22, size));
       document.documentElement.style.setProperty('--reader-font-size', (currentSize / 16) + 'rem');
       localStorage.setItem('rs_size', currentSize.toString());
@@ -331,7 +331,18 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     });
 
     // Fetch search index and listen to input
-    let searchIndex = null;
+    interface SearchResultItem {
+      title: string;
+      author: string;
+      category?: string;
+      categoryLabel?: string;
+      description?: string;
+      tags?: string[];
+      url: string;
+      type?: string;
+    }
+
+    let searchIndex: SearchResultItem[] | null = null;
     async function loadSearchIndex() {
       if (!searchIndex) {
         try {
@@ -355,11 +366,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
 
       const items = await loadSearchIndex();
-      const matched = items.filter(item => 
+      const matched = items.filter((item: SearchResultItem) => 
         item.title.toLowerCase().includes(query) ||
         item.author.toLowerCase().includes(query) ||
         (item.description && item.description.toLowerCase().includes(query)) ||
-        (item.tags && item.tags.some(t => t.toLowerCase().includes(query)))
+        (item.tags && item.tags.some((t: string) => t.toLowerCase().includes(query)))
       );
 
       if (matched.length === 0) {
@@ -367,7 +378,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         return;
       }
 
-      resultsContainer.innerHTML = matched.map(item => `
+      resultsContainer.innerHTML = matched.map((item: SearchResultItem) => `
         <a href="${item.url}" class="block p-3 rounded hover:bg-[var(--paper-deep)] border-b border-[var(--rule)] no-underline group transition-colors">
           <div class="flex items-center justify-between gap-2">
             <h5 class="text-sm font-semibold text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors m-0 font-['Fraunces',serif]">

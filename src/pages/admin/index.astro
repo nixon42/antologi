@@ -274,14 +274,14 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     tabEditorBtn?.addEventListener('click', () => {
       tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors';
-      tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
+      if (tabListBtn) tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
       viewEditor?.classList.remove('hidden');
       viewList?.classList.add('hidden');
     });
 
     tabListBtn?.addEventListener('click', () => {
       tabListBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors';
-      tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
+      if (tabEditorBtn) tabEditorBtn.className = 'mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors';
       viewList?.classList.remove('hidden');
       viewEditor?.classList.add('hidden');
       loadSavedWorks();
@@ -359,7 +359,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     });
 
     // Save to Supabase
-    const saveBtn = document.getElementById('btn-save-supabase');
+    const saveBtn = document.getElementById('btn-save-supabase') as HTMLButtonElement | null;
     const alertBox = document.getElementById('editor-alert');
 
     saveBtn?.addEventListener('click', async () => {
