@@ -184,6 +184,38 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <!-- Vertical Divider (Desktop) -->
         <span class="hidden md:block w-[1px] h-5 bg-[var(--rule-strong)] mx-0.5"></span>
 
+        <!-- Login / Masuk Button (Desktop: Unauthenticated) -->
+        <a 
+          id="desktop-login-link"
+          href={`${basePath}/admin/login`} 
+          class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--rule-strong)] hover:border-[var(--crimson)] text-[var(--ink-soft)] hover:text-[var(--crimson)] bg-[var(--paper-card)] hover:bg-[var(--paper-deep)] text-xs mono font-medium transition-colors shadow-2xs whitespace-nowrap no-underline cursor-pointer"
+          title="Masuk ke Studio Redaksi"
+        >
+          <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+          </svg>
+          <span>Masuk</span>
+        </a>
+
+        <!-- Logged-in Redaksi Group (Desktop: Authenticated) -->
+        <div id="desktop-logged-in-group" class="hidden items-center gap-2">
+          <a 
+            href={`${basePath}/admin`} 
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] bg-[var(--paper-card)] hover:bg-[var(--paper-deep)] text-xs mono font-semibold transition-colors shadow-2xs whitespace-nowrap no-underline"
+            title="Buka Studio Redaksi"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Studio Redaksi ✎</span>
+          </a>
+          <a 
+            href={`${basePath}/admin/login?logout=1`} 
+            class="mono text-xs text-[var(--crimson)] hover:underline cursor-pointer px-1 font-medium" 
+            title="Keluar dari sesi redaksi"
+          >
+            Keluar
+          </a>
+        </div>
+
         <!-- Kirim Karya Solid CTA -->
         <a 
           href={`${basePath}/kirim`} 
@@ -254,7 +286,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </div>
 
         <div class="flex items-center gap-2">
-          <a href={`${basePath}/admin`} class="mono text-xs text-[var(--crimson)] font-semibold no-underline hover:underline flex items-center gap-1">
+          <a id="drawer-login-link" href={`${basePath}/admin/login`} class="mono text-xs text-[var(--ink-soft)] hover:text-[var(--crimson)] no-underline flex items-center gap-1">
+            <span>Masuk Redaksi</span>
+            <span>↗</span>
+          </a>
+          <a id="drawer-admin-link" href={`${basePath}/admin`} class="hidden mono text-xs text-[var(--crimson)] font-semibold no-underline hover:underline flex items-center gap-1">
             <span>Studio Redaksi</span>
             <span>✎</span>
           </a>
@@ -544,15 +580,40 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       `).join('');
     });
 
-    // Tampilkan tombol keluar jika sesi redaksi sedang aktif
+    // Status Otentikasi Redaksi (Navbar Desktop & Mobile Drawer)
     try {
       if (typeof window !== 'undefined') {
         const hasSession = localStorage.getItem('rs_admin_session') || 
           Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+
+        const desktopLoginLink = document.getElementById('desktop-login-link');
+        const desktopLoggedInGroup = document.getElementById('desktop-logged-in-group');
+        const drawerLoginLink = document.getElementById('drawer-login-link');
+        const drawerAdminLink = document.getElementById('drawer-admin-link');
+        const drawerLogoutDivider = document.getElementById('drawer-logout-divider');
+        const drawerLogoutLink = document.getElementById('drawer-logout-link');
+        const footerLogoutItem = document.getElementById('footer-logout-item');
+
         if (hasSession) {
-          document.getElementById('drawer-logout-divider')?.classList.remove('hidden');
-          document.getElementById('drawer-logout-link')?.classList.remove('hidden');
-          document.getElementById('footer-logout-item')?.classList.remove('hidden');
+          desktopLoginLink?.classList.add('!hidden');
+          desktopLoggedInGroup?.classList.remove('hidden');
+          desktopLoggedInGroup?.classList.add('md:inline-flex');
+
+          drawerLoginLink?.classList.add('hidden');
+          drawerAdminLink?.classList.remove('hidden');
+          drawerLogoutDivider?.classList.remove('hidden');
+          drawerLogoutLink?.classList.remove('hidden');
+          footerLogoutItem?.classList.remove('hidden');
+        } else {
+          desktopLoginLink?.classList.remove('!hidden');
+          desktopLoggedInGroup?.classList.add('hidden');
+          desktopLoggedInGroup?.classList.remove('md:inline-flex');
+
+          drawerLoginLink?.classList.remove('hidden');
+          drawerAdminLink?.classList.add('hidden');
+          drawerLogoutDivider?.classList.add('hidden');
+          drawerLogoutLink?.classList.add('hidden');
+          footerLogoutItem?.classList.add('hidden');
         }
       }
     } catch {}
