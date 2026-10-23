@@ -197,23 +197,25 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           <span>Masuk</span>
         </a>
 
-        <!-- Logged-in Redaksi Group (Desktop: Authenticated) -->
+        <!-- Logged-in Group (Desktop: Authenticated Redaksi / Penulis) -->
         <div id="desktop-logged-in-group" class="hidden items-center gap-2">
           <a 
+            id="desktop-user-badge-link"
             href={`${basePath}/admin`} 
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] bg-[var(--paper-card)] hover:bg-[var(--paper-deep)] text-xs mono font-semibold transition-colors shadow-2xs whitespace-nowrap no-underline"
-            title="Buka Studio Redaksi"
+            title="Buka Panel"
           >
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Studio Redaksi ✎</span>
+            <span id="desktop-user-badge-text">Studio Redaksi ✎</span>
           </a>
-          <a 
-            href={`${basePath}/admin/login?logout=1`} 
-            class="mono text-xs text-[var(--crimson)] hover:underline cursor-pointer px-1 font-medium" 
-            title="Keluar dari sesi redaksi"
+          <button 
+            id="btn-desktop-logout"
+            type="button"
+            class="mono text-xs text-[var(--crimson)] hover:underline cursor-pointer px-1 font-medium bg-transparent border-0" 
+            title="Keluar dari sesi"
           >
             Keluar
-          </a>
+          </button>
         </div>
 
         <!-- Kirim Karya Solid CTA -->
@@ -580,30 +582,58 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       `).join('');
     });
 
-    // Status Otentikasi Redaksi (Navbar Desktop & Mobile Drawer)
+    // Status Otentikasi (Navbar Desktop & Mobile Drawer)
     try {
       if (typeof window !== 'undefined') {
-        const hasSession = localStorage.getItem('rs_admin_session') || 
-          Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        const clientBasePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+        const adminSessionRaw = localStorage.getItem('rs_admin_session');
+        const penulisSessionRaw = localStorage.getItem('rs_penulis_session');
+        const hasAdminSession = adminSessionRaw || Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        const hasPenulisSession = !!penulisSessionRaw;
 
         const desktopLoginLink = document.getElementById('desktop-login-link');
         const desktopLoggedInGroup = document.getElementById('desktop-logged-in-group');
+        const desktopUserBadgeLink = document.getElementById('desktop-user-badge-link') as HTMLAnchorElement | null;
+        const desktopUserBadgeText = document.getElementById('desktop-user-badge-text');
+        const btnDesktopLogout = document.getElementById('btn-desktop-logout');
+
         const drawerLoginLink = document.getElementById('drawer-login-link');
-        const drawerAdminLink = document.getElementById('drawer-admin-link');
+        const drawerAdminLink = document.getElementById('drawer-admin-link') as HTMLAnchorElement | null;
         const drawerLogoutDivider = document.getElementById('drawer-logout-divider');
         const drawerLogoutLink = document.getElementById('drawer-logout-link');
         const footerLogoutItem = document.getElementById('footer-logout-item');
 
-        if (hasSession) {
+        if (hasAdminSession) {
           desktopLoginLink?.classList.add('!hidden');
           desktopLoggedInGroup?.classList.remove('hidden');
           desktopLoggedInGroup?.classList.add('md:inline-flex');
+          if (desktopUserBadgeLink) desktopUserBadgeLink.href = `${clientBasePath}/admin`;
+          if (desktopUserBadgeText) desktopUserBadgeText.textContent = 'Studio Redaksi ✎';
 
           drawerLoginLink?.classList.add('hidden');
           drawerAdminLink?.classList.remove('hidden');
           drawerLogoutDivider?.classList.remove('hidden');
           drawerLogoutLink?.classList.remove('hidden');
           footerLogoutItem?.classList.remove('hidden');
+        } else if (hasPenulisSession) {
+          try {
+            const penulis = JSON.parse(penulisSessionRaw);
+            desktopLoginLink?.classList.add('!hidden');
+            desktopLoggedInGroup?.classList.remove('hidden');
+            desktopLoggedInGroup?.classList.add('md:inline-flex');
+            if (desktopUserBadgeLink) desktopUserBadgeLink.href = `${clientBasePath}/kirim`;
+            if (desktopUserBadgeText) desktopUserBadgeText.textContent = `✍️ ${penulis.nama.split(' ')[0]} (Naskah Saya)`;
+
+            drawerLoginLink?.classList.add('hidden');
+            if (drawerAdminLink) {
+              drawerAdminLink.href = `${clientBasePath}/kirim`;
+              drawerAdminLink.innerHTML = '<span>✍️ Naskah Saya</span>';
+              drawerAdminLink.classList.remove('hidden');
+            }
+            drawerLogoutDivider?.classList.remove('hidden');
+            drawerLogoutLink?.classList.remove('hidden');
+            footerLogoutItem?.classList.remove('hidden');
+          } catch {}
         } else {
           desktopLoginLink?.classList.remove('!hidden');
           desktopLoggedInGroup?.classList.add('hidden');
@@ -615,6 +645,18 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           drawerLogoutLink?.classList.add('hidden');
           footerLogoutItem?.classList.add('hidden');
         }
+
+        btnDesktopLogout?.addEventListener('click', () => {
+          localStorage.removeItem('rs_admin_session');
+          localStorage.removeItem('rs_penulis_session');
+          for (let i = localStorage.length - 1; i >= 0; i--) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith('sb-') || k.includes('auth-token'))) {
+              localStorage.removeItem(k);
+            }
+          }
+          window.location.reload();
+        });
       }
     } catch {}
   </script>

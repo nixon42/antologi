@@ -6,12 +6,12 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <Layout 
   title="Kirim Naskah Karya Siswa — Ruang Sastra SMPI YQ"
-  description="Formulir submisi karya tulis ilmiah, puisi, cerpen, dan naskah drama untuk siswa dan guru SMPI Yambu'ul Qur'an."
+  description="Formulir submisi karya tulis ilmiah, puisi, cerpen, dan naskah drama untuk siswa dan santri SMPI Yambu'ul Qur'an."
 >
-  <div class="wrap py-12 md:py-16">
+  <div class="wrap py-10 md:py-16">
     
     <!-- Header -->
-    <header class="mb-10 pb-6 border-b border-[var(--rule-strong)]">
+    <header class="mb-8 pb-6 border-b border-[var(--rule-strong)]">
       <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-2 uppercase tracking-wider">
         <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
         <span>/</span>
@@ -21,10 +21,90 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         Ruang Submisi &amp; Kirim Karya
       </h1>
       <p class="font-['Source_Serif_4',serif] italic text-base md:text-lg text-[var(--ink-soft)] mt-3 max-w-2xl leading-relaxed">
-        Punya tulisan ilmiah, bait puisi, cerpen, atau naskah drama yang ingin diterbitkan di portal Ruang Sastra? Kirimkan naskah Anda melalui formulir di bawah ini.
+        Punya karya tulis ilmiah, bait puisi, cerpen, atau naskah drama yang ingin diterbitkan di portal Ruang Sastra? Kirimkan naskah Anda melalui formulir di bawah ini.
       </p>
     </header>
 
+    <!-- SECTION: AUTHOR STATUS STRIP (Penulis Active Card or Guest Prompt) -->
+    
+    <!-- 1. Penulis Logged In Active Card -->
+    <div id="penulis-active-card" class="hidden mb-8 p-4 sm:p-5 bg-[var(--paper-card)] border border-[var(--crimson)] rounded-sm flex items-center justify-between flex-wrap gap-4 shadow-xs">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-full bg-[var(--crimson)] text-[var(--paper)] flex items-center justify-center font-['Fraunces',serif] font-bold text-base shadow-inner flex-shrink-0">
+          ✍️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="mono text-[0.68rem] uppercase text-[var(--crimson)] font-semibold tracking-wider">Akun Penulis Aktif</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </div>
+          <h3 class="font-['Fraunces',serif] font-semibold text-base sm:text-lg text-[var(--ink)] m-0 flex items-center gap-2 flex-wrap">
+            <span id="active-penulis-name">Penulis Santri</span>
+            <span id="active-penulis-grade" class="text-xs font-normal text-[var(--ink-soft)] font-mono px-2 py-0.5 rounded bg-[var(--paper-deep)] border border-[var(--rule)]"></span>
+          </h3>
+          <span id="active-penulis-email" class="mono text-xs text-[var(--ink-faint)]"></span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button 
+          id="btn-toggle-riwayat" 
+          type="button" 
+          class="mono text-xs px-3.5 py-1.5 rounded border border-[var(--rule-strong)] hover:border-[var(--crimson)] text-[var(--ink)] hover:text-[var(--crimson)] bg-[var(--paper)] transition-colors cursor-pointer flex items-center gap-2"
+        >
+          <span>Riwayat Naskah Saya</span>
+          <span id="penulis-karya-badge" class="px-1.5 py-0.2 rounded-full bg-[var(--crimson)] text-[var(--paper)] text-[0.65rem] font-bold">0</span>
+        </button>
+        <button 
+          id="btn-logout-penulis" 
+          type="button" 
+          class="mono text-xs px-2.5 py-1.5 text-[var(--crimson)] hover:underline cursor-pointer font-medium"
+        >
+          Keluar
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Guest Writer Prompt (Shown when not logged in) -->
+    <div id="penulis-guest-prompt" class="mb-8 p-4 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded-sm flex items-center justify-between flex-wrap gap-3.5 text-xs">
+      <div class="flex items-center gap-3">
+        <span class="text-lg text-[var(--gold)]">✦</span>
+        <p class="m-0 font-['Source_Serif_4',serif] text-[var(--ink)] leading-relaxed text-xs sm:text-sm">
+          <strong>Punya akun santri?</strong> Masuk atau daftarkan akun penulis terlebih dahulu agar riwayat naskah Anda tercatat dan dapat dipantau status kurasinya setiap saat.
+        </p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <a href={`${basePath}/admin/login?tab=penulis`} class="btn-literary btn-literary-solid !py-1 !px-3.5 !text-xs no-underline">
+          Masuk Penulis →
+        </a>
+        <a href={`${basePath}/admin/login?tab=penulis&mode=daftar`} class="mono text-xs text-[var(--crimson)] font-semibold hover:underline px-2">
+          Daftar Akun Baru ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. Expandable Author Manuscript Tracker -->
+    <div id="penulis-riwayat-container" class="hidden mb-10 p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
+        <div>
+          <h3 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">
+            Daftar Naskah Kiriman Anda
+          </h3>
+          <p class="mono text-xs text-[var(--ink-faint)] m-0 mt-0.5">
+            Pantau status kurasi naskah yang telah Anda kirimkan ke Dewan Redaksi.
+          </p>
+        </div>
+        <button id="btn-close-riwayat" type="button" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer">
+          ✕ Tutup
+        </button>
+      </div>
+
+      <div id="riwayat-list" class="space-y-3">
+        <p class="mono text-xs text-[var(--ink-faint)] text-center py-4">Memuat riwayat naskah...</p>
+      </div>
+    </div>
+
+    <!-- MAIN FORM GRID -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
       
       <!-- Submission Form (2 Cols) -->
@@ -54,7 +134,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               type="text" 
               id="sub-author" 
               required 
-              placeholder="Nama lengkap atau pena"
+              placeholder="Nama lengkap santri atau nama pena"
               class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
             />
           </div>
@@ -172,10 +252,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="p-6 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-sm space-y-2">
           <span class="mono text-xs text-[var(--gold)] uppercase tracking-wider block font-semibold">Integrasi Database</span>
           <h4 class="font-['Fraunces',serif] font-semibold text-sm text-[var(--ink)] m-0">
-            Arsitektur Penyimpanan Mandiri
+            Penyimpanan Supabase &amp; Arsip Realtime
           </h4>
           <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] leading-relaxed m-0">
-            Naskah yang Anda kirimkan tersimpan secara aman di backend Firebase Firestore dan cadangan lokal. Setelah lolos kurasi, dewan redaksi akan mengonversinya menjadi commit Git permanen di repositori.
+            Naskah yang Anda kirimkan tersimpan secara aman di database Supabase PostgreSQL dan cadangan lokal. Setelah lolos kurasi redaksi, karya akan langsung dipublikasikan ke katalog pembaca.
           </p>
         </div>
       </aside>
@@ -185,25 +265,146 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   </div>
 
   <script>
-    import { simpanKarya, uploadFotoKarya } from '../lib/supabase';
+    import { 
+      simpanKarya, 
+      uploadFotoKarya, 
+      getPenulisUser, 
+      logoutPenulis, 
+      getKaryaByPenulis,
+      type PenulisUser 
+    } from '../lib/supabase';
     import confetti from 'canvas-confetti';
 
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+    // Form Elements
     const form = document.getElementById('submission-form') as HTMLFormElement;
     const submitBtn = document.getElementById('sub-submit-btn') as HTMLButtonElement;
     const statusMsg = document.getElementById('sub-status-msg');
 
+    const inputTitle = document.getElementById('sub-title') as HTMLInputElement;
+    const inputAuthor = document.getElementById('sub-author') as HTMLInputElement;
+    const inputGrade = document.getElementById('sub-grade') as HTMLInputElement;
+    const inputCategory = document.getElementById('sub-category') as HTMLSelectElement;
+    const inputContact = document.getElementById('sub-contact') as HTMLInputElement;
+    const inputAbstract = document.getElementById('sub-abstract') as HTMLTextAreaElement;
+    const inputBody = document.getElementById('sub-body') as HTMLTextAreaElement;
+    const fileInput = document.getElementById('sub-file') as HTMLInputElement;
+
+    // Author Status Elements
+    const activeCard = document.getElementById('penulis-active-card');
+    const guestPrompt = document.getElementById('penulis-guest-prompt');
+    const activeName = document.getElementById('active-penulis-name');
+    const activeGrade = document.getElementById('active-penulis-grade');
+    const activeEmail = document.getElementById('active-penulis-email');
+    const karyaBadge = document.getElementById('penulis-karya-badge');
+    const btnToggleRiwayat = document.getElementById('btn-toggle-riwayat');
+    const btnCloseRiwayat = document.getElementById('btn-close-riwayat');
+    const btnLogoutPenulis = document.getElementById('btn-logout-penulis');
+    const riwayatContainer = document.getElementById('penulis-riwayat-container');
+    const riwayatList = document.getElementById('riwayat-list');
+
+    let currentPenulis: PenulisUser | null = null;
+
+    // 1. Check Author Session & Populate
+    async function initAuthorSession() {
+      currentPenulis = await getPenulisUser();
+      if (currentPenulis) {
+        // Show Active Card, Hide Guest Prompt
+        activeCard?.classList.remove('hidden');
+        guestPrompt?.classList.add('hidden');
+
+        if (activeName) activeName.textContent = currentPenulis.nama;
+        if (activeGrade) activeGrade.textContent = currentPenulis.kelas;
+        if (activeEmail) activeEmail.textContent = currentPenulis.email;
+
+        // Auto-fill form fields
+        if (inputAuthor && !inputAuthor.value) inputAuthor.value = currentPenulis.nama;
+        if (inputGrade && !inputGrade.value) inputGrade.value = currentPenulis.kelas;
+        if (inputContact && !inputContact.value && currentPenulis.kontak) inputContact.value = currentPenulis.kontak;
+
+        // Load Author's Submissions
+        loadRiwayatNaskah(currentPenulis.nama, currentPenulis.email);
+      } else {
+        activeCard?.classList.add('hidden');
+        guestPrompt?.classList.remove('hidden');
+      }
+    }
+
+    // 2. Load Submitted Works Tracker
+    async function loadRiwayatNaskah(nama: string, email?: string) {
+      if (!riwayatList) return;
+      const works = await getKaryaByPenulis(nama, email);
+      if (karyaBadge) karyaBadge.textContent = works.length.toString();
+
+      if (works.length === 0) {
+        riwayatList.innerHTML = `
+          <div class="text-center py-6 text-xs font-['Source_Serif_4',serif] italic text-[var(--ink-faint)]">
+            Anda belum pernah mengirimkan naskah. Tulis dan kirim naskah pertama Anda di bawah ini!
+          </div>
+        `;
+        return;
+      }
+
+      riwayatList.innerHTML = works.map(w => {
+        let statusBadge = '<span class="px-2 py-0.5 rounded text-[0.65rem] mono font-semibold bg-amber-100 text-amber-900 border border-amber-300">⏳ Menunggu Kurasi Redaksi</span>';
+        if (w.status === 'published') {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[0.65rem] mono font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300">🟢 Telah Terbit</span>';
+        } else if (w.status === 'draft') {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[0.65rem] mono font-semibold bg-gray-100 text-gray-800 border border-gray-300">📝 Draf</span>';
+        }
+
+        const dateStr = (w as any).created_at ? new Date((w as any).created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Baru saja';
+        const linkHtml = w.status === 'published' 
+          ? `<a href="${basePath}/karya/${w.slug}" class="mono text-xs text-[var(--crimson)] hover:underline ml-2">Buka Karya ↗</a>` 
+          : '';
+
+        return `
+          <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule)] rounded flex items-center justify-between flex-wrap gap-2 transition-colors hover:border-[var(--rule-strong)]">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-['Fraunces',serif] font-semibold text-sm text-[var(--ink)] m-0">${w.title}</h4>
+                <span class="mono text-[0.68rem] px-2 py-0.2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] uppercase">${w.category_label || w.category}</span>
+              </div>
+              <p class="text-xs text-[var(--ink-faint)] mono mt-1 m-0">Terkirim: ${dateStr}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              ${statusBadge}
+              ${linkHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle Riwayat
+    btnToggleRiwayat?.addEventListener('click', () => {
+      riwayatContainer?.classList.toggle('hidden');
+    });
+    btnCloseRiwayat?.addEventListener('click', () => {
+      riwayatContainer?.classList.add('hidden');
+    });
+
+    // Logout Penulis
+    btnLogoutPenulis?.addEventListener('click', async () => {
+      await logoutPenulis();
+      window.location.reload();
+    });
+
+    initAuthorSession();
+
+    // 3. Form Submission Handler
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const title = (document.getElementById('sub-title') as HTMLInputElement).value.trim();
-        const author = (document.getElementById('sub-author') as HTMLInputElement).value.trim();
-        const grade = (document.getElementById('sub-grade') as HTMLInputElement).value.trim();
-        const category = (document.getElementById('sub-category') as HTMLSelectElement).value;
-        const contact = (document.getElementById('sub-contact') as HTMLInputElement).value.trim();
-        const abstract = (document.getElementById('sub-abstract') as HTMLTextAreaElement).value.trim();
-        const body = (document.getElementById('sub-body') as HTMLTextAreaElement).value.trim();
-        const fileInput = document.getElementById('sub-file') as HTMLInputElement;
+        const title = inputTitle.value.trim();
+        const author = inputAuthor.value.trim();
+        const grade = inputGrade.value.trim();
+        const category = inputCategory.value;
+        const contact = inputContact.value.trim();
+        const abstract = inputAbstract.value.trim();
+        const body = inputBody.value.trim();
 
         if (!title || !author || !body) return;
 
@@ -220,6 +421,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
           if (statusMsg) statusMsg.textContent = 'Menyimpan naskah ke database...';
 
+          const tags = [];
+          if (contact) tags.push(`Kontak: ${contact}`);
+          if (currentPenulis?.email) tags.push(`Email: ${currentPenulis.email}`);
+
           const res = await simpanKarya({
             title,
             author,
@@ -228,15 +433,23 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             description: abstract,
             content: body,
             cover_image_url: fotoUrl,
-            tags: contact ? [`Kontak: ${contact}`] : [],
+            tags,
             status: 'menunggu_kurasi',
           });
 
           if (res.success) {
             form.reset();
+            // Re-populate author details if logged in
+            if (currentPenulis) {
+              if (inputAuthor) inputAuthor.value = currentPenulis.nama;
+              if (inputGrade) inputGrade.value = currentPenulis.kelas;
+              if (inputContact && currentPenulis.kontak) inputContact.value = currentPenulis.kontak;
+              loadRiwayatNaskah(currentPenulis.nama, currentPenulis.email);
+            }
+
             if (statusMsg) {
-              statusMsg.textContent = 'Naskah berhasil terkirim ke Redaksi!';
-              statusMsg.classList.add('text-green-700', 'font-semibold');
+              statusMsg.textContent = 'Naskah berhasil terkirim ke Dewan Redaksi!';
+              statusMsg.className = 'mono text-xs text-emerald-700 font-semibold';
             }
 
             // Confetti Celebration
@@ -253,7 +466,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           }
         } catch (err: any) {
           console.error(err);
-          if (statusMsg) statusMsg.textContent = 'Terjadi kesalahan saat mengirim: ' + err.message;
+          if (statusMsg) statusMsg.textContent = 'Terjadi kesalahan saat mengirim: ' + (err.message || 'Error');
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Kirim Naskah ke Redaksi →';

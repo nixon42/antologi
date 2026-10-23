@@ -572,3 +572,265 @@ export async function logoutAdmin(): Promise<void> {
     }
   }
 }
+
+// ==========================================================
+// 6. AUTENTIKASI & MANAJEMEN PENULIS (SANTRI / PENGIRIM NASKAH)
+// ==========================================================
+
+export interface PenulisUser {
+  id?: string;
+  nama: string;
+  email: string;
+  kelas: string;
+  kontak?: string;
+  role: 'penulis' | 'santri';
+  source: 'supabase' | 'local';
+}
+
+export interface DaftarPenulisInput {
+  nama: string;
+  email: string;
+  password: string;
+  kelas: string;
+  kontak?: string;
+}
+
+export async function getPenulisUser(): Promise<PenulisUser | null> {
+  if (typeof window === 'undefined') return null;
+
+  // 1. Cek Local Storage Session Penulis
+  const localSession = localStorage.getItem('rs_penulis_session');
+  if (localSession) {
+    try {
+      const parsed = JSON.parse(localSession);
+      if (parsed && parsed.email) {
+        return parsed as PenulisUser;
+      }
+    } catch {
+      // Ignored
+    }
+  }
+
+  // 2. Cek Supabase Auth Session
+  if (supabase) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email && session.user.user_metadata?.role === 'penulis') {
+        const meta = session.user.user_metadata;
+        const user: PenulisUser = {
+          id: session.user.id,
+          nama: meta.nama || session.user.email.split('@')[0],
+          email: session.user.email,
+          kelas: meta.kelas || 'Santri',
+          kontak: meta.kontak || '',
+          role: 'penulis',
+          source: 'supabase',
+        };
+        localStorage.setItem('rs_penulis_session', JSON.stringify(user));
+        return user;
+      }
+    } catch (e) {
+      console.warn('Gagal cek sesi Supabase Penulis:', e);
+    }
+  }
+
+  return null;
+}
+
+export async function daftarPenulis(input: DaftarPenulisInput): Promise<{ success: boolean; user?: PenulisUser; message: string }> {
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const nama = input.nama.trim();
+  const kelas = input.kelas.trim();
+  const kontak = input.kontak?.trim() || '';
+  const password = input.password;
+
+  if (!nama || !normalizedEmail || !password || !kelas) {
+    return { success: false, message: 'Harap lengkapi semua kolom wajib (Nama, Email, Kelas, dan Kata Sandi).' };
+  }
+
+  if (password.length < 6) {
+    return { success: false, message: 'Kata sandi minimal terdiri dari 6 karakter.' };
+  }
+
+  let createdUser: PenulisUser = {
+    nama,
+    email: normalizedEmail,
+    kelas,
+    kontak,
+    role: 'penulis',
+    source: 'local',
+  };
+
+  // 1. Coba daftar ke Supabase Auth
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          data: {
+            nama,
+            kelas,
+            kontak,
+            role: 'penulis',
+          },
+        },
+      });
+
+      if (!error && data?.user) {
+        createdUser = {
+          id: data.user.id,
+          nama,
+          email: normalizedEmail,
+          kelas,
+          kontak,
+          role: 'penulis',
+          source: 'supabase',
+        };
+      }
+    } catch (e: any) {
+      console.warn('[Supabase Auth] Gagal daftar online, beralih ke registrasi lokal:', e.message || e);
+    }
+  }
+
+  // 2. Zero-Fragility Fallback: Simpan di LocalStorage (Pasti Berhasil)
+  if (typeof window !== 'undefined') {
+    try {
+      const existingUsersRaw = localStorage.getItem('rs_penulis_users');
+      const existingUsers: Array<DaftarPenulisInput & { created_at: string }> = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+
+      const idx = existingUsers.findIndex(u => u.email === normalizedEmail);
+      if (idx >= 0) {
+        existingUsers[idx] = { ...input, email: normalizedEmail, created_at: new Date().toISOString() };
+      } else {
+        existingUsers.push({ ...input, email: normalizedEmail, created_at: new Date().toISOString() });
+      }
+
+      localStorage.setItem('rs_penulis_users', JSON.stringify(existingUsers));
+      localStorage.setItem('rs_penulis_session', JSON.stringify(createdUser));
+    } catch (e) {
+      console.warn('Gagal simpan akun lokal:', e);
+    }
+  }
+
+  return {
+    success: true,
+    user: createdUser,
+    message: `Pendaftaran berhasil! Selamat datang di Ruang Sastra, ${nama}.`,
+  };
+}
+
+export async function loginPenulis(email: string, password: string): Promise<{ success: boolean; user?: PenulisUser; message: string }> {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // 1. Coba login melalui Supabase Auth
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (!error && data?.user) {
+        const meta = data.user.user_metadata || {};
+        const user: PenulisUser = {
+          id: data.user.id,
+          nama: meta.nama || data.user.email?.split('@')[0] || 'Penulis',
+          email: normalizedEmail,
+          kelas: meta.kelas || 'Santri SMPI YQ',
+          kontak: meta.kontak || '',
+          role: 'penulis',
+          source: 'supabase',
+        };
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rs_penulis_session', JSON.stringify(user));
+        }
+        return { success: true, user, message: `Selamat datang kembali, ${user.nama}!` };
+      }
+    } catch (e) {
+      console.warn('Gagal login online, periksa kredensial lokal:', e);
+    }
+  }
+
+  // 2. Zero-Fragility Fallback: Cek LocalStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const existingUsersRaw = localStorage.getItem('rs_penulis_users');
+      const existingUsers: Array<DaftarPenulisInput> = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+      const matched = existingUsers.find(u => u.email === normalizedEmail && u.password === password);
+
+      if (matched) {
+        const user: PenulisUser = {
+          nama: matched.nama,
+          email: matched.email,
+          kelas: matched.kelas,
+          kontak: matched.kontak || '',
+          role: 'penulis',
+          source: 'local',
+        };
+        localStorage.setItem('rs_penulis_session', JSON.stringify(user));
+        return { success: true, user, message: `Selamat datang kembali, ${user.nama}!` };
+      }
+    } catch {
+      // Ignored
+    }
+  }
+
+  return {
+    success: false,
+    message: 'Email atau kata sandi tidak cocok. Belum punya akun? Silakan daftar akun baru.',
+  };
+}
+
+export async function logoutPenulis(): Promise<void> {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('rs_penulis_session');
+  }
+  if (supabase) {
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {}
+  }
+}
+
+export async function getKaryaByPenulis(authorName: string, authorEmail?: string): Promise<KaryaInput[]> {
+  const results: KaryaInput[] = [];
+
+  // 1. Ambil dari Supabase
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('karya')
+        .select('*')
+        .ilike('author', `%${authorName.trim()}%`)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        results.push(...(data as KaryaInput[]));
+      }
+    } catch (e) {
+      console.warn('Gagal ambil karya penulis dari Supabase:', e);
+    }
+  }
+
+  // 2. Ambil dari LocalStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('rs_karya_list');
+      if (stored) {
+        const localKarya: KaryaInput[] = JSON.parse(stored);
+        const filtered = localKarya.filter(k => 
+          k.author.toLowerCase().includes(authorName.trim().toLowerCase()) ||
+          (authorEmail && k.tags?.some(t => t.includes(authorEmail)))
+        );
+        filtered.forEach(k => {
+          if (!results.some(r => r.id === k.id || r.slug === k.slug)) {
+            results.push(k);
+          }
+        });
+      }
+    } catch {}
+  }
+
+  return results;
+}

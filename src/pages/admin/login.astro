@@ -5,41 +5,41 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <Layout 
-  title="Masuk Studio Redaksi — Ruang Sastra SMPI YQ"
-  description="Halaman autentikasi pengurus, dewan redaksi, dan pembina literasi SMPI Yambu'ul Qur'an."
+  title="Masuk & Registrasi Penulis — Ruang Sastra SMPI YQ"
+  description="Portal autentikasi untuk pengirim naskah, santri, dewan redaksi, dan pembina literasi SMPI Yambu'ul Qur'an."
 >
-  <div class="wrap py-12 md:py-20 flex items-center justify-center min-h-[70vh]">
-    <div class="w-full max-w-md bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm p-7 sm:p-9 shadow-lg relative">
+  <div class="wrap py-10 md:py-16 flex items-center justify-center min-h-[75vh]">
+    <div class="w-full max-w-lg bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm p-6 sm:p-9 shadow-lg relative">
       
       <!-- Monogram Header -->
-      <div class="text-center mb-7">
+      <div class="text-center mb-6">
         <div class="w-12 h-12 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-bold text-base text-[var(--crimson)] mx-auto mb-3 shadow-inner">
           YQ
         </div>
-        <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider block mb-1">Akses Dewan Redaksi</span>
+        <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider block mb-1">Portal Literasi SMPI Yambu'ul Qur'an</span>
         <h1 class="font-['Fraunces',serif] font-semibold text-2xl sm:text-3xl text-[var(--ink)] m-0">
-          Studio Redaksi
+          Akses Ruang Sastra
         </h1>
         <p class="font-['Source_Serif_4',serif] italic text-xs sm:text-sm text-[var(--ink-soft)] mt-1.5 leading-relaxed">
-          Silakan masuk untuk mengurasi kiriman naskah santri, menyunting naskah, dan mengelola arsip literatur.
+          Silakan masuk atau daftarkan akun untuk mengirim karya, memantau kurasi naskah, atau mengelola arsip literatur.
         </p>
       </div>
 
-      <!-- Active Session Banner (if already logged in) -->
-      <div id="already-logged-in-banner" class="hidden mb-5 p-3.5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded text-xs space-y-2.5">
+      <!-- Active Session Banner (if already logged in as Redaksi or Penulis) -->
+      <div id="already-logged-in-banner" class="hidden mb-6 p-4 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded text-xs space-y-2.5">
         <div class="flex items-center justify-between">
           <span class="mono text-[0.72rem] text-[var(--ink)] font-semibold flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            Sesi Redaksi Aktif:
+            Sesi Masuk Aktif:
           </span>
           <span id="banner-user-email" class="mono text-[0.72rem] text-[var(--crimson)] font-bold"></span>
         </div>
-        <p class="text-[0.75rem] text-[var(--ink-soft)] font-['Source_Serif_4',serif] italic m-0">
-          Anda saat ini masih dalam keadaan masuk. Anda dapat langsung membuka Studio Redaksi atau keluar dari sesi ini.
+        <p id="banner-user-role-text" class="text-[0.75rem] text-[var(--ink-soft)] font-['Source_Serif_4',serif] italic m-0">
+          Anda saat ini sudah dalam keadaan masuk.
         </p>
         <div class="pt-1 flex items-center gap-3">
-          <a href={`${basePath}/admin`} class="btn-literary btn-literary-solid !py-1 !px-3.5 !text-xs no-underline">
-            Ke Studio Redaksi →
+          <a id="banner-redirect-link" href={`${basePath}/kirim`} class="btn-literary btn-literary-solid !py-1 !px-3.5 !text-xs no-underline">
+            Lanjut ke Halaman Karya →
           </a>
           <button id="btn-banner-logout" type="button" class="mono text-xs text-[var(--crimson)] hover:underline cursor-pointer font-semibold">
             Keluar dari Sesi
@@ -48,66 +48,260 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       </div>
 
       <!-- Alert Box -->
-      <div id="login-alert" class="hidden mb-5 p-3 rounded text-xs mono border transition-all"></div>
+      <div id="auth-alert" class="hidden mb-5 p-3.5 rounded text-xs mono border transition-all"></div>
 
-      <!-- Login Form -->
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label for="login-email" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
-            Alamat Email Redaksi *
-          </label>
-          <input 
-            type="email" 
-            id="login-email" 
-            required 
-            placeholder="redaksi@yq.sch.id" 
-            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
-            autocomplete="email"
-          />
-        </div>
+      <!-- Role Selector Tabs -->
+      <div class="grid grid-cols-2 p-1 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-sm mb-6 text-xs mono font-medium">
+        <button 
+          type="button" 
+          id="tab-btn-penulis" 
+          class="py-2 rounded-sm bg-[var(--crimson)] text-[var(--paper)] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs font-semibold"
+        >
+          <span>✍️ Pengirim Naskah</span>
+        </button>
+        <button 
+          type="button" 
+          id="tab-btn-redaksi" 
+          class="py-2 rounded-sm text-[var(--ink-soft)] hover:text-[var(--ink)] transition-all flex items-center justify-center gap-1.5 cursor-pointer font-semibold"
+        >
+          <span>🏛️ Dewan Redaksi</span>
+        </button>
+      </div>
 
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label for="login-password" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] font-medium">
-              Kata Sandi *
-            </label>
-            <button 
-              type="button" 
-              id="toggle-pwd-btn" 
-              class="mono text-[0.68rem] text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer"
-            >
-              Lihat Sandi
+      <!-- ========================================================= -->
+      <!-- TAB 1: PENGIRIM NASKAH (SANTRI / PENULIS) -->
+      <!-- ========================================================= -->
+      <div id="section-penulis" class="space-y-4">
+        
+        <!-- Sub-Toggle: Masuk vs Daftar Baru -->
+        <div class="flex items-center justify-between border-b border-[var(--rule)] pb-2 mb-3">
+          <span id="penulis-mode-title" class="mono text-xs uppercase tracking-wider text-[var(--ink)] font-semibold">
+            Masuk Akun Santri / Penulis
+          </span>
+          <div class="flex items-center gap-2 mono text-xs">
+            <button type="button" id="toggle-penulis-login" class="text-[var(--crimson)] font-semibold underline cursor-pointer">
+              Masuk
+            </button>
+            <span class="text-[var(--ink-faint)]">|</span>
+            <button type="button" id="toggle-penulis-daftar" class="text-[var(--ink-soft)] hover:text-[var(--crimson)] cursor-pointer">
+              Daftar Baru
             </button>
           </div>
-          <input 
-            type="password" 
-            id="login-password" 
-            required 
-            placeholder="••••••••" 
-            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
-            autocomplete="current-password"
-          />
         </div>
 
-        <button 
-          type="submit" 
-          id="btn-submit-login" 
-          class="btn-literary btn-literary-solid !w-full !py-2.5 !text-sm cursor-pointer mt-2"
-        >
-          Masuk ke Studio Redaksi →
-        </button>
-      </form>
+        <!-- FORM 1A: LOGIN PENULIS -->
+        <form id="form-login-penulis" class="space-y-4">
+          <div>
+            <label for="penulis-login-email" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
+              Alamat Email Santri / Penulis *
+            </label>
+            <input 
+              type="email" 
+              id="penulis-login-email" 
+              required 
+              placeholder="nama@santri.yq.sch.id" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              autocomplete="email"
+            />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="penulis-login-password" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] font-medium">
+                Kata Sandi *
+              </label>
+              <button 
+                type="button" 
+                class="btn-toggle-pwd mono text-[0.68rem] text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer"
+                data-target="penulis-login-password"
+              >
+                Lihat Sandi
+              </button>
+            </div>
+            <input 
+              type="password" 
+              id="penulis-login-password" 
+              required 
+              placeholder="••••••••" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-penulis-login" 
+            class="btn-literary btn-literary-solid !w-full !py-2.5 !text-sm cursor-pointer mt-2"
+          >
+            Masuk &amp; Buka Ruang Naskah →
+          </button>
+        </form>
+
+        <!-- FORM 1B: DAFTAR AKUN PENULIS BARU -->
+        <form id="form-daftar-penulis" class="space-y-3.5 hidden">
+          <div>
+            <label for="daftar-nama" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
+              Nama Lengkap Santri / Penulis *
+            </label>
+            <input 
+              type="text" 
+              id="daftar-nama" 
+              required 
+              placeholder="Nama lengkap santri atau nama pena" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="daftar-kelas" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
+                Kelas / Angkatan *
+              </label>
+              <input 
+                type="text" 
+                id="daftar-kelas" 
+                required 
+                placeholder="Misal: Kelas VII-A / IX-B" 
+                class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              />
+            </div>
+            <div>
+              <label for="daftar-kontak" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
+                No. WhatsApp (Opsional)
+              </label>
+              <input 
+                type="text" 
+                id="daftar-kontak" 
+                placeholder="0812xxxxxxxx" 
+                class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="daftar-email" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
+              Alamat Email *
+            </label>
+            <input 
+              type="email" 
+              id="daftar-email" 
+              required 
+              placeholder="santri@yq.sch.id atau email pribadi" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              autocomplete="email"
+            />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="daftar-password" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] font-medium">
+                Buat Kata Sandi * (Min. 6 Karakter)
+              </label>
+              <button 
+                type="button" 
+                class="btn-toggle-pwd mono text-[0.68rem] text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer"
+                data-target="daftar-password"
+              >
+                Lihat Sandi
+              </button>
+            </div>
+            <input 
+              type="password" 
+              id="daftar-password" 
+              required 
+              minlength="6"
+              placeholder="••••••••" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-daftar" 
+            class="btn-literary btn-literary-solid !w-full !py-2.5 !text-sm cursor-pointer mt-2"
+          >
+            Daftar &amp; Mulai Mengirim Karya →
+          </button>
+        </form>
+
+        <p class="mono text-[0.72rem] text-[var(--ink-faint)] text-center pt-1 m-0">
+          *Setelah masuk, nama dan kelas Anda akan otomatis tercatat saat mengirim naskah.
+        </p>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- TAB 2: DEWAN REDAKSI (STUDIO EDITORIAL) -->
+      <!-- ========================================================= -->
+      <div id="section-redaksi" class="space-y-4 hidden">
+        <form id="form-login-redaksi" class="space-y-4">
+          <div>
+            <label for="redaksi-email" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-medium">
+              Alamat Email Dewan Redaksi *
+            </label>
+            <input 
+              type="email" 
+              id="redaksi-email" 
+              required 
+              placeholder="redaksi@yq.sch.id" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              autocomplete="email"
+            />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="redaksi-password" class="block mono text-xs uppercase tracking-wider text-[var(--ink-soft)] font-medium">
+                Kata Sandi Redaksi *
+              </label>
+              <button 
+                type="button" 
+                class="btn-toggle-pwd mono text-[0.68rem] text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer"
+                data-target="redaksi-password"
+              >
+                Lihat Sandi
+              </button>
+            </div>
+            <input 
+              type="password" 
+              id="redaksi-password" 
+              required 
+              placeholder="••••••••" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-redaksi-login" 
+            class="btn-literary btn-literary-solid !w-full !py-2.5 !text-sm cursor-pointer mt-2"
+          >
+            Masuk ke Studio Redaksi →
+          </button>
+        </form>
+
+        <!-- Colophon Note -->
+        <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-[0.75rem] text-[var(--ink-soft)] text-center leading-relaxed">
+          <p class="m-0 text-[var(--ink-faint)] font-['Source_Serif_4',serif] italic">
+            Khusus Dewan Redaksi dan Pembina Literasi SMPI Yambu'ul Qur'an untuk kurasi kiriman santri dan penerbitan karya.
+          </p>
+        </div>
+      </div>
 
       <!-- Literary Divider -->
       <div class="my-6 border-t border-[var(--rule)] relative text-center">
         <span class="bg-[var(--paper-card)] px-3 text-[var(--gold)] text-xs relative -top-2.5 font-serif">❧</span>
       </div>
 
-      <!-- Security & Colophon Note (No password exposed) -->
-      <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-[0.75rem] text-[var(--ink-soft)] text-center leading-relaxed">
-        <p class="m-0 text-[var(--ink-faint)] font-['Source_Serif_4',serif] italic">
-          Khusus Dewan Redaksi dan Pembina Literasi SMPI Yambu'ul Qur'an. Hubungi administrator madrasah jika Anda memerlukan akses atau lupa kata sandi.
+      <!-- Direct Submission Note -->
+      <div class="text-center space-y-2">
+        <p class="mono text-xs text-[var(--ink-soft)] m-0">
+          Ingin langsung mengirim naskah tanpa mendaftar akun?
         </p>
+        <a href={`${basePath}/kirim`} class="btn-literary btn-literary-ghost !py-1.5 !px-4 !text-xs inline-block no-underline">
+          Kirim Naskah Sebagai Kontributor Tamu →
+        </a>
       </div>
 
       <!-- Back Link -->
@@ -121,58 +315,168 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   </div>
 
   <script>
-    import { loginAdmin, getAdminUser, logoutAdmin } from '../../lib/supabase';
-
-    const form = document.getElementById('login-form') as HTMLFormElement;
-    const emailInput = document.getElementById('login-email') as HTMLInputElement;
-    const pwdInput = document.getElementById('login-password') as HTMLInputElement;
-    const togglePwdBtn = document.getElementById('toggle-pwd-btn');
-    const submitBtn = document.getElementById('btn-submit-login') as HTMLButtonElement;
-    const alertBox = document.getElementById('login-alert');
-    const alreadyLoggedInBanner = document.getElementById('already-logged-in-banner');
-    const bannerUserEmail = document.getElementById('banner-user-email');
-    const bannerLogoutBtn = document.getElementById('btn-banner-logout');
+    import { 
+      loginAdmin, 
+      getAdminUser, 
+      logoutAdmin,
+      loginPenulis,
+      daftarPenulis,
+      getPenulisUser,
+      logoutPenulis
+    } from '../../lib/supabase';
 
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-    // Check URL parameters for explicit logout
+    // Tabs & Sections
+    const tabBtnPenulis = document.getElementById('tab-btn-penulis');
+    const tabBtnRedaksi = document.getElementById('tab-btn-redaksi');
+    const sectionPenulis = document.getElementById('section-penulis');
+    const sectionRedaksi = document.getElementById('section-redaksi');
+
+    // Penulis Sub-toggles
+    const togglePenulisLogin = document.getElementById('toggle-penulis-login');
+    const togglePenulisDaftar = document.getElementById('toggle-penulis-daftar');
+    const formLoginPenulis = document.getElementById('form-login-penulis');
+    const formDaftarPenulis = document.getElementById('form-daftar-penulis');
+    const penulisModeTitle = document.getElementById('penulis-mode-title');
+
+    // Forms
+    const formRedaksi = document.getElementById('form-login-redaksi');
+    const alertBox = document.getElementById('auth-alert');
+
+    // Banner elements
+    const alreadyLoggedInBanner = document.getElementById('already-logged-in-banner');
+    const bannerUserEmail = document.getElementById('banner-user-email');
+    const bannerUserRoleText = document.getElementById('banner-user-role-text');
+    const bannerRedirectLink = document.getElementById('banner-redirect-link') as HTMLAnchorElement;
+    const bannerLogoutBtn = document.getElementById('btn-banner-logout');
+
+
+    // 1. Check URL query parameters
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('logout')) {
-      logoutAdmin().then(() => {
-        showAlert('Anda telah berhasil keluar dari sesi Studio Redaksi.', 'info');
+      Promise.all([logoutAdmin(), logoutPenulis()]).then(() => {
+        showAlert('Anda telah berhasil keluar dari sesi Ruang Sastra.', 'info');
         if (window.history && window.history.replaceState) {
           window.history.replaceState({}, document.title, window.location.pathname);
         }
       });
-    } else {
-      // Check if already authenticated to show active session banner
-      getAdminUser().then(user => {
-        if (user && alreadyLoggedInBanner && bannerUserEmail) {
-          bannerUserEmail.textContent = user.email;
-          alreadyLoggedInBanner.classList.remove('hidden');
-        }
-      });
     }
 
-    // Logout button from banner
+    if (urlParams.get('tab') === 'redaksi') {
+      switchRole('redaksi');
+    } else {
+      switchRole('penulis');
+    }
+
+    if (urlParams.get('mode') === 'daftar') {
+      switchPenulisMode('daftar');
+    }
+
+    // 2. Check Existing Sessions (Redaksi or Penulis)
+    async function checkExistingAuth() {
+      const admin = await getAdminUser();
+      if (admin && alreadyLoggedInBanner && bannerUserEmail) {
+        bannerUserEmail.textContent = admin.email;
+        if (bannerUserRoleText) bannerUserRoleText.textContent = 'Anda masuk sebagai Dewan Redaksi. Anda dapat membuka Studio Redaksi atau berganti akun.';
+        if (bannerRedirectLink) {
+          bannerRedirectLink.href = `${basePath}/admin`;
+          bannerRedirectLink.textContent = 'Buka Studio Redaksi →';
+        }
+        alreadyLoggedInBanner.classList.remove('hidden');
+        return;
+      }
+
+      const penulis = await getPenulisUser();
+      if (penulis && alreadyLoggedInBanner && bannerUserEmail) {
+        bannerUserEmail.textContent = `${penulis.nama} (${penulis.kelas})`;
+        if (bannerUserRoleText) bannerUserRoleText.textContent = 'Anda masuk sebagai Penulis Santri. Anda dapat melanjutkan pengiriman naskah atau memantau karya.';
+        if (bannerRedirectLink) {
+          bannerRedirectLink.href = `${basePath}/kirim`;
+          bannerRedirectLink.textContent = 'Buka Ruang Pengiriman Naskah →';
+        }
+        alreadyLoggedInBanner.classList.remove('hidden');
+      }
+    }
+    checkExistingAuth();
+
+    // Banner Logout Action
     bannerLogoutBtn?.addEventListener('click', async () => {
       if (bannerLogoutBtn) bannerLogoutBtn.textContent = 'Mengeluarkan...';
-      await logoutAdmin();
+      await Promise.all([logoutAdmin(), logoutPenulis()]);
       alreadyLoggedInBanner?.classList.add('hidden');
-      showAlert('Anda telah berhasil keluar dari akun redaksi.', 'info');
+      showAlert('Sesi telah diakhiri. Silakan masuk kembali.', 'info');
     });
 
-    // Toggle Password Visibility
-    togglePwdBtn?.addEventListener('click', () => {
-      if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        togglePwdBtn.textContent = 'Sembunyikan';
+    // 3. Role Switcher Handler
+    function switchRole(role: 'penulis' | 'redaksi') {
+      if (role === 'penulis') {
+        tabBtnPenulis?.classList.add('bg-[var(--crimson)]', 'text-[var(--paper)]', 'shadow-2xs');
+        tabBtnPenulis?.classList.remove('text-[var(--ink-soft)]');
+        tabBtnRedaksi?.classList.remove('bg-[var(--crimson)]', 'text-[var(--paper)]', 'shadow-2xs');
+        tabBtnRedaksi?.classList.add('text-[var(--ink-soft)]');
+
+        sectionPenulis?.classList.remove('hidden');
+        sectionRedaksi?.classList.add('hidden');
       } else {
-        pwdInput.type = 'password';
-        togglePwdBtn.textContent = 'Lihat Sandi';
+        tabBtnRedaksi?.classList.add('bg-[var(--crimson)]', 'text-[var(--paper)]', 'shadow-2xs');
+        tabBtnRedaksi?.classList.remove('text-[var(--ink-soft)]');
+        tabBtnPenulis?.classList.remove('bg-[var(--crimson)]', 'text-[var(--paper)]', 'shadow-2xs');
+        tabBtnPenulis?.classList.add('text-[var(--ink-soft)]');
+
+        sectionRedaksi?.classList.remove('hidden');
+        sectionPenulis?.classList.add('hidden');
       }
+    }
+
+    tabBtnPenulis?.addEventListener('click', () => switchRole('penulis'));
+    tabBtnRedaksi?.addEventListener('click', () => switchRole('redaksi'));
+
+    // 4. Penulis Sub-Mode Handler (Login vs Daftar)
+    function switchPenulisMode(mode: 'login' | 'daftar') {
+      if (mode === 'login') {
+        togglePenulisLogin?.classList.add('text-[var(--crimson)]', 'font-semibold', 'underline');
+        togglePenulisLogin?.classList.remove('text-[var(--ink-soft)]');
+        togglePenulisDaftar?.classList.remove('text-[var(--crimson)]', 'font-semibold', 'underline');
+        togglePenulisDaftar?.classList.add('text-[var(--ink-soft)]');
+
+        if (penulisModeTitle) penulisModeTitle.textContent = 'Masuk Akun Santri / Penulis';
+        formLoginPenulis?.classList.remove('hidden');
+        formDaftarPenulis?.classList.add('hidden');
+      } else {
+        togglePenulisDaftar?.classList.add('text-[var(--crimson)]', 'font-semibold', 'underline');
+        togglePenulisDaftar?.classList.remove('text-[var(--ink-soft)]');
+        togglePenulisLogin?.classList.remove('text-[var(--crimson)]', 'font-semibold', 'underline');
+        togglePenulisLogin?.classList.add('text-[var(--ink-soft)]');
+
+        if (penulisModeTitle) penulisModeTitle.textContent = 'Daftar Akun Santri / Penulis Baru';
+        formDaftarPenulis?.classList.remove('hidden');
+        formLoginPenulis?.classList.add('hidden');
+      }
+    }
+
+    togglePenulisLogin?.addEventListener('click', () => switchPenulisMode('login'));
+    togglePenulisDaftar?.addEventListener('click', () => switchPenulisMode('daftar'));
+
+    // 5. Password Visibility Toggle
+    document.querySelectorAll('.btn-toggle-pwd').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (!targetId) return;
+        const input = document.getElementById(targetId) as HTMLInputElement | null;
+        if (!input) return;
+
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = 'Sembunyikan';
+        } else {
+          input.type = 'password';
+          btn.textContent = 'Lihat Sandi';
+        }
+      });
     });
 
+    // 6. Alert Message Helper
     function showAlert(msg: string, type: 'error' | 'success' | 'info') {
       if (!alertBox) return;
       alertBox.textContent = msg;
@@ -187,15 +491,78 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
     }
 
-    form?.addEventListener('submit', async (e) => {
+    // 7. Form Handlers
+    // 7A. Penulis Login
+    formLoginPenulis?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = emailInput.value.trim();
-      const password = pwdInput.value;
+      const email = (document.getElementById('penulis-login-email') as HTMLInputElement).value.trim();
+      const pwd = (document.getElementById('penulis-login-password') as HTMLInputElement).value;
+      const btn = document.getElementById('btn-submit-penulis-login') as HTMLButtonElement;
+
+      if (!email || !pwd) return;
+      btn.disabled = true;
+      btn.textContent = 'Memverifikasi...';
+
+      try {
+        const res = await loginPenulis(email, pwd);
+        if (res.success) {
+          showAlert(res.message + ' Mengalihkan ke halaman naskah...', 'success');
+          setTimeout(() => {
+            window.location.href = `${basePath}/kirim`;
+          }, 600);
+        } else {
+          showAlert(res.message, 'error');
+        }
+      } catch (err: any) {
+        showAlert('Gagal masuk: ' + (err.message || 'Terjadi kesalahan sistem'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Masuk & Buka Ruang Naskah →';
+      }
+    });
+
+    // 7B. Penulis Registrasi
+    formDaftarPenulis?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nama = (document.getElementById('daftar-nama') as HTMLInputElement).value.trim();
+      const kelas = (document.getElementById('daftar-kelas') as HTMLInputElement).value.trim();
+      const kontak = (document.getElementById('daftar-kontak') as HTMLInputElement).value.trim();
+      const email = (document.getElementById('daftar-email') as HTMLInputElement).value.trim();
+      const password = (document.getElementById('daftar-password') as HTMLInputElement).value;
+      const btn = document.getElementById('btn-submit-daftar') as HTMLButtonElement;
+
+      if (!nama || !kelas || !email || !password) return;
+      btn.disabled = true;
+      btn.textContent = 'Mendaftarkan Akun...';
+
+      try {
+        const res = await daftarPenulis({ nama, kelas, kontak, email, password });
+        if (res.success) {
+          showAlert(res.message + ' Mengalihkan ke formulir naskah...', 'success');
+          setTimeout(() => {
+            window.location.href = `${basePath}/kirim`;
+          }, 800);
+        } else {
+          showAlert(res.message, 'error');
+        }
+      } catch (err: any) {
+        showAlert('Gagal mendaftar: ' + (err.message || 'Terjadi kesalahan sistem'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Daftar & Mulai Mengirim Karya →';
+      }
+    });
+
+    // 7C. Redaksi Login
+    formRedaksi?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (document.getElementById('redaksi-email') as HTMLInputElement).value.trim();
+      const password = (document.getElementById('redaksi-password') as HTMLInputElement).value;
+      const btn = document.getElementById('btn-submit-redaksi-login') as HTMLButtonElement;
 
       if (!email || !password) return;
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Memeriksa Kredensial...';
+      btn.disabled = true;
+      btn.textContent = 'Memeriksa Kredensial Redaksi...';
 
       try {
         const res = await loginAdmin(email, password);
@@ -210,8 +577,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       } catch (err: any) {
         showAlert('Terjadi kesalahan: ' + (err.message || 'Gagal masuk'), 'error');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Masuk ke Studio Redaksi →';
+        btn.disabled = false;
+        btn.textContent = 'Masuk ke Studio Redaksi →';
       }
     });
   </script>
