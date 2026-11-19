@@ -138,8 +138,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           Quotes
         </a>
         <a 
-          href={`${basePath}/#tentang`} 
-          class="no-underline whitespace-nowrap py-1 text-[var(--ink)] hover:text-[var(--crimson)] transition-colors font-medium border-b-2 border-transparent hover:border-[var(--crimson)]"
+          href={`${basePath}/tentang`} 
+          class={`no-underline whitespace-nowrap py-1 transition-colors relative font-medium ${currentPath.includes('/tentang') ? 'text-[var(--crimson)] font-semibold border-b-2 border-[var(--crimson)]' : 'text-[var(--ink)] hover:text-[var(--crimson)] border-b-2 border-transparent hover:border-[var(--crimson)]'}`}
         >
           Tentang
         </a>
@@ -271,7 +271,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           <span>Quotes &amp; Mutiara Kata</span>
           <span class="mono text-xs text-[var(--ink-faint)]">“ ”</span>
         </a>
-        <a href={`${basePath}/#tentang`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
+        <a href={`${basePath}/tentang`} class="py-2 px-3 rounded hover:bg-[var(--paper-deep)] text-[var(--ink)] no-underline flex items-center justify-between">
           <span>Tentang Portal</span>
           <span class="mono text-xs text-[var(--ink-faint)]">❧</span>
         </a>
@@ -371,7 +371,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div>
           <h4 class="font-semibold text-[var(--ink)] text-xs uppercase tracking-wider mb-3">Redaksi &amp; Akses</h4>
           <ul class="space-y-2 list-none p-0 m-0 text-[0.78rem]">
-            <li><a href={`${basePath}/#tentang`} class="hover:text-[var(--crimson)] transition-colors">Tentang Portal</a></li>
+            <li><a href={`${basePath}/tentang`} class="hover:text-[var(--crimson)] transition-colors">Tentang Portal</a></li>
             <li><a href={`${basePath}/kirim`} class="hover:text-[var(--crimson)] transition-colors">Kirim Naskah Baru</a></li>
             <li><a href={`${basePath}/admin`} class="hover:text-[var(--crimson)] transition-colors font-semibold text-[var(--crimson)]">Studio Redaksi &amp; Live Editor ✎</a></li>
             <li><a href={`${basePath}/admin/login`} class="hover:text-[var(--crimson)] transition-colors">Masuk Redaksi (Login)</a></li>

@@ -74,6 +74,6 @@ Bukan sekadar blog generik, Ruang Sastra adalah media penerbitan literatur sekol
 ## Product Principles
 
 1. **Kehormatan Teks (Text Supremacy)**: Format tata letak dirancang melayani pembacaan teks sastra dan ilmiah secara nyaman tanpa distraksi visual berlebihan.
-2. **Kemandirian & Ketahanan (Zero Fragility)**: Blog tidak boleh mati hanya karena kuota database habis. Situs tetap berfungsi 100% secara statis melalui Git Markdown, dengan Firebase sebagai suplemen dinamis.
+2. **Kemandirian & Ketahanan (Zero Fragility)**: Blog tidak boleh mati hanya karena kuota database habis. Situs tetap berfungsi 100% secara statis melalui Git Markdown, dengan Google Apps Script (Spreadsheet & Drive) sebagai suplemen cloud dinamis dan LocalStorage sebagai fallback otomatis.
 3. **Format yang Otentik**: Naskah drama harus terlihat seperti naskah teater sungguhan; puisi harus menjaga jeda baris bait; karya ilmiah harus memiliki abstraksi dan catatan kaki yang rapi.
 4. **Sentuhan Fisik di Ranah Digital**: Nuansa kertas hangat (*warm paper*), tinta alami (*organic ink*), dan fleuron sastra membangkitkan keintiman buku cetak.

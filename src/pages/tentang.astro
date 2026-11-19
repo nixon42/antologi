@@ -6,125 +6,396 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <Layout 
   title="Tentang Ruang Sastra — SMPI Yambu'ul Qur'an"
-  description="Mengenal visi literasi, struktur redaksi, dan proses berkarya di Ruang Sastra SMPI Yambu'ul Qur'an."
+  description="Mengenal visi literasi, struktur dewan redaksi, alur kurasi naskah, dan arsitektur publikasi Ruang Sastra SMPI Yambu'ul Qur'an."
 >
-  <div class="wrap py-12 md:py-16">
+  <div class="wrap py-12 md:py-20">
     
-    <!-- Header -->
-    <header class="mb-12 pb-6 border-b border-[var(--rule-strong)]">
-      <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-2 uppercase tracking-wider">
+    <!-- Masthead Header -->
+    <header class="mb-12 pb-8 border-b border-[var(--rule-strong)]">
+      <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-3 uppercase tracking-wider font-semibold">
         <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
         <span>/</span>
-        <span>Tentang</span>
+        <span>Tentang Ruang Sastra</span>
       </div>
-      <h1 class="font-['Fraunces',serif] font-semibold text-3xl md:text-5xl text-[var(--ink)] m-0">
-        Tentang Ruang Sastra
-      </h1>
-      <p class="font-['Source_Serif_4',serif] italic text-lg md:text-xl text-[var(--ink-soft)] mt-4 max-w-2xl leading-relaxed">
-        Menghidupkan nalar kritis, merajut imajinasi, dan menabur nilai-nilai Qur'ani melalui keabadian kata-kata.
-      </p>
+
+      <div class="flex items-start gap-4 flex-wrap">
+        <div class="w-14 h-14 rounded-full border-2 border-[var(--crimson)] bg-[var(--paper-card)] flex items-center justify-center font-['Fraunces',serif] font-bold text-lg text-[var(--crimson)] flex-shrink-0 shadow-inner">
+          YQ
+        </div>
+        <div class="min-w-0 flex-1">
+          <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-widest font-bold block mb-1">
+            Kolofon &amp; Manifesto Literasi
+          </span>
+          <h1 class="font-['Fraunces',serif] font-bold text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] m-0 tracking-tight">
+            Tentang Ruang Sastra
+          </h1>
+          <p class="font-['Source_Serif_4',serif] italic text-base sm:text-lg text-[var(--ink-soft)] mt-2.5 max-w-2xl leading-relaxed">
+            Menghidupkan nalar kritis, merawat kepekaan budi, dan menabur nilai-nilai Qur'ani melalui keabadian kata-kata.
+          </p>
+        </div>
+      </div>
     </header>
 
-    <!-- Reading Well Longform Story -->
-    <div class="reading-well reading-content space-y-8 text-base md:text-lg leading-[1.8] text-[var(--ink)] font-['Source_Serif_4',serif]">
+    <!-- Main Editorial Longform Story -->
+    <div class="space-y-12 text-[var(--ink)]">
       
-      <section>
-        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] mb-4">
-          Sebuah Ikhtiar Menjaga Tradisi Literasi
+      <!-- SECTION 1: MANIFESTO & VISI -->
+      <section class="reading-well reading-content space-y-5 text-base md:text-lg leading-[1.8] font-['Source_Serif_4',serif]">
+        <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
+          Sebuah Ikhtiar Menjaga Tradisi Literasi Santri
         </h2>
         <p>
-          Ruang Sastra lahir dari kesadaran bahwa pendidikan santri tidak boleh berhenti pada hafalan teks semata. Di lingkungan <strong>SMPI Yambu'ul Qur'an</strong>, kami percaya bahwa setiap generasi Qur'ani dituntut memiliki kedalaman berpikir, ketajaman analisis, dan kepekaan rasa terhadap realitas di sekelilingnya.
+          Ruang Sastra lahir dari kesadaran bahwa pendidikan santri tidak boleh berhenti pada hafalan teks semata. Di lingkungan <strong>SMPI Yambu'ul Qur'an</strong>, kami meyakini bahwa generasi Qur'ani yang sejati dituntut memiliki kedalaman berpikir, ketajaman analisis, dan kehalusan rasa dalam merespons dinamika zaman.
         </p>
         <p>
-          Melalui portal ini, tulisan siswa bukan lagi sekadar tugas sekolah yang berakhir di meja guru atau tumpukan arsip berdebu. Setiap karya—baik berupa telaah ilmiah yang kritis, soneta puisi yang syahdu, cerpen yang menyentuh, antologi bersama, lakon naskah drama, hingga mutiara kata sastra—diberi panggung yang bermartabat agar dapat dibaca, direnungkan, dan diapresiasi oleh khalayak yang lebih luas.
+          Melalui portal ini, tulisan siswa bukan lagi sekadar tugas sekolah yang berakhir di tumpukan map berdebu. Setiap karya santri—mulai dari kajian ilmiah objektif, sajak puisi kontemplatif, narasi cerpen humanis, antologi bersama, naskah drama panggung, hingga sari pati mutiara kata—diberi panggung yang bermartabat agar dapat dibaca, direnungkan, dan diapresiasi oleh khalayak yang lebih luas.
         </p>
+        
+        <blockquote class="my-6 p-5 bg-[var(--paper-card)] border-l-4 border-[var(--crimson)] rounded-r-lg font-['Fraunces',serif] italic text-base md:text-lg text-[var(--ink)]">
+          "Membaca adalah menghirup dunia, dan menulis adalah mengembuskan kembali kearifan ke relung semesta. Setiap huruf yang terpahat dengan keikhlasan adalah benih keabadian yang mekar di sanubari pembacanya."
+        </blockquote>
       </section>
 
       <div class="fleuron-divider">❧</div>
 
-      <section>
-        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] mb-4">
-          6 Pilar Konten Sastra
-        </h2>
-        <div class="space-y-4 not-prose">
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--gold)] m-0 mb-1">
-              1. Karya Tulis Ilmiah
-            </h3>
-            <p class="text-sm text-[var(--ink-soft)] m-0 leading-relaxed font-['Source_Serif_4',serif]">
-              Wadah penelitian remaja, analisis teks sastra, kajian sosial kemasyarakatan, dan eksplorasi sains berlandaskan metode ilmiah objektif, lengkap dengan abstrak dwibahasa dan sitasi daftar pustaka.
-            </p>
+      <!-- SECTION 2: 6 PILAR KONTEN SASTRA -->
+      <section class="space-y-6">
+        <div>
+          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
+            Ragam Format Sastra
+          </span>
+          <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
+            6 Pilar Konten Ruang Sastra
+          </h2>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] mt-1.5 max-w-xl">
+            Setiap format literatur dirancang dengan konvensi tata letak dan tipografi khusus yang menghormati karakteristik aslinya:
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          
+          <!-- 1. KTI -->
+          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--gold)] transition-colors">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-bold">
+                  Akademik &amp; Riset
+                </span>
+                <svg class="w-5 h-5 text-[var(--gold)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
+                1. Karya Tulis Ilmiah
+              </h3>
+              <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
+                Wadah penelitian santri, telaah teks sastra, dan kajian sosial berlandaskan metodologi ilmiah objektif, lengkap dengan abstrak dwibahasa, guru pembimbing, dan unduhan dokumen PDF.
+              </p>
+            </div>
+            <a href={`${basePath}/karya?kategori=ilmiah`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
+              Jelajahi Karya Ilmiah →
+            </a>
           </div>
 
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--crimson)] m-0 mb-1">
-              2. Puisi &amp; Prosa
-            </h3>
-            <p class="text-sm text-[var(--ink-soft)] m-0 leading-relaxed font-['Source_Serif_4',serif]">
-              Ruang ekspresi puitik yang merawat bait-bait sajak, prosa liris, serta pemutar audio musikalisasi puisi yang memadukan sastra dengan melodi gambus dan gesekan biola santri.
-            </p>
+          <!-- 2. Puisi & Prosa -->
+          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--crimson)] transition-colors">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-bold">
+                  Puitika &amp; Nada
+                </span>
+                <svg class="w-5 h-5 text-[var(--crimson)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                </svg>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
+                2. Puisi &amp; Prosa
+              </h3>
+              <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
+                Ekspresi puitik yang merawat jeda bait sajak, kontemplasi spiritualitas malam, dan pemutar audio musikalisasi puisi yang memadukan bait syair dengan petikan melodi dawai santri.
+              </p>
+            </div>
+            <a href={`${basePath}/karya?kategori=puisi`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
+              Dengarkan &amp; Baca Puisi →
+            </a>
           </div>
 
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--sage)] m-0 mb-1">
-              3. Cerpen (Cerita Pendek)
-            </h3>
-            <p class="text-sm text-[var(--ink-soft)] m-0 leading-relaxed font-['Source_Serif_4',serif]">
-              Kisah-kisah fiksi dan narasi pengalaman santri yang menelusuri lorong-lorong asrama, persahabatan, pencarian ilmu, dan dinamika keluarga dengan ritme narasi yang memikat.
-            </p>
+          <!-- 3. Cerpen -->
+          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--sage)] transition-colors">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--sage)] text-[var(--sage)] uppercase font-bold">
+                  Fiksi Naratif
+                </span>
+                <svg class="w-5 h-5 text-[var(--sage)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
+                3. Cerpen Santri
+              </h3>
+              <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
+                Kisah-kisah fiksi dan memoar yang menelusuri lorong asrama, persahabatan, riak-riak pencarian ilmu, dan dinamika keluarga dengan indikator progres baca (*reading time tracker*).
+              </p>
+            </div>
+            <a href={`${basePath}/karya?kategori=cerpen`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
+              Buka Kumpulan Cerpen →
+            </a>
           </div>
 
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--gold)] m-0 mb-1">
-              4. Antologi Bersama
-            </h3>
-            <p class="text-sm text-[var(--ink-soft)] m-0 leading-relaxed font-['Source_Serif_4',serif]">
-              Penerbitan jilid kumpulan karya lintas kelas dan angkatan yang menghimpun beragam warna tulisan ke dalam satu buku tematik yang terorganisasi rapi.
-            </p>
+          <!-- 4. Antologi -->
+          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--gold)] transition-colors">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-bold">
+                  Kompilasi Tematik
+                </span>
+                <svg class="w-5 h-5 text-[var(--gold)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
+                4. Antologi Bersama
+              </h3>
+              <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
+                Penerbitan buku tematik karya gabungan lintas kelas dan angkatan yang menghimpun beragam warna tulisan ke dalam jilid berindeks bab dan daftar kontributor rapi.
+              </p>
+            </div>
+            <a href={`${basePath}/karya?kategori=antologi`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
+              Lihat Jilid Antologi →
+            </a>
           </div>
 
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--crimson-soft)] m-0 mb-1">
-              5. Naskah Drama &amp; Teater
-            </h3>
-            <p class="text-sm text-[var(--ink-soft)] m-0 leading-relaxed font-['Source_Serif_4',serif]">
-              Naskah lakon pementasan teater yang disusun dengan konvensi penulisan drama baku: nama tokoh kapital menjorok, petunjuk lakuan panggung miring, serta rekaman video pementasan.
-            </p>
+          <!-- 5. Naskah Drama -->
+          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--crimson)] transition-colors">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-bold">
+                  Seni Lakon Teater
+                </span>
+                <svg class="w-5 h-5 text-[var(--crimson)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
+                5. Naskah Drama &amp; Teater
+              </h3>
+              <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
+                Naskah pementasan teater yang disusun dengan tipografi baku: nama tokoh kapital menjorok, petunjuk lakuan panggung miring, serta rekaman video pementasan santri.
+              </p>
+            </div>
+            <a href={`${basePath}/panggung`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
+              Buka Panggung Teater →
+            </a>
           </div>
 
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] m-0 mb-1">
-              6. Quotes &amp; Mutiara Kata
-            </h3>
-            <p class="text-sm text-[var(--ink-soft)] m-0 leading-relaxed font-['Source_Serif_4',serif]">
-              Petikan sari pati pemikiran para kyai, guru, dan santri yang dapat disalin atau diekspor instan menjadi kartu grafis media sosial.
-            </p>
+          <!-- 6. Quotes Sastra -->
+          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--ink)] transition-colors">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] uppercase font-bold">
+                  Aforisma &amp; Hikmah
+                </span>
+                <svg class="w-5 h-5 text-[var(--ink)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                </svg>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
+                6. Quotes &amp; Mutiara Kata
+              </h3>
+              <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
+                Petikan sari pati pemikiran para kyai, ustadz, dan santri yang dapat disalin satu klik atau diekspor instan menjadi kartu grafis media sosial (PNG generator).
+              </p>
+            </div>
+            <a href={`${basePath}/quotes`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
+              Lihat Galeri Quotes →
+            </a>
           </div>
+
         </div>
       </section>
 
       <div class="fleuron-divider">❧</div>
 
-      <section>
-        <h2 class="font-['Fraunces',serif] font-semibold text-2xl md:text-3xl text-[var(--ink)] mb-4">
-          Kolofon Teknis &amp; Arsitektur
+      <!-- SECTION 3: ALUR KERJA KURASI EDITORIAL -->
+      <section class="space-y-6">
+        <div>
+          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
+            Standar Mutu
+          </span>
+          <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
+            Alur Kurasi &amp; Penerbitan Naskah
+          </h2>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] mt-1.5 max-w-xl">
+            Setiap naskah yang dikirim oleh santri dan guru melalui tahapan kurasi berjenjang oleh Dewan Redaksi:
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Tahap 1 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
+            <span class="mono text-[0.62rem] text-[var(--crimson)] uppercase tracking-wider font-bold block">
+              Tahap 01
+            </span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Submisi Naskah
+            </h3>
+            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] leading-relaxed m-0">
+              Penulis mengirimkan naskah melalui formulir online atau akun santri terdaftar, lengkap dengan identitas, kategori, dan foto sampul.
+            </p>
+          </div>
+
+          <!-- Tahap 2 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
+            <span class="mono text-[0.62rem] text-[var(--gold)] uppercase tracking-wider font-bold block">
+              Tahap 02
+            </span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Uji Kelayakan &amp; Adab
+            </h3>
+            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] leading-relaxed m-0">
+              Dewan Redaksi memeriksa orisinalitas (anti-plagiarisme), kesantunan tutur, dan keselarasan nilai-nilai akhlak Qur'ani.
+            </p>
+          </div>
+
+          <!-- Tahap 3 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
+            <span class="mono text-[0.62rem] text-[var(--sage)] uppercase tracking-wider font-bold block">
+              Tahap 03
+            </span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Penyuntingan Redaksi
+            </h3>
+            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] leading-relaxed m-0">
+              Koreksi tipografi, ejaan EYD, ritme bait puisi, atau abstraksi ilmiah di Studio Redaksi untuk memaksimalkan mutu keterbacaan.
+            </p>
+          </div>
+
+          <!-- Tahap 4 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
+            <span class="mono text-[0.62rem] text-emerald-800 uppercase tracking-wider font-bold block">
+              Tahap 04
+            </span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Publikasi &amp; Apresiasi
+            </h3>
+            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] leading-relaxed m-0">
+              Karya diterbitkan ke Pojok Baca publik, diarsipkan ke database Google Sheets, dan terbuka bagi komentar pembaca.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <div class="fleuron-divider">❧</div>
+
+      <!-- SECTION 4: STRUKTUR DEWAN REDAKSI -->
+      <section class="space-y-6">
+        <div>
+          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
+            Pengelola &amp; Pembina
+          </span>
+          <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
+            Struktur Dewan Redaksi &amp; Pembina
+          </h2>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] mt-1.5 max-w-xl">
+            Didukung oleh jajaran asatidz pembina literasi dan tim redaksi santri SMPI Yambu'ul Qur'an:
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <!-- Card 1 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl space-y-1.5">
+            <span class="mono text-[0.65rem] text-[var(--gold)] uppercase font-semibold block">Pelindung &amp; Penasehat</span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Kepala SMPI Yambu'ul Qur'an
+            </h3>
+            <p class="mono text-[0.7rem] text-[var(--ink-faint)] m-0">Pengarah Kebijakan Literasi Sekolah</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl space-y-1.5">
+            <span class="mono text-[0.65rem] text-[var(--crimson)] uppercase font-semibold block">Pembina Literasi &amp; Bahasa</span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Guru Bahasa &amp; Sastra
+            </h3>
+            <p class="mono text-[0.7rem] text-[var(--ink-faint)] m-0">Pembimbing Kurasi Karya Ilmiah &amp; Puisi</p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl space-y-1.5">
+            <span class="mono text-[0.65rem] text-[var(--sage)] uppercase font-semibold block">Dewan Redaksi Pelaksana</span>
+            <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+              Tim Kurator Santri &amp; Asatidz
+            </h3>
+            <p class="mono text-[0.7rem] text-[var(--ink-faint)] m-0">Penyunting Naskah &amp; Moderasi Pojok Baca</p>
+          </div>
+
+        </div>
+      </section>
+
+      <div class="fleuron-divider">❧</div>
+
+      <!-- SECTION 5: KOLOFON TEKNIS & ZERO-FRAGILITY -->
+      <section class="reading-well reading-content space-y-5 text-base md:text-lg leading-[1.8] font-['Source_Serif_4',serif]">
+        <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
+          Kolofon Teknis &amp; Arsitektur Static-First Hybrid
         </h2>
         <p>
-          Ruang Sastra dibangun berlandaskan filosofi ketahanan digital (*zero fragility*):
+          Ruang Sastra dibangun berlandaskan filosofi ketahanan digital mutlak (<strong>Zero-Fragility Architecture</strong>):
         </p>
+        
         <ul class="list-disc list-inside space-y-2 text-sm md:text-base">
-          <li><strong>Generator Situs</strong>: Ditenagai oleh <em>Astro v5</em>, menghasilkan kode HTML statis berkecepatan tinggi tanpa beban server runtime.</li>
-          <li><strong>Penyimpanan Inti</strong>: File naskah disimpan dalam format Markdown/MDX di repositori Git, memastikan riwayat revisi dan keamanan arsip seumur hidup secara gratis di <em>GitHub Pages</em>.</li>
-          <li><strong>Integrasi Dinamis</strong>: Didampingi modul <em>Firebase Firestore &amp; Storage</em> untuk menangani fitur interaktif (tepuk tangan/apresiasi pembaca, kolom diskusi, dan submisi naskah online).</li>
-          <li><strong>Tipografi &amp; Estetika</strong>: Mengikuti pedoman desain <em>/impeccable</em> dengan palet kertas hangat (#efeae0), tinta organik (#1c2419), dan font editorial klasik (Fraunces &amp; Source Serif 4).</li>
+          <li>
+            <strong>Generator Situs Statis (SSG)</strong>: Ditenagai oleh <em>Astro v5</em>, menghasilkan kode HTML statis murni yang disajikan secara instan di edge CDN global <em>GitHub Pages</em> tanpa ketergantungan server runtime yang rentan macet.
+          </li>
+          <li>
+            <strong>Cloud Database &amp; Media Storage</strong>: Terintegrasi dengan <em>Google Apps Script Web App</em> yang terhubung langsung ke Google Spreadsheet (`Ruang Sastra DB`) dan Google Drive (`RuangSastra_Media`), menjamin ketersediaan gratis tanpa biaya hosting berkala.
+          </li>
+          <li>
+            <strong>Ketahanan Offline (Zero-Fragility)</strong>: Dilengkapi modul fallback <em>LocalStorage</em> otomatis. Seluruh fitur (pembacaan karya, penambahan apresiasi claps, komentar, hingga pembuatan draf naskah) tetap berfungsi normal saat koneksi internet terputus.
+          </li>
+          <li>
+            <strong>Standar Desain Impeccable</strong>: Mematuhi sistem token tipografi klasik: Kertas Hangat (<code class="mono text-xs">#efeae0</code>), Merah Crimson (<code class="mono text-xs">#7c2d26</code>), Emas Antik (<code class="mono text-xs">#a6813c</code>), dan Tinta Organik (<code class="mono text-xs">#1c2419</code>), dipadukan dengan tipografi <em>Fraunces</em>, <em>Source Serif 4</em>, dan <em>IBM Plex Mono</em>.
+          </li>
         </ul>
       </section>
 
-      <div class="pt-8 text-center not-prose">
-        <a href={`${basePath}/karya`} class="btn-literary btn-literary-solid">
-          Mulai Membaca Karya Santri →
-        </a>
-      </div>
+      <div class="fleuron-divider">❧</div>
+
+      <!-- SECTION 6: SEKRETARIAT & CALL TO ACTION -->
+      <section class="p-8 sm:p-10 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl text-center space-y-6 shadow-sm">
+        <div class="max-w-xl mx-auto space-y-2">
+          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-bold">
+            Sekretariat &amp; Kirim Karya
+          </span>
+          <h3 class="font-['Fraunces',serif] font-bold text-2xl text-[var(--ink)] m-0">
+            Mari Menjadi Bagian dari Jejak Pena Santri
+          </h3>
+          <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] leading-relaxed m-0">
+            Pintu Ruang Sastra terbuka lebar bagi seluruh santri, dewan guru, dan alumni SMPI Yambu'ul Qur'an. Kirimkan naskah Anda hari ini untuk dikurasi oleh dewan redaksi.
+          </p>
+        </div>
+
+        <div class="flex items-center justify-center gap-3 flex-wrap pt-2">
+          <a href={`${basePath}/kirim`} class="btn-literary btn-literary-solid !py-2.5 !px-5 text-xs no-underline">
+            Kirim Naskah Baru →
+          </a>
+          <a href={`${basePath}/karya`} class="btn-literary !py-2.5 !px-5 text-xs no-underline">
+            Jelajahi Pojok Baca
+          </a>
+          <a href={`${basePath}/admin`} class="btn-literary btn-literary-ghost !py-2.5 !px-5 text-xs no-underline">
+            Studio Redaksi (Admin) ✎
+          </a>
+        </div>
+
+        <div class="pt-4 border-t border-[var(--rule)] text-xs mono text-[var(--ink-faint)] space-y-1">
+          <p class="m-0"><strong>SMPI Yambu'ul Qur'an</strong> — Lembaga Pendidikan Islam &amp; Tahfidz Terpadu</p>
+          <p class="m-0">Surel Redaksi: <a href="mailto:redaksi@yq.sch.id" class="text-[var(--crimson)] underline">redaksi@yq.sch.id</a></p>
+        </div>
+      </section>
 
     </div>
 
