@@ -155,9 +155,11 @@ p {
 }
 
 /* Links */
-a {
-  color: inherit;
-  text-underline-offset: 3px;
+@layer base {
+  a {
+    color: inherit;
+    text-underline-offset: 3px;
+  }
 }
 
 /* Monospace & Tabular Numerals */
@@ -205,17 +207,18 @@ a {
 
 .btn-literary:hover {
   background-color: var(--crimson);
-  color: var(--paper);
+  color: var(--paper) !important;
 }
 
 .btn-literary-solid {
   background-color: var(--crimson);
-  color: var(--paper);
+  color: var(--paper) !important;
 }
 
 .btn-literary-solid:hover {
   background-color: var(--crimson-soft);
   border-color: var(--crimson-soft);
+  color: var(--paper) !important;
 }
 
 .btn-literary-ghost {

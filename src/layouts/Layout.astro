@@ -224,10 +224,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <!-- Kirim Karya Solid CTA -->
         <a 
           href={`${basePath}/kirim`} 
-          class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--crimson)] hover:bg-[var(--crimson-soft)] text-[var(--paper)] text-xs mono font-semibold tracking-wide transition-all shadow-xs whitespace-nowrap no-underline cursor-pointer"
+          class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--crimson)] hover:bg-[var(--crimson-soft)] !text-[var(--paper)] text-xs mono font-semibold tracking-wide transition-all shadow-xs whitespace-nowrap no-underline cursor-pointer"
+          style="color: var(--paper) !important;"
         >
-          <span>Kirim Karya</span>
-          <span class="text-xs">→</span>
+          <span class="!text-[var(--paper)] font-semibold" style="color: var(--paper) !important;">Kirim Karya</span>
+          <span class="text-xs !text-[var(--paper)] font-bold" style="color: var(--paper) !important;">→</span>
         </a>
 
         <!-- Mobile Menu Toggle Button (Hamburger / Close) -->
