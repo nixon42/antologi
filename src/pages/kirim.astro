@@ -250,12 +250,12 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </div>
 
         <div class="p-6 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-sm space-y-2">
-          <span class="mono text-xs text-[var(--gold)] uppercase tracking-wider block font-semibold">Integrasi Database</span>
+          <span class="mono text-xs text-[var(--gold)] uppercase tracking-wider block font-semibold">Integrasi Cloud Database</span>
           <h4 class="font-['Fraunces',serif] font-semibold text-sm text-[var(--ink)] m-0">
-            Penyimpanan Supabase &amp; Arsip Realtime
+            Penyimpanan Google Sheets &amp; Drive
           </h4>
           <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] leading-relaxed m-0">
-            Naskah yang Anda kirimkan tersimpan secara aman di database Supabase PostgreSQL dan cadangan lokal. Setelah lolos kurasi redaksi, karya akan langsung dipublikasikan ke katalog pembaca.
+            Naskah yang Anda kirimkan tersimpan secara aman di database Google Spreadsheet dan cadangan lokal. Setelah lolos kurasi dewan redaksi, karya akan langsung dipublikasikan ke katalog pembaca.
           </p>
         </div>
       </aside>
@@ -415,7 +415,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         try {
           let fotoUrl = '';
           if (fileInput.files && fileInput.files[0]) {
-            if (statusMsg) statusMsg.textContent = 'Mengunggah foto sampul ke Supabase Storage...';
+            if (statusMsg) statusMsg.textContent = 'Mengunggah foto sampul ke Google Drive Storage...';
             fotoUrl = await uploadFotoKarya(fileInput.files[0]);
           }
 

@@ -6,7 +6,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <Layout 
   title="Studio Redaksi & Manajemen Karya — Ruang Sastra SMPI YQ"
-  description="Pusat kerja dewan redaksi untuk mengurasi kiriman naskah santri, mengelola karya terpublikasi, dan menyunting literatur secara real-time ke Supabase."
+  description="Pusat kerja dewan redaksi untuk mengurasi kiriman naskah santri, mengelola karya terpublikasi, dan menyunting literatur secara real-time ke Cloud Database Google Spreadsheet & Drive."
 >
   <div class="wrap py-8 md:py-12">
     
@@ -19,7 +19,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         Akses Khusus Dewan Redaksi
       </h2>
       <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] mt-2 max-w-md mx-auto">
-        Anda harus masuk terlebih dahulu dengan akun redaksi atau Supabase Auth untuk mengakses panel kurasi dan studio penulisan.
+        Anda harus masuk terlebih dahulu dengan akun dewan redaksi SMPI YQ untuk mengakses panel kurasi dan studio penulisan.
       </p>
       <div class="mt-6 flex items-center justify-center gap-4">
         <a href={`${basePath}/admin/login`} class="btn-literary btn-literary-solid !py-2.5 !px-5 text-sm no-underline">
@@ -46,7 +46,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             Studio Redaksi &amp; Manajemen Karya
           </h1>
           <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] mt-1.5">
-            Kurasi kiriman naskah santri, kelola karya terpublikasi, atau terbitkan karya sastra baru ke Supabase.
+            Kurasi kiriman naskah santri, kelola karya terpublikasi, atau terbitkan karya sastra baru ke Google Sheets DB.
           </p>
         </div>
 
@@ -54,7 +54,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="flex items-center gap-3 flex-wrap">
           <div id="supabase-status-badge" class="mono text-xs px-3 py-1.5 rounded-full border border-[var(--rule-strong)] bg-[var(--paper-card)] flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
-            <span id="status-text">Supabase Aktif ⚡</span>
+            <span id="status-text">Apps Script Cloud Aktif ⚡</span>
           </div>
 
           <div class="flex items-center gap-2 px-3 py-1.5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded-full mono text-xs text-[var(--ink)]">
@@ -114,7 +114,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <span id="stat-total" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
             <span class="mono text-xs text-[var(--ink-faint)]">Karya</span>
           </div>
-          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Keseluruhan naskah tersimpan di Supabase</p>
+          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Keseluruhan naskah tersimpan di Cloud Database</p>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </button>
 
         <div class="ml-auto">
-          <button id="btn-refresh-all" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer flex items-center gap-1 p-1" title="Segarkan Data dari Supabase">
+          <button id="btn-refresh-all" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer flex items-center gap-1 p-1" title="Segarkan Data dari Cloud Google Sheets">
             <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -325,10 +325,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             ></textarea>
           </div>
 
-          <!-- Upload Foto ke Supabase Storage -->
+          <!-- Upload Foto ke Google Drive Storage -->
           <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded">
             <label class="block mono text-xs uppercase text-[var(--crimson)] mb-1.5 font-semibold">
-              Unggah Foto Sampul ke Supabase Storage
+              Unggah Foto Sampul ke Google Drive Storage
             </label>
             <div class="flex items-center gap-3">
               <input 
@@ -370,7 +370,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                 id="btn-save-supabase" 
                 class="btn-literary btn-literary-solid !py-2.5 !px-5 text-sm cursor-pointer"
               >
-                Simpan ke Supabase DB ⚡
+                Simpan ke Cloud DB (Google Sheets) ⚡
               </button>
             </div>
             <button 
@@ -836,7 +836,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           const id = b.dataset.id || slug;
           const title = b.dataset.title || 'karya ini';
 
-          if (confirm(`Hapus permanen karya "${title}" dari database Supabase?`)) {
+          if (confirm(`Hapus permanen karya "${title}" dari database cloud?`)) {
             await hapusKarya(id);
             await loadAllWorks();
           }
@@ -987,18 +987,18 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       el?.addEventListener('input', updateLivePreview);
     });
 
-    // 6. Photo File Upload to Supabase Storage
+    // 6. Photo File Upload to Cloud Storage (Google Drive)
     photoFileInput?.addEventListener('change', async () => {
       if (!photoFileInput.files || !photoFileInput.files[0]) return;
       const file = photoFileInput.files[0];
-      if (uploadStatus) uploadStatus.textContent = 'Mengunggah ke Supabase Storage...';
+      if (uploadStatus) uploadStatus.textContent = 'Mengunggah ke Google Drive Storage...';
 
       try {
         const publicUrl = await uploadFotoKarya(file);
         photoUrlInput.value = publicUrl;
         updateLivePreview();
         if (uploadStatus) {
-          uploadStatus.textContent = 'Foto berhasil diunggah ke Supabase!';
+          uploadStatus.textContent = 'Foto berhasil diunggah ke Google Drive!';
           uploadStatus.className = 'mono text-[0.68rem] text-emerald-600 block mt-1';
         }
       } catch (err: any) {
@@ -1009,7 +1009,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
     });
 
-    // 7. Save to Supabase
+    // 7. Save to Cloud DB
     saveBtn?.addEventListener('click', async () => {
       if (!titleInput.value || !authorInput.value || !contentInput.value) {
         alert('Harap lengkapi Judul, Penulis, dan Isi Naskah terlebih dahulu.');
@@ -1017,7 +1017,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
 
       saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan ke Supabase...';
+      saveBtn.textContent = 'Menyimpan ke Cloud DB...';
 
       const payload: KaryaInput = {
         id: editIdInput.value || undefined,
@@ -1055,7 +1055,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         }
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = 'Simpan ke Supabase DB ⚡';
+        saveBtn.textContent = 'Simpan ke Cloud DB (Google Sheets) ⚡';
       }
     });
 

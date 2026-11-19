@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Astro (Static Site Generator) + Markdown/MDX Collections + Supabase (PostgreSQL Database & S3 File Storage) + Custom literary CSS design tokens + Client Islands for interactive reader features. Hosted on GitHub Pages via GitHub Actions.
+Astro (Static Site Generator) + Markdown/MDX Collections + Google Apps Script (Google Sheets Database & Google Drive Media Storage) + Custom literary CSS design tokens + Client Islands for interactive reader features. Hosted on GitHub Pages via GitHub Actions.
 
 ## Users
 
@@ -39,8 +39,8 @@ Bukan sekadar blog generik, Ruang Sastra adalah media penerbitan literatur sekol
   6. *Quotes / Kutipan Sastra*: Mutiara kata dengan penyusun, sumber karya, tombol salin teks, serta generator kartu kutipan visual yang siap diunduh/dibagikan ke media sosial.
 - **Basis Data & Media**:
   - *Arsitektur Inti (Git-backed)*: File Markdown/MDX di `src/content/`. 100% aman, gratis, terindeks git, performa instan tanpa database delay.
-  - *Database & Storage Online (Supabase)*: Modul `src/lib/supabase.ts` terintegrasi penuh dengan PostgreSQL Database dan File Storage gratis Supabase untuk live editing dari web, upload foto instan, tepuk tangan/claps real-time, dan komentar pembaca.
-  - *Penyimpanan Foto/Media*: Upload langsung dari halaman web ke Supabase Storage bucket `karya-media`, plus dukungan aset lokal gambar Astro WebP/AVIF modern.
+  - *Database & Storage Online (Google Apps Script)*: Modul `src/lib/appsscript.ts` (dengan alias `src/lib/supabase.ts`) terintegrasi penuh dengan Google Spreadsheet dan Google Drive gratis via Google Apps Script Web App untuk live editing dari web, upload foto instan, tepuk tangan/claps real-time, dan komentar pembaca.
+  - *Penyimpanan Foto/Media*: Upload langsung dari halaman web ke Google Drive folder `RuangSastra_Media` via Apps Script, plus dukungan aset lokal gambar Astro WebP/AVIF modern.
 - **Fitur Navigasi & Pencarian**:
   - Pencarian cepat di sisi klien (*instant search*) berdasarkan judul, pengarang, dan kategori/tag.
   - Filter kategori dan tag literatur.

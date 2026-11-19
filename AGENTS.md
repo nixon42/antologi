@@ -36,11 +36,11 @@ This repository is built on a **Static-First Hybrid Architecture**:
                      ┌───────────────┴───────────────┐
                      ▼                               ▼
      ┌───────────────────────────────┐   ┌──────────────────────────────┐
-     │   Dynamic Layer (Supabase)    │   │  Zero-Fragility Fallback     │
-     │  - PostgreSQL DB (`karya`,    │   │  - Client `localStorage`     │
-     │    `quotes`, `komentar`)      │   │  - Works 100% offline        │
-     │  - Storage (`karya-media`)    │   │  - Works if keys not set     │
-     │  - Realtime WebSockets        │   │  - Zero runtime crashes      │
+     │   Cloud Backend (Apps Script) │   │  Zero-Fragility Fallback     │
+     │  - Google Spreadsheet DB      │   │  - Client `localStorage`     │
+     │    (`Karya`, `Quotes`, dll)   │   │  - Works 100% offline        │
+     │  - Google Drive Media Storage │   │  - Instant cache sync        │
+     │  - Live sync & claps counter  │   │  - Zero runtime crashes      │
      └───────────────────────────────┘   └──────────────────────────────┘
 ```
 
@@ -54,9 +54,9 @@ This repository is built on a **Static-First Hybrid Architecture**:
 | **Package Manager**| Bun | `1.4.x` | Preferred over npm/yarn for speed on btrfs |
 | **Styling** | Tailwind CSS v4 | `@tailwindcss/vite@^4.3.3` | Configured via `astro.config.mjs` vite plugins |
 | **Design Standard**| `/impeccable` | Canonical 8-section token spec | See [`DESIGN.md`](./DESIGN.md) & [`PRODUCT.md`](./PRODUCT.md) |
-| **Database** | Supabase (PostgreSQL) | `@supabase/supabase-js@^2.118.0` | Client wrapper: `src/lib/supabase.ts` |
-| **Storage** | Supabase File Storage | Bucket: `karya-media` | Public bucket for cover photos & audio |
-| **Realtime** | Supabase Realtime | WebSocket postgres_changes | Used in `ApresiasiButton` & `KomentarSection` |
+| **Database** | Google Spreadsheet DB | Via Apps Script Web App | Client wrapper: `src/lib/appsscript.ts` & `src/lib/supabase.ts` |
+| **Storage** | Google Drive Storage | Folder: `RuangSastra_Media` | Public Google CDN URL (`lh3.googleusercontent.com`) |
+| **Realtime Sync**| Polling / Focus Sync | Tab focus & periodic interval | Used in `ApresiasiButton` & `KomentarSection` |
 | **Search** | Fuse.js Client Index | `fuse.js@^7.1.0` | Pre-built `/search-index.json` |
 | **Deployment** | GitHub Pages | GitHub Actions Workflow | Config: `.github/workflows/deploy.yml` |
 
@@ -79,8 +79,8 @@ When modifying this repository, you **MUST NEVER violate** these 6 invariants:
   This ensures the site works identically whether deployed on a subpath (`/antologi/`) or on a custom root subdomain (`sastra.domain.com`).
 
 ### 🔴 Invariant 2: Zero Fragility (Fallback Mandatory)
-- **Every dynamic Supabase interaction must degrade gracefully to `localStorage`**.
-- If `PUBLIC_SUPABASE_URL` or `PUBLIC_SUPABASE_ANON_KEY` is missing or network fails:
+- **Every dynamic cloud interaction must degrade gracefully to `localStorage`**.
+- If `PUBLIC_APPS_SCRIPT_URL` is missing or network fails:
   - Reading works must fall back to local content collections or `localStorage`.
   - Apresiasi (claps) must count locally in `localStorage`.
   - Comments must append to `localStorage`.
