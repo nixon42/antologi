@@ -97,7 +97,7 @@ const { karyaId } = Astro.props;
       }
 
       listContainer.innerHTML = comments.map(c => `
-        <article class="p-4 bg-[var(--paper-card)] border-l-2 border-[var(--crimson)] rounded-r-sm space-y-1.5">
+        <article class="p-4 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg space-y-1.5">
           <div class="flex items-baseline justify-between gap-2 flex-wrap">
             <div class="flex items-center gap-2">
               <strong class="font-['Fraunces',serif] font-semibold text-sm text-[var(--ink)]">${c.nama}</strong>

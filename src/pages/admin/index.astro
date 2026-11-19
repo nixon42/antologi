@@ -65,7 +65,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Cloud Database Aktif</span>
           </div>
-          <span class="mono text-[0.62rem] text-[var(--gold)] font-bold">Sheets &amp; Drive</span>
+          <span class="mono text-[0.68rem] text-[var(--gold)] font-bold">Sheets &amp; Drive</span>
         </div>
 
         <!-- Sidebar Navigation Menu Items -->
@@ -74,7 +74,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             type="button" 
             onclick="switchAdminSection('ringkasan')" 
             id="nav-btn-ringkasan" 
-            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer bg-[var(--paper-deep)] text-[var(--crimson)] font-bold border-l-4 border-[var(--crimson)]"
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer bg-[var(--paper-deep)] text-[var(--crimson)] font-bold border border-[var(--rule-strong)] shadow-xs"
           >
             <div class="flex items-center gap-2.5">
               <svg class="w-4 h-4 text-[var(--crimson)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Analisis Pengunjung</span>
             </div>
-            <span id="sidebar-badge-pengunjung" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-cyan-100 text-cyan-800">Live</span>
+            <span id="sidebar-badge-pengunjung" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-cyan-100 text-cyan-800">Live</span>
           </button>
 
           <button 
@@ -111,7 +111,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Antrean Kurasi</span>
             </div>
-            <span id="sidebar-badge-kurasi" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-rose-100 text-rose-800">0</span>
+            <span id="sidebar-badge-kurasi" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-rose-100 text-rose-800">0</span>
           </button>
 
           <button 
@@ -126,7 +126,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Karya Sastra (Katalog)</span>
             </div>
-            <span id="sidebar-badge-karya" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+            <span id="sidebar-badge-karya" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
           </button>
 
           <button 
@@ -141,7 +141,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Catatan &amp; Komentar</span>
             </div>
-            <span id="sidebar-badge-komentar" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+            <span id="sidebar-badge-komentar" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
           </button>
 
           <button 
@@ -156,7 +156,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Quotes &amp; Mutiara</span>
             </div>
-            <span id="sidebar-badge-quotes" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+            <span id="sidebar-badge-quotes" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
           </button>
 
           <button 
@@ -171,7 +171,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Penulis Santri</span>
             </div>
-            <span id="sidebar-badge-penulis" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+            <span id="sidebar-badge-penulis" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
           </button>
 
           <button 
@@ -187,7 +187,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Pengaturan Portal</span>
             </div>
-            <span class="mono text-[0.62rem] text-[var(--gold)]">Cloud</span>
+            <span class="mono text-[0.68rem] text-[var(--gold)]">Cloud</span>
           </button>
 
           <div class="pt-2">
@@ -212,7 +212,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <p id="admin-user-display-email" class="mono text-[0.72rem] font-bold text-[var(--ink)] truncate m-0">
               redaksi@yq.sch.id
             </p>
-            <p id="admin-user-display-role" class="mono text-[0.62rem] text-[var(--crimson)] uppercase font-semibold m-0">
+            <p id="admin-user-display-role" class="mono text-[0.68rem] text-[var(--crimson)] uppercase font-semibold m-0">
               Redaktur Utama
             </p>
           </div>
@@ -594,7 +594,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                   </h3>
                   <p class="mono text-[0.68rem] text-[var(--ink-soft)] mt-0.5">Komposisi pembaca Karya Sastra vs Akses Portal &amp; Beranda</p>
                 </div>
-                <span class="mono text-[0.62rem] font-bold bg-[var(--paper-deep)] text-[var(--ink-soft)] px-2.5 py-1 rounded-full border border-[var(--rule)]">WIB (UTC+7)</span>
+                <span class="mono text-[0.68rem] font-bold bg-[var(--paper-deep)] text-[var(--ink-soft)] px-2.5 py-1 rounded-full border border-[var(--rule)]">WIB (UTC+7)</span>
               </div>
 
               <div class="h-64 w-full relative" id="trend-chart-wrapper">
@@ -1102,7 +1102,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           <h3 id="modal-editor-title" class="font-['Fraunces',serif] font-bold text-base text-[var(--paper)] m-0">
             Tulis Naskah Sastra Baru
           </h3>
-          <p class="mono text-[0.62rem] text-[var(--paper)]/80 uppercase tracking-wider m-0">
+          <p class="mono text-[0.68rem] text-[var(--paper)]/80 uppercase tracking-wider m-0">
             Studio Redaksi SMPI Yambu'ul Qur'an
           </p>
         </div>
@@ -1217,7 +1217,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </label>
           <div class="flex items-center gap-3">
             <div id="cover-preview-box" class="w-16 h-16 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] overflow-hidden flex items-center justify-center flex-shrink-0">
-              <span class="mono text-[0.6rem] text-[var(--ink-faint)]">Foto</span>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)]">Foto</span>
             </div>
             <div class="flex-1 space-y-1.5">
               <input 
@@ -1538,11 +1538,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         const navBtn = document.getElementById(`nav-btn-${k}`);
         if (k === sectionKey) {
           secEl?.classList.remove('hidden');
-          navBtn?.classList.add('bg-[var(--paper-deep)]', 'text-[var(--crimson)]', 'font-bold', 'border-l-4', 'border-[var(--crimson)]');
+          navBtn?.classList.add('bg-[var(--paper-deep)]', 'text-[var(--crimson)]', 'font-bold', 'border', 'border-[var(--rule-strong)]', 'shadow-xs');
           navBtn?.classList.remove('text-[var(--ink-soft)]');
         } else {
           secEl?.classList.add('hidden');
-          navBtn?.classList.remove('bg-[var(--paper-deep)]', 'text-[var(--crimson)]', 'font-bold', 'border-l-4', 'border-[var(--crimson)]');
+          navBtn?.classList.remove('bg-[var(--paper-deep)]', 'text-[var(--crimson)]', 'font-bold', 'border', 'border-[var(--rule-strong)]', 'shadow-xs');
           navBtn?.classList.add('text-[var(--ink-soft)]');
         }
       });
@@ -1578,10 +1578,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="p-4 flex items-center justify-between gap-3 flex-wrap hover:bg-[var(--paper-deep)]/50 transition-colors">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 mb-1">
-              <span class="mono text-[0.62rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-semibold">
+              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-semibold">
                 ${k.category_label || k.category}
               </span>
-              <span class="mono text-[0.62rem] text-[var(--ink-faint)]">
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
                 ${k.created_at ? new Date(k.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : 'Baru'}
               </span>
             </div>
@@ -1678,7 +1678,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       container.innerHTML = pageItems.map(k => `
         <div class="p-4 flex items-center justify-between gap-3 hover:bg-[var(--paper-deep)]/50 transition-colors">
           <div class="min-w-0">
-            <span class="mono text-[0.62rem] text-[var(--gold)] uppercase font-semibold">
+            <span class="mono text-[0.68rem] text-[var(--gold)] uppercase font-semibold">
               ${k.category_label || k.category}
             </span>
             <h4 class="font-['Fraunces',serif] font-bold text-sm text-[var(--ink)] m-0 truncate">
@@ -1926,17 +1926,17 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       tbody.innerHTML = pageList.map(k => {
         let statusBadge = '';
         if (k.status === 'published') {
-          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-emerald-100 text-emerald-800">Tayang</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-emerald-100 text-emerald-800">Tayang</span>';
         } else if (k.status === 'menunggu_kurasi') {
-          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-rose-100 text-rose-800">Kurasi</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-rose-100 text-rose-800">Kurasi</span>';
         } else {
-          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-amber-100 text-amber-800">Draf</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-amber-100 text-amber-800">Draf</span>';
         }
 
         const formattedImgUrl = k.cover_image_url ? formatDriveImageUrl(k.cover_image_url) : '';
         const coverImg = formattedImgUrl 
           ? `<img src="${formattedImgUrl}" class="w-9 h-9 rounded object-cover border border-[var(--rule)]" alt="Sampul" />`
-          : `<div class="w-9 h-9 rounded bg-[var(--paper-deep)] border border-[var(--rule)] flex items-center justify-center mono text-[0.55rem] text-[var(--ink-faint)]">N/A</div>`;
+          : `<div class="w-9 h-9 rounded bg-[var(--paper-deep)] border border-[var(--rule)] flex items-center justify-center mono text-[0.68rem] text-[var(--ink-faint)]">N/A</div>`;
 
         return `
           <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors">
@@ -1945,11 +1945,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               <a href="${basePath}/karya/${k.slug}" target="_blank" class="font-['Fraunces',serif] font-bold text-xs text-[var(--ink)] hover:text-[var(--crimson)] no-underline block max-w-xs truncate">
                 ${k.title}
               </a>
-              <span class="mono text-[0.62rem] text-[var(--ink-faint)] truncate block">${k.slug}</span>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)] truncate block">${k.slug}</span>
             </td>
             <td class="px-4 py-3">
               <span class="font-semibold text-xs text-[var(--ink)] block">${k.author}</span>
-              <span class="mono text-[0.62rem] text-[var(--ink-faint)]">${k.author_grade || '-'}</span>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)]">${k.author_grade || '-'}</span>
             </td>
             <td class="px-4 py-3">
               <span class="mono text-[0.65rem] px-2 py-0.5 rounded border border-[var(--rule)] text-[var(--ink-soft)] uppercase">
@@ -2095,7 +2095,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       container.innerHTML = fullDb.quotes.map(q => `
         <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-4">
           <div class="space-y-2">
-            <span class="mono text-[0.62rem] px-2 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-semibold">
+            <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-semibold">
               ${q.category || 'Quotes'}
             </span>
             <p class="font-['Fraunces',serif] italic text-sm text-[var(--ink)] m-0 leading-relaxed">
@@ -2319,7 +2319,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         const directUrl = formatDriveImageUrl(url);
         coverPreviewBox.innerHTML = `<img src="${directUrl}" class="w-full h-full object-cover" alt="Sampul" />`;
       } else {
-        coverPreviewBox.innerHTML = '<span class="mono text-[0.6rem] text-[var(--ink-faint)]">Foto</span>';
+        coverPreviewBox.innerHTML = '<span class="mono text-[0.68rem] text-[var(--ink-faint)]">Foto</span>';
       }
     }
     formCoverUrl?.addEventListener('input', () => updateCoverPreview(formCoverUrl.value));
@@ -2700,7 +2700,7 @@ ${formContent.value}
                   precision: 0
                 },
                 grid: {
-                  color: 'rgba(0, 0, 0, 0.06)'
+                  color: 'rgba(28, 36, 25, 0.08)'
                 }
               }
             }
@@ -2840,15 +2840,15 @@ ${formContent.value}
       }
 
       tbody.innerHTML = logs.map(l => {
-        let catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-[var(--paper-deep)] text-[var(--ink)] uppercase">${l.category}</span>`;
+        let catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-[var(--paper-deep)] text-[var(--ink)] uppercase">${l.category}</span>`;
         if (l.category === 'karya') {
-          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-[var(--crimson-subtle)] text-[var(--crimson)] border border-[var(--crimson)]/30 uppercase">Karya Sastra</span>`;
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-[var(--crimson-subtle)] text-[var(--crimson)] border border-[var(--crimson)]/30 uppercase">Karya Sastra</span>`;
         } else if (l.category === 'portal') {
-          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-amber-50 text-amber-800 border border-amber-300 uppercase">Portal Beranda</span>`;
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-amber-50 text-amber-800 border border-amber-300 uppercase">Portal Beranda</span>`;
         } else if (l.category === 'quotes') {
-          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-purple-50 text-purple-800 border border-purple-300 uppercase">Quotes</span>`;
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-purple-50 text-purple-800 border border-purple-300 uppercase">Quotes</span>`;
         } else if (l.category === 'panggung') {
-          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-blue-50 text-blue-800 border border-blue-300 uppercase">Panggung</span>`;
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-blue-50 text-blue-800 border border-blue-300 uppercase">Panggung</span>`;
         }
 
         let devIcon = `<span class="inline-flex items-center gap-1 text-[var(--ink-soft)]">💻 Desktop</span>`;

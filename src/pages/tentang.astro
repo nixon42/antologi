@@ -23,9 +23,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           YQ
         </div>
         <div class="min-w-0 flex-1">
-          <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-widest font-bold block mb-1">
-            Kolofon &amp; Manifesto Literasi
-          </span>
           <h1 class="font-['Fraunces',serif] font-bold text-3xl sm:text-4xl md:text-5xl text-[var(--ink)] m-0 tracking-tight">
             Tentang Ruang Sastra
           </h1>
@@ -51,7 +48,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           Melalui portal ini, tulisan siswa bukan lagi sekadar tugas sekolah yang berakhir di tumpukan map berdebu. Setiap karya santri—mulai dari kajian ilmiah objektif, sajak puisi kontemplatif, narasi cerpen humanis, antologi bersama, naskah drama panggung, hingga sari pati mutiara kata—diberi panggung yang bermartabat agar dapat dibaca, direnungkan, dan diapresiasi oleh khalayak yang lebih luas.
         </p>
         
-        <blockquote class="my-6 p-5 bg-[var(--paper-card)] border-l-4 border-[var(--crimson)] rounded-r-lg font-['Fraunces',serif] italic text-base md:text-lg text-[var(--ink)]">
+        <blockquote class="my-8 py-5 px-6 sm:px-10 border-y border-[var(--rule)] text-center font-['Fraunces',serif] italic text-lg sm:text-xl text-[var(--ink)] leading-relaxed">
           "Membaca adalah menghirup dunia, dan menulis adalah mengembuskan kembali kearifan ke relung semesta. Setiap huruf yang terpahat dengan keikhlasan adalah benih keabadian yang mekar di sanubari pembacanya."
         </blockquote>
       </section>
@@ -61,9 +58,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       <!-- SECTION 2: 6 PILAR KONTEN SASTRA -->
       <section class="space-y-6">
         <div>
-          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
-            Ragam Format Sastra
-          </span>
           <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
             6 Pilar Konten Ruang Sastra
           </h2>
@@ -75,142 +69,130 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           
           <!-- 1. KTI -->
-          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--gold)] transition-colors">
+          <article class="p-6 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-bold">
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--rule)]">
+                <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-wider font-semibold">
                   Akademik &amp; Riset
                 </span>
-                <svg class="w-5 h-5 text-[var(--gold)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
+                <span class="font-['Fraunces',serif] italic text-sm text-[var(--ink-faint)]">I</span>
               </div>
               <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
-                1. Karya Tulis Ilmiah
+                Karya Tulis Ilmiah
               </h3>
               <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
                 Wadah penelitian santri, telaah teks sastra, dan kajian sosial berlandaskan metodologi ilmiah objektif, lengkap dengan abstrak dwibahasa, guru pembimbing, dan unduhan dokumen PDF.
               </p>
             </div>
-            <a href={`${basePath}/karya?kategori=ilmiah`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
-              Jelajahi Karya Ilmiah →
+            <a href={`${basePath}/karya?kategori=ilmiah`} class="mono text-xs text-[var(--crimson)] hover:underline font-semibold no-underline inline-flex items-center gap-1">
+              Jelajahi Karya Ilmiah &rarr;
             </a>
-          </div>
+          </article>
 
           <!-- 2. Puisi & Prosa -->
-          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--crimson)] transition-colors">
+          <article class="p-6 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-bold">
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--rule)]">
+                <span class="mono text-[0.68rem] text-[var(--crimson)] uppercase tracking-wider font-semibold">
                   Puitika &amp; Nada
                 </span>
-                <svg class="w-5 h-5 text-[var(--crimson)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
-                </svg>
+                <span class="font-['Fraunces',serif] italic text-sm text-[var(--ink-faint)]">II</span>
               </div>
               <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
-                2. Puisi &amp; Prosa
+                Puisi &amp; Prosa
               </h3>
               <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
                 Ekspresi puitik yang merawat jeda bait sajak, kontemplasi spiritualitas malam, dan pemutar audio musikalisasi puisi yang memadukan bait syair dengan petikan melodi dawai santri.
               </p>
             </div>
-            <a href={`${basePath}/karya?kategori=puisi`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
-              Dengarkan &amp; Baca Puisi →
+            <a href={`${basePath}/karya?kategori=puisi`} class="mono text-xs text-[var(--crimson)] hover:underline font-semibold no-underline inline-flex items-center gap-1">
+              Dengarkan &amp; Baca Puisi &rarr;
             </a>
-          </div>
+          </article>
 
           <!-- 3. Cerpen -->
-          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--sage)] transition-colors">
+          <article class="p-6 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--sage)] text-[var(--sage)] uppercase font-bold">
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--rule)]">
+                <span class="mono text-[0.68rem] text-[var(--sage)] uppercase tracking-wider font-semibold">
                   Fiksi Naratif
                 </span>
-                <svg class="w-5 h-5 text-[var(--sage)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <span class="font-['Fraunces',serif] italic text-sm text-[var(--ink-faint)]">III</span>
               </div>
               <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
-                3. Cerpen Santri
+                Cerpen Santri
               </h3>
               <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
-                Kisah-kisah fiksi dan memoar yang menelusuri lorong asrama, persahabatan, riak-riak pencarian ilmu, dan dinamika keluarga dengan indikator progres baca (*reading time tracker*).
+                Kisah-kisah fiksi dan memoar yang menelusuri lorong asrama, persahabatan, riak-riak pencarian ilmu, dan dinamika keluarga dengan indikator progres baca.
               </p>
             </div>
-            <a href={`${basePath}/karya?kategori=cerpen`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
-              Buka Kumpulan Cerpen →
+            <a href={`${basePath}/karya?kategori=cerpen`} class="mono text-xs text-[var(--crimson)] hover:underline font-semibold no-underline inline-flex items-center gap-1">
+              Buka Kumpulan Cerpen &rarr;
             </a>
-          </div>
+          </article>
 
           <!-- 4. Antologi -->
-          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--gold)] transition-colors">
+          <article class="p-6 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-bold">
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--rule)]">
+                <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-wider font-semibold">
                   Kompilasi Tematik
                 </span>
-                <svg class="w-5 h-5 text-[var(--gold)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                </svg>
+                <span class="font-['Fraunces',serif] italic text-sm text-[var(--ink-faint)]">IV</span>
               </div>
               <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
-                4. Antologi Bersama
+                Antologi Bersama
               </h3>
               <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
                 Penerbitan buku tematik karya gabungan lintas kelas dan angkatan yang menghimpun beragam warna tulisan ke dalam jilid berindeks bab dan daftar kontributor rapi.
               </p>
             </div>
-            <a href={`${basePath}/karya?kategori=antologi`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
-              Lihat Jilid Antologi →
+            <a href={`${basePath}/karya?kategori=antologi`} class="mono text-xs text-[var(--crimson)] hover:underline font-semibold no-underline inline-flex items-center gap-1">
+              Lihat Jilid Antologi &rarr;
             </a>
-          </div>
+          </article>
 
           <!-- 5. Naskah Drama -->
-          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--crimson)] transition-colors">
+          <article class="p-6 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-bold">
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--rule)]">
+                <span class="mono text-[0.68rem] text-[var(--crimson)] uppercase tracking-wider font-semibold">
                   Seni Lakon Teater
                 </span>
-                <svg class="w-5 h-5 text-[var(--crimson)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                </svg>
+                <span class="font-['Fraunces',serif] italic text-sm text-[var(--ink-faint)]">V</span>
               </div>
               <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
-                5. Naskah Drama &amp; Teater
+                Naskah Drama &amp; Teater
               </h3>
               <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
                 Naskah pementasan teater yang disusun dengan tipografi baku: nama tokoh kapital menjorok, petunjuk lakuan panggung miring, serta rekaman video pementasan santri.
               </p>
             </div>
-            <a href={`${basePath}/panggung`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
-              Buka Panggung Teater →
+            <a href={`${basePath}/panggung`} class="mono text-xs text-[var(--crimson)] hover:underline font-semibold no-underline inline-flex items-center gap-1">
+              Buka Panggung Teater &rarr;
             </a>
-          </div>
+          </article>
 
           <!-- 6. Quotes Sastra -->
-          <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-3 hover:border-[var(--ink)] transition-colors">
+          <article class="p-6 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg flex flex-col justify-between space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] uppercase font-bold">
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[var(--rule)]">
+                <span class="mono text-[0.68rem] text-[var(--ink-soft)] uppercase tracking-wider font-semibold">
                   Aforisma &amp; Hikmah
                 </span>
-                <svg class="w-5 h-5 text-[var(--ink)]" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                </svg>
+                <span class="font-['Fraunces',serif] italic text-sm text-[var(--ink-faint)]">VI</span>
               </div>
               <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mb-2">
-                6. Quotes &amp; Mutiara Kata
+                Quotes &amp; Mutiara Kata
               </h3>
               <p class="font-['Source_Serif_4',serif] text-xs leading-relaxed text-[var(--ink-soft)] m-0">
                 Petikan sari pati pemikiran para kyai, ustadz, dan santri yang dapat disalin satu klik atau diekspor instan menjadi kartu grafis media sosial (PNG generator).
               </p>
             </div>
-            <a href={`${basePath}/quotes`} class="mono text-[0.72rem] text-[var(--crimson)] hover:underline font-semibold no-underline">
-              Lihat Galeri Quotes →
+            <a href={`${basePath}/quotes`} class="mono text-xs text-[var(--crimson)] hover:underline font-semibold no-underline inline-flex items-center gap-1">
+              Lihat Galeri Quotes &rarr;
             </a>
-          </div>
+          </article>
 
         </div>
       </section>
@@ -220,9 +202,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       <!-- SECTION 3: ALUR KERJA KURASI EDITORIAL -->
       <section class="space-y-6">
         <div>
-          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
-            Standar Mutu
-          </span>
           <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
             Alur Kurasi &amp; Penerbitan Naskah
           </h2>
@@ -234,9 +213,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           <!-- Tahap 1 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
-            <span class="mono text-[0.62rem] text-[var(--crimson)] uppercase tracking-wider font-bold block">
-              Tahap 01
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg relative space-y-2">
+            <span class="mono text-[0.68rem] text-[var(--crimson)] uppercase tracking-wider font-bold block">
+              Tahap 1
             </span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Submisi Naskah
@@ -247,9 +226,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
 
           <!-- Tahap 2 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
-            <span class="mono text-[0.62rem] text-[var(--gold)] uppercase tracking-wider font-bold block">
-              Tahap 02
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg relative space-y-2">
+            <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-wider font-bold block">
+              Tahap 2
             </span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Uji Kelayakan &amp; Adab
@@ -260,9 +239,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
 
           <!-- Tahap 3 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
-            <span class="mono text-[0.62rem] text-[var(--sage)] uppercase tracking-wider font-bold block">
-              Tahap 03
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg relative space-y-2">
+            <span class="mono text-[0.68rem] text-[var(--sage)] uppercase tracking-wider font-bold block">
+              Tahap 3
             </span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Penyuntingan Redaksi
@@ -273,9 +252,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
 
           <!-- Tahap 4 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl relative space-y-2">
-            <span class="mono text-[0.62rem] text-emerald-800 uppercase tracking-wider font-bold block">
-              Tahap 04
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg relative space-y-2">
+            <span class="mono text-[0.68rem] text-emerald-800 uppercase tracking-wider font-bold block">
+              Tahap 4
             </span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Publikasi &amp; Apresiasi
@@ -293,9 +272,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       <!-- SECTION 4: STRUKTUR DEWAN REDAKSI -->
       <section class="space-y-6">
         <div>
-          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
-            Pengelola &amp; Pembina
-          </span>
           <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
             Struktur Dewan Redaksi &amp; Pembina
           </h2>
@@ -307,8 +283,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           
           <!-- Card 1 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl space-y-1.5">
-            <span class="mono text-[0.65rem] text-[var(--gold)] uppercase font-semibold block">Pelindung &amp; Penasehat</span>
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg space-y-1.5">
+            <span class="mono text-[0.68rem] text-[var(--gold)] uppercase font-semibold block">Pelindung &amp; Penasehat</span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Kepala SMPI Yambu'ul Qur'an
             </h3>
@@ -316,8 +292,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
 
           <!-- Card 2 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl space-y-1.5">
-            <span class="mono text-[0.65rem] text-[var(--crimson)] uppercase font-semibold block">Pembina Literasi &amp; Bahasa</span>
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg space-y-1.5">
+            <span class="mono text-[0.68rem] text-[var(--crimson)] uppercase font-semibold block">Pembina Literasi &amp; Bahasa</span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Guru Bahasa &amp; Sastra
             </h3>
@@ -325,8 +301,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
 
           <!-- Card 3 -->
-          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl space-y-1.5">
-            <span class="mono text-[0.65rem] text-[var(--sage)] uppercase font-semibold block">Dewan Redaksi Pelaksana</span>
+          <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg space-y-1.5">
+            <span class="mono text-[0.68rem] text-[var(--sage)] uppercase font-semibold block">Dewan Redaksi Pelaksana</span>
             <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
               Tim Kurator Santri &amp; Asatidz
             </h3>
@@ -368,9 +344,6 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       <!-- SECTION 6: PANDUAN KONTRIBUTOR & TANYA JAWAB (FAQ) -->
       <section class="space-y-6">
         <div>
-          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
-            Tanya Jawab &amp; Panduan
-          </span>
           <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
             Pertanyaan yang Sering Diajukan
           </h2>
@@ -381,12 +354,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
         <div class="space-y-3">
           <!-- FAQ 1 -->
-          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
             <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
-              <span class="flex items-center gap-2">
-                <span class="mono text-xs text-[var(--gold)] font-bold">01.</span>
-                <span>Siapa saja yang berhak mengirimkan karya ke portal ini?</span>
-              </span>
+              <span>Siapa saja yang berhak mengirimkan karya ke portal ini?</span>
               <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -399,12 +369,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </details>
 
           <!-- FAQ 2 -->
-          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
             <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
-              <span class="flex items-center gap-2">
-                <span class="mono text-xs text-[var(--gold)] font-bold">02.</span>
-                <span>Berapa lama proses kurasi naskah berlangsung?</span>
-              </span>
+              <span>Berapa lama proses kurasi naskah berlangsung?</span>
               <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -417,12 +384,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </details>
 
           <!-- FAQ 3 -->
-          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
             <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
-              <span class="flex items-center gap-2">
-                <span class="mono text-xs text-[var(--gold)] font-bold">03.</span>
-                <span>Apakah format Karya Tulis Ilmiah (KTI) wajib menyertakan PDF?</span>
-              </span>
+              <span>Apakah format Karya Tulis Ilmiah (KTI) wajib menyertakan PDF?</span>
               <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -435,12 +399,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </details>
 
           <!-- FAQ 4 -->
-          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
             <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
-              <span class="flex items-center gap-2">
-                <span class="mono text-xs text-[var(--gold)] font-bold">04.</span>
-                <span>Bagaimana kepemilikan hak cipta atas karya yang diterbitkan?</span>
-              </span>
+              <span>Bagaimana kepemilikan hak cipta atas karya yang diterbitkan?</span>
               <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -453,12 +414,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </details>
 
           <!-- FAQ 5 -->
-          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule)] rounded-lg p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
             <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
-              <span class="flex items-center gap-2">
-                <span class="mono text-xs text-[var(--gold)] font-bold">05.</span>
-                <span>Apakah pembaca dapat memberikan apresiasi dan komentar?</span>
-              </span>
+              <span>Apakah pembaca dapat memberikan apresiasi dan komentar?</span>
               <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -475,11 +433,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       <div class="fleuron-divider">❧</div>
 
       <!-- SECTION 7: SEKRETARIAT & CALL TO ACTION -->
-      <section class="p-8 sm:p-10 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl text-center space-y-6 shadow-sm">
+      <section class="p-8 sm:p-10 bg-[var(--paper-card)] border border-[var(--rule)] rounded-2xl text-center space-y-6 shadow-sm">
         <div class="max-w-xl mx-auto space-y-2">
-          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-bold">
-            Sekretariat &amp; Kirim Karya
-          </span>
           <h3 class="font-['Fraunces',serif] font-bold text-2xl text-[var(--ink)] m-0">
             Mari Menjadi Bagian dari Jejak Pena Santri
           </h3>
