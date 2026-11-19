@@ -365,7 +365,116 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
       <div class="fleuron-divider">❧</div>
 
-      <!-- SECTION 6: SEKRETARIAT & CALL TO ACTION -->
+      <!-- SECTION 6: PANDUAN KONTRIBUTOR & TANYA JAWAB (FAQ) -->
+      <section class="space-y-6">
+        <div>
+          <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-semibold block mb-1">
+            Tanya Jawab &amp; Panduan
+          </span>
+          <h2 class="font-['Fraunces',serif] font-bold text-2xl md:text-3xl text-[var(--ink)] m-0">
+            Pertanyaan yang Sering Diajukan
+          </h2>
+          <p class="font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] mt-1.5 max-w-xl">
+            Informasi penting bagi santri, asatidz, alumni, dan pembaca seputar publikasi di Ruang Sastra:
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <!-- FAQ 1 -->
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+            <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="mono text-xs text-[var(--gold)] font-bold">01.</span>
+                <span>Siapa saja yang berhak mengirimkan karya ke portal ini?</span>
+              </span>
+              <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="mt-3 pt-3 border-t border-[var(--rule)] font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed space-y-2">
+              <p class="m-0">
+                Ruang Sastra terbuka untuk seluruh <strong>santri aktif, dewan guru/asatidz, dan alumni SMPI Yambu'ul Qur'an</strong>. Setiap penulis dapat mendaftarkan akun santri melalui formulir registrasi atau mengirimkan naskah secara langsung melalui halaman <em>Kirim Karya</em>.
+              </p>
+            </div>
+          </details>
+
+          <!-- FAQ 2 -->
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+            <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="mono text-xs text-[var(--gold)] font-bold">02.</span>
+                <span>Berapa lama proses kurasi naskah berlangsung?</span>
+              </span>
+              <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="mt-3 pt-3 border-t border-[var(--rule)] font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed space-y-2">
+              <p class="m-0">
+                Proses kurasi dan penyuntingan oleh Dewan Redaksi berlangsung rata-rata <strong>1 hingga 3 hari kerja</strong>. Setelah disetujui, karya akan langsung tayang secara otomatis di katalog <em>Pojok Baca</em> dan terindeks di sistem pencarian situs.
+              </p>
+            </div>
+          </details>
+
+          <!-- FAQ 3 -->
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+            <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="mono text-xs text-[var(--gold)] font-bold">03.</span>
+                <span>Apakah format Karya Tulis Ilmiah (KTI) wajib menyertakan PDF?</span>
+              </span>
+              <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="mt-3 pt-3 border-t border-[var(--rule)] font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed space-y-2">
+              <p class="m-0">
+                Sangat dianjurkan. Pada format KTI, portal menyediakan tab abstrak dwibahasa (Indonesia &amp; Inggris) serta tombol unduh naskah lengkap. Penulis dapat menyematkan tautan Google Drive dokumen PDF agar pembaca akademik dapat menelaah rujukan ilmiah secara utuh.
+              </p>
+            </div>
+          </details>
+
+          <!-- FAQ 4 -->
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+            <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="mono text-xs text-[var(--gold)] font-bold">04.</span>
+                <span>Bagaimana kepemilikan hak cipta atas karya yang diterbitkan?</span>
+              </span>
+              <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="mt-3 pt-3 border-t border-[var(--rule)] font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed space-y-2">
+              <p class="m-0">
+                <strong>Hak cipta 100% tetap milik penulis/santri yang bersangkutan</strong>. Ruang Sastra berfungsi sebagai media publikasi non-komersial dan pengarsipan literatur sekolah. Naskah santri dapat diikutsertakan pada perlombaan eksternal atau diterbitkan dalam buku cetak antologi tahunan sekolah.
+              </p>
+            </div>
+          </details>
+
+          <!-- FAQ 5 -->
+          <details class="group bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-4 sm:p-5 transition-colors open:border-[var(--crimson)] shadow-2xs">
+            <summary class="flex items-center justify-between gap-3 cursor-pointer list-none font-['Fraunces',serif] font-bold text-base sm:text-lg text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="mono text-xs text-[var(--gold)] font-bold">05.</span>
+                <span>Apakah pembaca dapat memberikan apresiasi dan komentar?</span>
+              </span>
+              <svg class="w-4 h-4 text-[var(--crimson)] transition-transform duration-200 group-open:rotate-180 flex-shrink-0" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="mt-3 pt-3 border-t border-[var(--rule)] font-['Source_Serif_4',serif] text-sm text-[var(--ink-soft)] leading-relaxed space-y-2">
+              <p class="m-0">
+                Tentu. Setiap karya dilengkapi dengan tombol apresiasi tepuk tangan (*claps counter*) dan kolom catatan pembaca yang dimoderasi oleh Dewan Redaksi untuk menjaga adab dan budaya santun bertutur.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <div class="fleuron-divider">❧</div>
+
+      <!-- SECTION 7: SEKRETARIAT & CALL TO ACTION -->
       <section class="p-8 sm:p-10 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl text-center space-y-6 shadow-sm">
         <div class="max-w-xl mx-auto space-y-2">
           <span class="mono text-xs text-[var(--crimson)] uppercase tracking-wider font-bold">
@@ -400,4 +509,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
 
   </div>
+
+  <script>
+    import { recordVisit } from '../lib/appsscript';
+
+    // Record visitor view for Tentang Portal
+    recordVisit({ category: 'portal', path: '/tentang', title: 'Tentang Ruang Sastra' });
+  </script>
 </Layout>
