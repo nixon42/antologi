@@ -231,7 +231,7 @@ const categoryColor =
   </article>
 
   <script>
-    import { tambahViewKarya } from '../../lib/appsscript';
+    import { recordVisit } from '../../lib/appsscript';
 
     // Share Buttons Logic
     const copyBtn = document.getElementById('share-copy-btn');
@@ -256,20 +256,29 @@ const categoryColor =
       });
     }
 
-    // View Counter Logic (Apps Script Backend Sync)
+    // View Counter & Visitor Logging (Apps Script Backend Sync)
     const viewsBadge = document.getElementById('views-badge');
     const viewsCount = document.getElementById('views-count');
     const karyaId = viewsBadge?.getAttribute('data-karya-id') || window.location.pathname.split('/').filter(Boolean).pop();
 
     if (karyaId) {
-      tambahViewKarya(karyaId).then((newCount) => {
-        if (viewsCount && newCount > 0) {
-          viewsCount.textContent = `${newCount.toLocaleString('id-ID')} pembaca`;
-        } else if (viewsCount) {
-          viewsCount.textContent = '1 pembaca';
+      const cachedViews = localStorage.getItem(`rs_views_${karyaId}`);
+      if (cachedViews && viewsCount) {
+        viewsCount.textContent = `${parseInt(cachedViews, 10).toLocaleString('id-ID')} pembaca`;
+      }
+
+      recordVisit({
+        category: 'karya',
+        karyaSlug: karyaId,
+        title: document.title,
+      }).then((res) => {
+        if (res && res.views && viewsCount) {
+          viewsCount.textContent = `${res.views.toLocaleString('id-ID')} pembaca`;
+        } else if (!cachedViews && viewsCount) {
+          viewsCount.textContent = 'Dibaca';
         }
       }).catch(() => {
-        if (viewsCount) viewsCount.textContent = 'Dibaca';
+        if (!cachedViews && viewsCount) viewsCount.textContent = 'Dibaca';
       });
     }
   </script>

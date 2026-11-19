@@ -121,6 +121,13 @@ const categories = [
                 {item.data.authorGrade && <span>· {item.data.authorGrade}</span>}
                 <span>· {formattedDate}</span>
                 {item.data.readingTime && <span>· ± {item.data.readingTime} Menit Baca</span>}
+                <span class="inline-flex items-center gap-1 text-[var(--ink-soft)]" data-views-slug={item.id}>
+                  <svg class="w-3.5 h-3.5 text-[var(--gold)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <span class="karya-views-num">...</span>
+                </span>
               </p>
 
               <!-- Excerpt / Description -->
@@ -160,6 +167,34 @@ const categories = [
   </div>
 
   <script>
+    import { recordVisit, fetchKaryaViewsMap } from '../../lib/appsscript';
+
+    // Record visitor view for Pojok Baca
+    recordVisit({ category: 'portal', path: '/karya', title: 'Pojok Baca Literatur' });
+
+    // Populate live views count on each karya card
+    const viewBadges = document.querySelectorAll('[data-views-slug]');
+    viewBadges.forEach(badge => {
+      const slug = badge.getAttribute('data-views-slug');
+      const numSpan = badge.querySelector('.karya-views-num');
+      if (slug && numSpan) {
+        const cached = localStorage.getItem(`rs_views_${slug}`);
+        if (cached) numSpan.textContent = `${parseInt(cached, 10).toLocaleString('id-ID')} pembaca`;
+      }
+    });
+
+    fetchKaryaViewsMap().then(map => {
+      viewBadges.forEach(badge => {
+        const slug = badge.getAttribute('data-views-slug');
+        const numSpan = badge.querySelector('.karya-views-num');
+        if (slug && numSpan && map[slug] !== undefined) {
+          numSpan.textContent = `${map[slug].toLocaleString('id-ID')} pembaca`;
+        } else if (numSpan && !numSpan.textContent?.includes('pembaca')) {
+          numSpan.textContent = 'Dibaca';
+        }
+      });
+    }).catch(() => {});
+
     // Client-side Category & Text Filtering
     const tabs = document.querySelectorAll('.category-tab-btn');
     const items = document.querySelectorAll('.karya-entry-item');

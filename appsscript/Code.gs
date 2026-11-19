@@ -119,6 +119,9 @@ function initSpreadsheet() {
     ],
     'Pengaturan': [
       'key', 'value'
+    ],
+    'Pengunjung': [
+      'id', 'timestamp', 'visit_date', 'category', 'path', 'title', 'karya_id', 'device_type', 'referrer', 'ip_masked', 'visitor_hash', 'user_agent'
     ]
   };
 
@@ -453,6 +456,82 @@ function isiDemoData(forceReset) {
       'Alumni SMPI YQ',
       '2026-08-20T14:30:00.000Z'
     ]);
+  }
+
+  // 5. Data Pengunjung Awal (Past 30 Days Realistic Seed for Analytics)
+  const pengunjungSheet = ss.getSheetByName('Pengunjung');
+  if (forceReset && pengunjungSheet && pengunjungSheet.getLastRow() > 1) {
+    try {
+      pengunjungSheet.deleteRows(2, pengunjungSheet.getLastRow() - 1);
+    } catch(e) {
+      pengunjungSheet.getRange(2, 1, pengunjungSheet.getLastRow() - 1, pengunjungSheet.getLastColumn()).clearContent();
+    }
+  }
+  if (pengunjungSheet && (pengunjungSheet.getLastRow() <= 1 || forceReset)) {
+    const seedVisitors = [];
+    const sampleKaryaSlugs = [
+      { slug: 'jejak-di-ujung-pena', title: 'Jejak di Ujung Pena', cat: 'puisi' },
+      { slug: 'analisis-semiotika-puisi-santri', title: 'Analisis Semiotika Riffaterre', cat: 'ilmiah' },
+      { slug: 'lentera-di-pinggir-kota', title: 'Lentera di Pinggir Kota', cat: 'cerpen' },
+      { slug: 'antologi-gemuruh-kata-generasi-qurani', title: 'Antologi: Gemuruh Kata Generasi Qurani', cat: 'antologi' },
+      { slug: 'naskah-drama-layar-terkembang', title: 'Layar Terkembang di Tepian Zaman', cat: 'drama' }
+    ];
+    const referrers = ['direct', 'https://api.whatsapp.com', 'https://www.google.com', 'https://l.instagram.com', 'direct'];
+    const devices = ['mobile', 'mobile', 'mobile', 'desktop', 'desktop', 'tablet'];
+    const nowMs = new Date().getTime();
+
+    for (let dayAgo = 29; dayAgo >= 0; dayAgo--) {
+      const dayDate = new Date(nowMs - dayAgo * 24 * 60 * 60 * 1000);
+      const dateStr = Utilities.formatDate(dayDate, 'Asia/Jakarta', 'yyyy-MM-dd');
+      const visitsToday = Math.floor(4 + (Math.sin(dayAgo * 0.4) + 1) * 3 + (dayAgo % 4));
+
+      for (let v = 0; v < visitsToday; v++) {
+        const hour = Math.floor(7 + Math.random() * 14);
+        const min = Math.floor(Math.random() * 60);
+        const sec = Math.floor(Math.random() * 60);
+        const timeStr = dateStr + ' ' + (hour < 10 ? '0' + hour : hour) + ':' + (min < 10 ? '0' + min : min) + ':' + (sec < 10 ? '0' + sec : sec);
+        const dev = devices[Math.floor(Math.random() * devices.length)];
+        const ref = referrers[Math.floor(Math.random() * referrers.length)];
+        const vHash = 'hash_' + (dayAgo % 7) + '_' + Math.floor(Math.random() * 100);
+        const ip = '180.252.' + (100 + (dayAgo % 50)) + '.***';
+
+        const randType = Math.random();
+        let cat = 'portal';
+        let path = '/';
+        let title = 'Beranda Ruang Sastra';
+        let kId = '';
+
+        if (randType < 0.65) {
+          const k = sampleKaryaSlugs[Math.floor(Math.random() * sampleKaryaSlugs.length)];
+          cat = 'karya';
+          path = '/karya/' + k.slug;
+          title = k.title;
+          kId = k.slug;
+        } else if (randType < 0.85) {
+          cat = 'portal';
+          path = Math.random() < 0.5 ? '/' : '/karya';
+          title = path === '/' ? 'Beranda Ruang Sastra' : 'Pojok Baca Literatur';
+        } else if (randType < 0.95) {
+          cat = 'quotes';
+          path = '/quotes';
+          title = 'Quotes Sastra Santri';
+        } else {
+          cat = 'panggung';
+          path = '/panggung';
+          title = 'Panggung Sastra';
+        }
+
+        const vlogId = 'vlog_' + (dayAgo * 1000 + v);
+        seedVisitors.push([
+          vlogId, timeStr, dateStr, cat, path, title, kId, dev, ref, ip, vHash, 'Mozilla/5.0'
+        ]);
+      }
+    }
+
+    for (let i = 0; i < seedVisitors.length; i += 50) {
+      const batch = seedVisitors.slice(i, i + 50);
+      pengunjungSheet.getRange(pengunjungSheet.getLastRow() + 1, 1, batch.length, batch[0].length).setValues(batch);
+    }
   }
 
   return 'Data demo Ruang Sastra berhasil diisi!';
@@ -1021,6 +1100,332 @@ function deleteData(sheetName, rowId, token) {
 }
 
 // ============================================================
+// 6.5. STATISTIK & ANALISIS PENGUNJUNG (VISITOR COUNTER & ANALYTICS)
+// ============================================================
+
+function formatCellDate_(val) {
+  if (!val) return '';
+  if (val instanceof Date) {
+    return Utilities.formatDate(val, 'Asia/Jakarta', 'yyyy-MM-dd');
+  }
+  const s = val.toString().trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
+  try {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      return Utilities.formatDate(d, 'Asia/Jakarta', 'yyyy-MM-dd');
+    }
+  } catch(e) {}
+  return s.substring(0, 10);
+}
+
+function formatCellTimestamp_(val) {
+  if (!val) return '';
+  if (val instanceof Date) {
+    return Utilities.formatDate(val, 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+  }
+  return val.toString();
+}
+
+function catatKunjungan(payload) {
+  if (!payload) return { success: false, error: 'Payload kunjungan kosong.' };
+  try {
+    const ss = getDb_();
+    let sheet = ss.getSheetByName('Pengunjung');
+    if (!sheet) {
+      initSpreadsheet();
+      sheet = ss.getSheetByName('Pengunjung');
+    }
+
+    const now = new Date();
+    const id = 'vlog_' + now.getTime() + '_' + Math.floor(Math.random() * 1000);
+    const timestamp = Utilities.formatDate(now, 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+    const visitDate = Utilities.formatDate(now, 'Asia/Jakarta', 'yyyy-MM-dd');
+
+    const category = (payload.category || 'portal').toString().toLowerCase().trim();
+    const path = (payload.path || '/').toString().trim();
+    const title = (payload.title || '').toString().trim();
+    const karyaId = (payload.karyaId || payload.karyaSlug || payload.karya_id || '').toString().trim();
+    const deviceType = (payload.deviceType || payload.device_type || 'desktop').toString().toLowerCase().trim();
+    const referrer = (payload.referrer || 'direct').toString().trim();
+    const ipMasked = (payload.ipMasked || payload.ip_masked || '180.252.***.***').toString().trim();
+    const visitorHash = (payload.visitorHash || payload.visitor_hash || Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, visitDate + '_' + Math.random()))).toString().substring(0, 16);
+    const userAgent = (payload.userAgent || payload.user_agent || '').toString().substring(0, 255);
+
+    sheet.appendRow([
+      id, timestamp, visitDate, category, path, title, karyaId, deviceType, referrer, ipMasked, visitorHash, userAgent
+    ]);
+
+    let updatedViews = 0;
+    if (karyaId || category === 'karya') {
+      const targetSlug = karyaId || path.split('/').filter(Boolean).pop();
+      if (targetSlug) {
+        updatedViews = tambahViewKarya(targetSlug);
+      }
+    }
+
+    return { success: true, id: id, views: updatedViews };
+  } catch (e) {
+    return { success: false, error: e.toString() };
+  }
+}
+
+function getVisitorAnalytics(period, categoryFilter, token) {
+  const ss = getDb_();
+  let sheet = ss.getSheetByName('Pengunjung');
+  if (!sheet) {
+    initSpreadsheet();
+    sheet = ss.getSheetByName('Pengunjung');
+  }
+  const karyaSheet = ss.getSheetByName('Karya');
+
+  const now = new Date();
+  const todayStr = Utilities.formatDate(now, 'Asia/Jakarta', 'yyyy-MM-dd');
+
+  let daysLimit = 30;
+  if (period === 'today') daysLimit = 1;
+  else if (period === '7d') daysLimit = 7;
+  else if (period === '30d') daysLimit = 30;
+  else if (period === 'all') daysLimit = 365;
+
+  const startDate = new Date(now.getTime() - (daysLimit - 1) * 24 * 60 * 60 * 1000);
+  const startDateStr = Utilities.formatDate(startDate, 'Asia/Jakarta', 'yyyy-MM-dd');
+
+  const prevEndDate = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
+  const prevStartDate = new Date(prevEndDate.getTime() - (daysLimit - 1) * 24 * 60 * 60 * 1000);
+  const prevStartDateStr = Utilities.formatDate(prevStartDate, 'Asia/Jakarta', 'yyyy-MM-dd');
+  const prevEndDateStr = Utilities.formatDate(prevEndDate, 'Asia/Jakarta', 'yyyy-MM-dd');
+
+  let rows = [];
+  if (sheet && sheet.getLastRow() > 1) {
+    rows = sheet.getDataRange().getValues();
+  }
+
+  const header = rows.length > 0 ? rows[0] : [
+    'id', 'timestamp', 'visit_date', 'category', 'path', 'title', 'karya_id', 'device_type', 'referrer', 'ip_masked', 'visitor_hash', 'user_agent'
+  ];
+
+  const colIdx = {
+    id: header.indexOf('id'),
+    timestamp: header.indexOf('timestamp'),
+    visit_date: header.indexOf('visit_date'),
+    category: header.indexOf('category'),
+    path: header.indexOf('path'),
+    title: header.indexOf('title'),
+    karya_id: header.indexOf('karya_id'),
+    device_type: header.indexOf('device_type'),
+    referrer: header.indexOf('referrer'),
+    ip_masked: header.indexOf('ip_masked'),
+    visitor_hash: header.indexOf('visitor_hash')
+  };
+
+  const curPeriodRows = [];
+  const prevPeriodRows = [];
+  const todayRows = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    const vDate = formatCellDate_(r[colIdx.visit_date]);
+    const cat = (r[colIdx.category] || '').toString().toLowerCase();
+
+    if (categoryFilter && categoryFilter !== 'all' && cat !== categoryFilter.toLowerCase()) {
+      continue;
+    }
+
+    if (vDate === todayStr) {
+      todayRows.push(r);
+    }
+
+    if (period === 'all' || (vDate >= startDateStr && vDate <= todayStr)) {
+      curPeriodRows.push(r);
+    } else if (vDate >= prevStartDateStr && vDate <= prevEndDateStr) {
+      prevPeriodRows.push(r);
+    }
+  }
+
+  const uniqueCur = new Set();
+  const uniqueToday = new Set();
+  const categoryBreakdown = {
+    karya: { total: 0, unique: new Set() },
+    portal: { total: 0, unique: new Set() },
+    quotes: { total: 0, unique: new Set() },
+    panggung: { total: 0, unique: new Set() },
+    admin: { total: 0, unique: new Set() }
+  };
+  const deviceBreakdown = { mobile: 0, desktop: 0, tablet: 0 };
+  const referrerMap = {};
+
+  const dailyMap = {};
+  const daysToIterate = Math.min(daysLimit, 30);
+  for (let d = daysToIterate - 1; d >= 0; d--) {
+    const dObj = new Date(now.getTime() - d * 24 * 60 * 60 * 1000);
+    const dStr = Utilities.formatDate(dObj, 'Asia/Jakarta', 'yyyy-MM-dd');
+    const dayLabel = Utilities.formatDate(dObj, 'Asia/Jakarta', 'dd MMM');
+    dailyMap[dStr] = {
+      date: dStr,
+      label: dayLabel,
+      total: 0,
+      karya: 0,
+      portal: 0,
+      other: 0,
+      uniqueHashes: new Set()
+    };
+  }
+
+  for (let i = 0; i < curPeriodRows.length; i++) {
+    const r = curPeriodRows[i];
+    const vDate = formatCellDate_(r[colIdx.visit_date]);
+    const vHash = (r[colIdx.visitor_hash] || r[colIdx.id]).toString();
+    const cat = (r[colIdx.category] || 'portal').toString().toLowerCase();
+    const dev = (r[colIdx.device_type] || 'desktop').toString().toLowerCase();
+    let ref = (r[colIdx.referrer] || 'direct').toString().toLowerCase();
+
+    if (ref.indexOf('whatsapp') > -1) ref = 'WhatsApp';
+    else if (ref.indexOf('google') > -1) ref = 'Google Search';
+    else if (ref.indexOf('instagram') > -1) ref = 'Instagram';
+    else if (ref.indexOf('facebook') > -1) ref = 'Facebook';
+    else if (!ref || ref === 'direct' || ref.indexOf('localhost') > -1 || ref.indexOf('nixon42.github.io') > -1) ref = 'Langsung (Direct)';
+    else ref = 'Lainnya (Referral)';
+
+    uniqueCur.add(vHash);
+
+    if (categoryBreakdown[cat]) {
+      categoryBreakdown[cat].total++;
+      categoryBreakdown[cat].unique.add(vHash);
+    } else {
+      if (!categoryBreakdown.portal) categoryBreakdown.portal = { total: 0, unique: new Set() };
+      categoryBreakdown.portal.total++;
+      categoryBreakdown.portal.unique.add(vHash);
+    }
+
+    if (dev.indexOf('mobile') > -1) deviceBreakdown.mobile++;
+    else if (dev.indexOf('tablet') > -1) deviceBreakdown.tablet++;
+    else deviceBreakdown.desktop++;
+
+    referrerMap[ref] = (referrerMap[ref] || 0) + 1;
+
+    if (dailyMap[vDate]) {
+      dailyMap[vDate].total++;
+      if (cat === 'karya') dailyMap[vDate].karya++;
+      else if (cat === 'portal') dailyMap[vDate].portal++;
+      else dailyMap[vDate].other++;
+      dailyMap[vDate].uniqueHashes.add(vHash);
+    }
+  }
+
+  for (let i = 0; i < todayRows.length; i++) {
+    const r = todayRows[i];
+    const vHash = (r[colIdx.visitor_hash] || r[colIdx.id]).toString();
+    uniqueToday.add(vHash);
+  }
+
+  const totalCur = curPeriodRows.length;
+  const totalPrev = prevPeriodRows.length;
+  let growthPct = 0;
+  if (totalPrev > 0) {
+    growthPct = Number((((totalCur - totalPrev) / totalPrev) * 100).toFixed(1));
+  } else if (totalCur > 0) {
+    growthPct = 100.0;
+  }
+
+  const dailyTrends = Object.keys(dailyMap).map(k => {
+    const d = dailyMap[k];
+    return {
+      date: d.date,
+      label: d.label,
+      total: d.total,
+      karya: d.karya,
+      portal: d.portal,
+      other: d.other,
+      unique: d.uniqueHashes.size
+    };
+  });
+
+  const topKarya = [];
+  if (karyaSheet && karyaSheet.getLastRow() > 1) {
+    const kData = karyaSheet.getDataRange().getValues();
+    const kHeader = kData[0];
+    const kIdIdx = kHeader.indexOf('id');
+    const kSlugIdx = kHeader.indexOf('slug');
+    const kTitleIdx = kHeader.indexOf('title');
+    const kAuthorIdx = kHeader.indexOf('author');
+    const kCatLabelIdx = kHeader.indexOf('category_label');
+    const kViewsIdx = kHeader.indexOf('views');
+    const kReadTimeIdx = kHeader.indexOf('reading_time');
+
+    for (let i = 1; i < kData.length; i++) {
+      const row = kData[i];
+      topKarya.push({
+        id: row[kIdIdx],
+        slug: row[kSlugIdx] || row[kIdIdx],
+        title: row[kTitleIdx],
+        author: row[kAuthorIdx],
+        categoryLabel: row[kCatLabelIdx] || 'Sastra',
+        views: parseInt(row[kViewsIdx] || 0, 10),
+        readingTime: row[kReadTimeIdx] || 3
+      });
+    }
+    topKarya.sort((a, b) => b.views - a.views);
+  }
+
+  const topReferrers = Object.keys(referrerMap).map(k => ({
+    source: k,
+    count: referrerMap[k],
+    pct: totalCur > 0 ? Number(((referrerMap[k] / totalCur) * 100).toFixed(1)) : 0
+  })).sort((a, b) => b.count - a.count);
+
+  const recentLogs = [];
+  const startIdx = Math.max(1, rows.length - 50);
+  for (let i = rows.length - 1; i >= startIdx; i--) {
+    const r = rows[i];
+    recentLogs.push({
+      id: r[colIdx.id],
+      timestamp: formatCellTimestamp_(r[colIdx.timestamp]),
+      visit_date: formatCellDate_(r[colIdx.visit_date]),
+      category: r[colIdx.category] || 'portal',
+      path: r[colIdx.path] || '/',
+      title: r[colIdx.title] || '',
+      device_type: r[colIdx.device_type] || 'desktop',
+      referrer: r[colIdx.referrer] || 'direct',
+      ip_masked: r[colIdx.ip_masked] || 'anonymized'
+    });
+  }
+
+  const totalDev = (deviceBreakdown.mobile + deviceBreakdown.desktop + deviceBreakdown.tablet) || 1;
+
+  return {
+    period: period || '30d',
+    category: categoryFilter || 'all',
+    summary: {
+      total_views: totalCur,
+      today_views: todayRows.length,
+      unique_visitors: uniqueCur.size,
+      today_unique: uniqueToday.size,
+      growth_pct: growthPct,
+      categories: {
+        karya: { total: categoryBreakdown.karya.total, unique: categoryBreakdown.karya.unique.size },
+        portal: { total: categoryBreakdown.portal.total, unique: categoryBreakdown.portal.unique.size },
+        quotes: { total: categoryBreakdown.quotes.total, unique: categoryBreakdown.quotes.unique.size },
+        panggung: { total: categoryBreakdown.panggung.total, unique: categoryBreakdown.panggung.unique.size },
+        admin: { total: categoryBreakdown.admin.total, unique: categoryBreakdown.admin.unique.size }
+      },
+      devices: {
+        mobile: deviceBreakdown.mobile,
+        desktop: deviceBreakdown.desktop,
+        tablet: deviceBreakdown.tablet,
+        mobile_pct: Number(((deviceBreakdown.mobile / totalDev) * 100).toFixed(1)),
+        desktop_pct: Number(((deviceBreakdown.desktop / totalDev) * 100).toFixed(1)),
+        tablet_pct: Number(((deviceBreakdown.tablet / totalDev) * 100).toFixed(1))
+      }
+    },
+    daily_trends: dailyTrends,
+    top_karya: topKarya.slice(0, 10),
+    top_referrers: topReferrers,
+    recent_logs: recentLogs
+  };
+}
+
+// ============================================================
 // 7. AUTENTIKASI REDAKSI & PENULIS
 // ============================================================
 
@@ -1304,6 +1709,10 @@ function doGet(e) {
       hasil = cekSesiAdmin(p.token);
     } else if (fn === 'tambahViewKarya') {
       hasil = tambahViewKarya(p.idOrSlug || p.karyaId || p.slug || p.id);
+    } else if (fn === 'catatKunjungan') {
+      hasil = catatKunjungan(p);
+    } else if (fn === 'getVisitorAnalytics') {
+      hasil = getVisitorAnalytics(p.period, p.category, p.token);
     } else if (fn === 'getPengaturan') {
       hasil = getPengaturan();
     } else if (fn === 'resetAdminPassword') {
@@ -1371,6 +1780,10 @@ function doPost(e) {
       hasil = hapusQuote(args[0] || body.id || body.quoteId, args[1] || body.token);
     } else if (fn === 'tambahViewKarya') {
       hasil = tambahViewKarya(args[0] || body.idOrSlug || body.slug || body.id);
+    } else if (fn === 'catatKunjungan') {
+      hasil = catatKunjungan(args[0] || body.payload || body);
+    } else if (fn === 'getVisitorAnalytics') {
+      hasil = getVisitorAnalytics(args[0] || body.period, args[1] || body.category, args[2] || body.token);
     } else if (fn === 'getPengaturan') {
       hasil = getPengaturan();
     } else if (fn === 'simpanPengaturan') {

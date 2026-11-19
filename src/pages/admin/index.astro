@@ -8,6 +8,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   title="Studio Redaksi & Dashboard Admin — Ruang Sastra SMPI YQ"
   description="Pusat kerja dewan redaksi SMPI Yambu'ul Qur'an: kurasi kiriman santri, kelola karya sastra terpublikasi, moderasi komentar, dan kutipan sastra real-time ke Cloud Database."
 >
+  <!-- Chart.js CDN for Visitor Analytics -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
   <!-- AUTH GUARD BARRIER (Shown when not logged in) -->
   <div id="auth-guard-barrier" class="wrap py-16 md:py-24 text-center hidden">
     <div class="max-w-md mx-auto bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-8 shadow-xl">
@@ -79,6 +82,21 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </svg>
               <span>Ringkasan &amp; Statistik</span>
             </div>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="switchAdminSection('pengunjung')" 
+            id="nav-btn-pengunjung" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-cyan-600" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              <span>Analisis Pengunjung</span>
+            </div>
+            <span id="sidebar-badge-pengunjung" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-cyan-100 text-cyan-800">Live</span>
           </button>
 
           <button 
@@ -233,6 +251,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             class="md:hidden px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs mono font-bold text-[var(--ink)] outline-none"
           >
             <option value="ringkasan">📊 Ringkasan &amp; Statistik</option>
+            <option value="pengunjung">📈 Analisis Pengunjung</option>
             <option value="kurasi">📥 Antrean Kurasi Naskah</option>
             <option value="karya">📚 Seluruh Karya Sastra</option>
             <option value="komentar">💬 Catatan &amp; Komentar</option>
@@ -282,8 +301,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <!-- SECTION 1: RINGKASAN & OVERVIEW -->
         <div id="section-ringkasan" class="admin-section space-y-6">
           
-          <!-- 4 KPI Metrics Strip -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 5 KPI Metrics Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             
             <!-- Antrean Kurasi -->
             <div class="p-4 bg-[var(--paper-card)] border border-[var(--crimson)] rounded-xl shadow-xs relative overflow-hidden">
@@ -325,6 +344,19 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               <p class="mono text-[0.65rem] text-[var(--ink-faint)] mt-1.5 mb-0">Respon dan catatan dari pembaca</p>
             </div>
 
+            <!-- Total Trafik & Pembaca -->
+            <div onclick="switchAdminSection('pengunjung')" class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] hover:border-cyan-500 rounded-xl shadow-xs cursor-pointer transition-all group col-span-2 sm:col-span-1">
+              <span class="mono text-[0.68rem] text-cyan-800 uppercase tracking-wider font-bold group-hover:text-cyan-600 flex items-center justify-between">
+                <span>Trafik Pembaca</span>
+                <span>→</span>
+              </span>
+              <div class="flex items-baseline justify-between mt-2">
+                <span id="kpi-views-total" class="font-['Fraunces',serif] font-bold text-3xl text-cyan-800">0</span>
+                <span class="mono text-[0.68rem] text-cyan-700 font-semibold bg-cyan-50 px-2 py-0.5 rounded-full">Views</span>
+              </div>
+              <p class="mono text-[0.65rem] text-[var(--ink-faint)] mt-1.5 mb-0">Statistik pengunjung analitik lengkap</p>
+            </div>
+
           </div>
 
           <!-- Quick Submission Queue (Antrean Cepat Kurasi) -->
@@ -358,6 +390,348 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             </div>
             <div id="overview-published-container" class="divide-y divide-[var(--rule)]">
               <p class="p-6 text-center mono text-xs text-[var(--ink-faint)] italic">Memuat karya terpublikasi...</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION: ANALISIS PENGUNJUNG (VISITOR ANALYTICS) -->
+        <!-- ========================================== -->
+        <div id="section-pengunjung" class="admin-section hidden space-y-6">
+          
+          <!-- Period & Filter Toolbar -->
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+              <!-- Period Buttons -->
+              <div class="flex items-center gap-1 bg-[var(--paper-deep)] p-1 rounded-xl border border-[var(--rule)]" id="vlog-period-btns">
+                <button type="button" onclick="setVlogPeriod('today')" data-period="today" class="vlog-p-btn px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-[var(--ink-soft)] hover:text-[var(--ink)]">
+                  Hari Ini
+                </button>
+                <button type="button" onclick="setVlogPeriod('7d')" data-period="7d" class="vlog-p-btn px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-[var(--ink-soft)] hover:text-[var(--ink)]">
+                  7 Hari
+                </button>
+                <button type="button" onclick="setVlogPeriod('30d')" data-period="30d" class="vlog-p-btn px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[var(--crimson)] text-[var(--paper)] shadow-xs">
+                  30 Hari
+                </button>
+                <button type="button" onclick="setVlogPeriod('all')" data-period="all" class="vlog-p-btn px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-[var(--ink-soft)] hover:text-[var(--ink)]">
+                  Semua
+                </button>
+              </div>
+
+              <!-- Category Filter -->
+              <div class="relative">
+                <select 
+                  id="vlog-category-filter" 
+                  onchange="setVlogCategory(this.value)"
+                  class="pl-3 pr-8 py-2 text-xs font-bold bg-[var(--paper-deep)] border border-[var(--rule)] rounded-xl text-[var(--ink)] focus:outline-none focus:border-[var(--crimson)] cursor-pointer"
+                >
+                  <option value="all">Semua Kategori</option>
+                  <option value="karya">Karya Sastra (Pojok Baca)</option>
+                  <option value="portal">Beranda / Portal Utama</option>
+                  <option value="quotes">Quotes &amp; Mutiara Sastra</option>
+                  <option value="panggung">Panggung Sastra (Video/Naskah)</option>
+                  <option value="admin">Studio Redaksi Admin</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <!-- Reset Filter Button -->
+              <button 
+                type="button" 
+                onclick="resetVlogFilter()" 
+                class="px-3 py-1.5 text-xs font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+              >
+                <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Reset</span>
+              </button>
+
+              <!-- Export CSV Button -->
+              <button 
+                type="button" 
+                onclick="exportVlogCsv()" 
+                class="px-3 py-1.5 text-xs font-bold text-[var(--gold)] hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                title="Ekspor log kunjungan ke format CSV"
+              >
+                <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Unduh CSV</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- 5 KPI Summary Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            <!-- 1. Total Kunjungan -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-4 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.68rem] font-bold text-[var(--ink-faint)] uppercase tracking-wider">Total Kunjungan</span>
+                <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                  <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div id="vlog-stat-total" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</div>
+              <div class="flex items-center justify-between mt-2 pt-2 border-t border-[var(--rule)] text-[0.68rem] mono">
+                <span class="text-[var(--ink-soft)]">Hari ini: <strong id="vlog-stat-today" class="text-emerald-700 font-bold">0</strong></span>
+                <span id="vlog-stat-growth" class="font-bold text-emerald-700">0%</span>
+              </div>
+            </div>
+
+            <!-- 2. Pengunjung Unik -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-4 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.68rem] font-bold text-[var(--ink-faint)] uppercase tracking-wider">Pengunjung Unik</span>
+                <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                  <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div id="vlog-stat-unique" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</div>
+              <div class="flex items-center justify-between mt-2 pt-2 border-t border-[var(--rule)] text-[0.68rem] mono">
+                <span class="text-[var(--ink-soft)]">Hari ini: <strong id="vlog-stat-today-unique" class="text-indigo-700 font-bold">0</strong></span>
+                <span class="text-[var(--gold)] font-bold">Privasi Terjaga</span>
+              </div>
+            </div>
+
+            <!-- 3. Pembaca Karya Sastra -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-4 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.68rem] font-bold text-[var(--crimson)] uppercase tracking-wider">Pembaca Karya</span>
+                <div class="w-7 h-7 rounded-lg bg-[var(--crimson-subtle)] text-[var(--crimson)] flex items-center justify-center">
+                  <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
+                </div>
+              </div>
+              <div id="vlog-stat-karya" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--crimson)]">0</div>
+              <div class="flex items-center justify-between mt-2 pt-2 border-t border-[var(--rule)] text-[0.68rem] mono">
+                <span class="text-[var(--ink-soft)]">Unik: <strong id="vlog-stat-karya-unique" class="text-[var(--ink)] font-bold">0</strong></span>
+                <span class="text-[var(--crimson)] font-bold">Pojok Baca</span>
+              </div>
+            </div>
+
+            <!-- 4. Portal & Beranda -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-4 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.68rem] font-bold text-amber-800 uppercase tracking-wider">Portal &amp; Beranda</span>
+                <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+                  <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                  </svg>
+                </div>
+              </div>
+              <div id="vlog-stat-portal" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</div>
+              <div class="flex items-center justify-between mt-2 pt-2 border-t border-[var(--rule)] text-[0.68rem] mono">
+                <span class="text-[var(--ink-soft)]">Unik: <strong id="vlog-stat-portal-unique" class="text-[var(--ink)] font-bold">0</strong></span>
+                <span class="text-amber-800 font-bold">Akses Utama</span>
+              </div>
+            </div>
+
+            <!-- 5. Smartphone Share -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-4 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="mono text-[0.68rem] font-bold text-blue-800 uppercase tracking-wider">Smartphone</span>
+                <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
+                  <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div id="vlog-stat-mobile-pct" class="font-['Fraunces',serif] font-bold text-3xl text-blue-700">0%</div>
+              <div class="flex items-center justify-between mt-2 pt-2 border-t border-[var(--rule)] text-[0.68rem] mono">
+                <span id="vlog-stat-mobile-count" class="text-[var(--ink-soft)]">0 Akses HP</span>
+                <span class="text-blue-700 font-bold">Mobile First</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Charts Section: Daily Trend Bar & Category Doughnut -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Daily Trend Chart (2 cols) -->
+            <div class="lg:col-span-2 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div>
+                  <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[var(--crimson)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span>Tren Kunjungan Harian per Kategori</span>
+                  </h3>
+                  <p class="mono text-[0.68rem] text-[var(--ink-soft)] mt-0.5">Komposisi pembaca Karya Sastra vs Akses Portal &amp; Beranda</p>
+                </div>
+                <span class="mono text-[0.62rem] font-bold bg-[var(--paper-deep)] text-[var(--ink-soft)] px-2.5 py-1 rounded-full border border-[var(--rule)]">WIB (UTC+7)</span>
+              </div>
+
+              <div class="h-64 w-full relative" id="trend-chart-wrapper">
+                <canvas id="visitorTrendChart"></canvas>
+                <div id="trend-chart-fallback" class="hidden absolute inset-0 flex items-center justify-center p-2"></div>
+              </div>
+            </div>
+
+            <!-- Category & Device Breakdown (1 col) -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0 flex items-center gap-2 mb-1">
+                  <svg class="w-4 h-4 text-[var(--gold)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                  </svg>
+                  <span>Distribusi Kategori &amp; Perangkat</span>
+                </h3>
+                <p class="mono text-[0.68rem] text-[var(--ink-soft)] mb-4">Proporsi pembaca mobile smartphone vs desktop</p>
+
+                <div class="h-44 w-full relative mb-4 flex items-center justify-center" id="doughnut-chart-wrapper">
+                  <canvas id="visitorCategoryDoughnut"></canvas>
+                </div>
+
+                <!-- Device Breakdown Stats -->
+                <div class="space-y-2 pt-3 border-t border-[var(--rule)] mono text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 text-[var(--ink-soft)]">
+                      <span class="w-2.5 h-2.5 rounded-full bg-[var(--crimson)] inline-block"></span>
+                      <span>Smartphone / HP</span>
+                    </span>
+                    <span id="vlog-dev-mobile" class="font-bold text-[var(--ink)]">0 (0%)</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 text-[var(--ink-soft)]">
+                      <span class="w-2.5 h-2.5 rounded-full bg-[var(--gold)] inline-block"></span>
+                      <span>Desktop / Laptop</span>
+                    </span>
+                    <span id="vlog-dev-desktop" class="font-bold text-[var(--ink)]">0 (0%)</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 text-[var(--ink-soft)]">
+                      <span class="w-2.5 h-2.5 rounded-full bg-[#2e7559] inline-block"></span>
+                      <span>Tablet</span>
+                    </span>
+                    <span id="vlog-dev-tablet" class="font-bold text-[var(--ink)]">0 (0%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 2 Columns: Leaderboard (Top 10 Karya) & Traffic Sources -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Leaderboard: Top 10 Karya Paling Ramai (2 cols) -->
+            <div class="lg:col-span-2 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0 flex items-center gap-2">
+                    <span class="text-[var(--gold)]">🏆</span>
+                    <span>Top Karya Sastra Paling Ramai Dibaca</span>
+                  </h3>
+                  <p class="mono text-[0.68rem] text-[var(--ink-soft)] mt-0.5">Peringkat karya terpopuler berdasarkan counter view pembaca aktual</p>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto no-scrollbar">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="border-b border-[var(--rule-strong)] bg-[var(--paper-deep)] text-[var(--ink)] font-bold mono">
+                      <th class="py-2.5 px-3 w-12 text-center">#</th>
+                      <th class="py-2.5 px-3">Judul Karya &amp; Penulis</th>
+                      <th class="py-2.5 px-3">Kategori</th>
+                      <th class="py-2.5 px-3 text-right">Total Pembaca</th>
+                      <th class="py-2.5 px-3 text-center w-24">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vlog-top-karya-tbody" class="divide-y divide-[var(--rule)]">
+                    <tr>
+                      <td colspan="5" class="py-8 text-center text-xs mono text-[var(--ink-faint)] italic">
+                        Memuat data peringkat karya...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Traffic Sources (1 col) -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0 flex items-center gap-2 mb-1">
+                  <svg class="w-4 h-4 text-emerald-700" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                  </svg>
+                  <span>Sumber Trafik (Referral)</span>
+                </h3>
+                <p class="mono text-[0.68rem] text-[var(--ink-soft)] mb-4">Kanal asal pembaca menuju portal literatur</p>
+
+                <div id="vlog-referrers-container" class="space-y-3">
+                  <div class="py-6 text-center text-xs mono text-[var(--ink-faint)]">
+                    Memuat data kanal...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Live Activity Stream: Recent Visitor Logs Table -->
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[var(--ink-soft)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>Log Kunjungan Terbaru (Live Stream)</span>
+                </h3>
+                <p class="mono text-[0.68rem] text-[var(--ink-soft)] mt-0.5">Catatan akses pembaca real-time yang tersimpan di Google Spreadsheet</p>
+              </div>
+
+              <!-- Log Search Filter -->
+              <div class="relative min-w-[220px]">
+                <input 
+                  type="search" 
+                  id="vlog-table-filter" 
+                  placeholder="Cari path, judul, atau IP..." 
+                  oninput="filterVlogTable(this.value)"
+                  class="w-full px-3 py-1.5 pl-8 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-lg text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+                />
+                <svg class="w-3.5 h-3.5 text-[var(--ink-faint)] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto no-scrollbar max-h-96 overflow-y-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="sticky top-0 bg-[var(--paper-deep)] z-10">
+                  <tr class="border-b border-[var(--rule-strong)] text-[var(--ink)] font-bold mono">
+                    <th class="py-2.5 px-3">Waktu (WIB)</th>
+                    <th class="py-2.5 px-3">Kategori</th>
+                    <th class="py-2.5 px-3">Path / Halaman</th>
+                    <th class="py-2.5 px-3">Perangkat</th>
+                    <th class="py-2.5 px-3">Sumber (Referrer)</th>
+                    <th class="py-2.5 px-3 font-mono">Masked IP</th>
+                  </tr>
+                </thead>
+                <tbody id="vlog-recent-logs-tbody" class="divide-y divide-[var(--rule)] font-mono text-[0.72rem]">
+                  <tr>
+                    <td colspan="6" class="py-8 text-center text-xs mono text-[var(--ink-faint)] italic">
+                      Memuat aktivitas live stream...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -982,8 +1356,13 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       getPengaturan,
       simpanPengaturan,
       formatDriveImageUrl,
+      getVisitorAnalytics,
       type KaryaInput,
-      type FullDatabaseDump 
+      type FullDatabaseDump,
+      type VisitorAnalyticsData,
+      type TopKaryaItem,
+      type TopReferrerItem,
+      type RecentVisitorLog 
     } from '../../lib/supabase';
     import confetti from 'canvas-confetti';
 
@@ -1083,11 +1462,14 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       const comments = fullDb.komentar.length;
       const quotes = fullDb.quotes.length;
       const penulis = fullDb.penulis.length;
+      const totalViews = fullDb.karya.reduce((acc, k) => acc + (parseInt((k as any).views || 0, 10)), 0);
 
       if (kpiSubmissions) kpiSubmissions.textContent = submissions.toString();
       if (kpiPublished) kpiPublished.textContent = published.toString();
       if (kpiDrafts) kpiDrafts.textContent = drafts.toString();
       if (kpiComments) kpiComments.textContent = comments.toString();
+      const kpiViewsTotal = document.getElementById('kpi-views-total');
+      if (kpiViewsTotal) kpiViewsTotal.textContent = totalViews.toLocaleString('id-ID');
 
       if (badgeKurasi) badgeKurasi.textContent = submissions.toString();
       if (badgeKarya) badgeKarya.textContent = fullDb.karya.length.toString();
@@ -1099,9 +1481,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     // 4. Section Switcher (like smpalmubarokweb)
     function switchAdminSection(sectionKey: string) {
-      const sections = ['ringkasan', 'kurasi', 'karya', 'komentar', 'quotes', 'penulis', 'pengaturan'];
+      const sections = ['ringkasan', 'pengunjung', 'kurasi', 'karya', 'komentar', 'quotes', 'penulis', 'pengaturan'];
       const titles: Record<string, string> = {
         ringkasan: 'Ringkasan & Statistik',
+        pengunjung: 'Analisis Pengunjung & Pembaca',
         kurasi: 'Antrean Kurasi Naskah Masuk',
         karya: 'Katalog Karya Sastra Lengkap',
         komentar: 'Moderasi Catatan & Komentar',
@@ -1129,6 +1512,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
       const mobileSelect = document.getElementById('admin-mobile-nav') as HTMLSelectElement;
       if (mobileSelect) mobileSelect.value = sectionKey;
+
+      if (sectionKey === 'pengunjung') {
+        loadVisitorAnalytics();
+      }
     }
     (window as any).switchAdminSection = switchAdminSection;
 
@@ -1865,5 +2252,405 @@ ${formContent.value}
         if (btn) btn.disabled = false;
       }
     });
+
+    // ==========================================================
+    // 16. ANALISIS PENGUNJUNG (VISITOR COUNTER & ANALYTICS)
+    // ==========================================================
+    let currentVlogPeriod: 'today' | '7d' | '30d' | 'all' = '30d';
+    let currentVlogCategory: string = 'all';
+    let currentVlogData: VisitorAnalyticsData | null = null;
+    let trendChartInstance: any = null;
+    let doughnutChartInstance: any = null;
+
+    async function loadVisitorAnalytics(period?: 'today' | '7d' | '30d' | 'all', category?: string) {
+      if (period) currentVlogPeriod = period;
+      if (category !== undefined) currentVlogCategory = category;
+
+      // Update period buttons visual
+      document.querySelectorAll('.vlog-p-btn').forEach(b => {
+        const p = b.getAttribute('data-period');
+        if (p === currentVlogPeriod) {
+          b.className = 'vlog-p-btn px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[var(--crimson)] text-[var(--paper)] shadow-xs';
+        } else {
+          b.className = 'vlog-p-btn px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-[var(--ink-soft)] hover:text-[var(--ink)]';
+        }
+      });
+
+      const catSelect = document.getElementById('vlog-category-filter') as HTMLSelectElement;
+      if (catSelect && catSelect.value !== currentVlogCategory) {
+        catSelect.value = currentVlogCategory;
+      }
+
+      try {
+        const data = await getVisitorAnalytics(currentVlogPeriod, currentVlogCategory);
+        if (!data) return;
+        currentVlogData = data;
+
+        // 1. KPI Cards
+        const totalEl = document.getElementById('vlog-stat-total');
+        const todayEl = document.getElementById('vlog-stat-today');
+        const growthEl = document.getElementById('vlog-stat-growth');
+        const uniqueEl = document.getElementById('vlog-stat-unique');
+        const todayUniqueEl = document.getElementById('vlog-stat-today-unique');
+        const karyaEl = document.getElementById('vlog-stat-karya');
+        const karyaUniqueEl = document.getElementById('vlog-stat-karya-unique');
+        const portalEl = document.getElementById('vlog-stat-portal');
+        const portalUniqueEl = document.getElementById('vlog-stat-portal-unique');
+        const mobilePctEl = document.getElementById('vlog-stat-mobile-pct');
+        const mobileCountEl = document.getElementById('vlog-stat-mobile-count');
+
+        if (totalEl) totalEl.textContent = data.summary.total_views.toLocaleString('id-ID');
+        if (todayEl) todayEl.textContent = data.summary.today_views.toLocaleString('id-ID');
+        if (growthEl) {
+          growthEl.textContent = `${data.summary.growth_pct >= 0 ? '+' : ''}${data.summary.growth_pct}%`;
+          growthEl.className = data.summary.growth_pct >= 0 ? 'font-bold text-emerald-700' : 'font-bold text-rose-700';
+        }
+        if (uniqueEl) uniqueEl.textContent = data.summary.unique_visitors.toLocaleString('id-ID');
+        if (todayUniqueEl) todayUniqueEl.textContent = data.summary.today_unique.toLocaleString('id-ID');
+        if (karyaEl) karyaEl.textContent = data.summary.categories.karya.total.toLocaleString('id-ID');
+        if (karyaUniqueEl) karyaUniqueEl.textContent = data.summary.categories.karya.unique.toLocaleString('id-ID');
+        if (portalEl) portalEl.textContent = data.summary.categories.portal.total.toLocaleString('id-ID');
+        if (portalUniqueEl) portalUniqueEl.textContent = data.summary.categories.portal.unique.toLocaleString('id-ID');
+        if (mobilePctEl) mobilePctEl.textContent = `${data.summary.devices.mobile_pct}%`;
+        if (mobileCountEl) mobileCountEl.textContent = `${data.summary.devices.mobile} Akses HP`;
+
+        // Devices
+        const devMob = document.getElementById('vlog-dev-mobile');
+        const devDesk = document.getElementById('vlog-dev-desktop');
+        const devTab = document.getElementById('vlog-dev-tablet');
+        if (devMob) devMob.textContent = `${data.summary.devices.mobile} (${data.summary.devices.mobile_pct}%)`;
+        if (devDesk) devDesk.textContent = `${data.summary.devices.desktop} (${data.summary.devices.desktop_pct}%)`;
+        if (devTab) devTab.textContent = `${data.summary.devices.tablet} (${data.summary.devices.tablet_pct}%)`;
+
+        // 2. Render Charts
+        renderVisitorCharts(data);
+
+        // 3. Render Top Karya Leaderboard
+        renderTopKaryaLeaderboard(data.top_karya);
+
+        // 4. Render Referrers
+        renderVisitorReferrers(data.top_referrers);
+
+        // 5. Render Recent Logs
+        renderVisitorLogsTable(data.recent_logs);
+
+      } catch (e) {
+        console.error('Error loading visitor analytics:', e);
+      }
+    }
+    (window as any).loadVisitorAnalytics = loadVisitorAnalytics;
+
+    function setVlogPeriod(p: 'today' | '7d' | '30d' | 'all') {
+      loadVisitorAnalytics(p, currentVlogCategory);
+    }
+    (window as any).setVlogPeriod = setVlogPeriod;
+
+    function setVlogCategory(c: string) {
+      loadVisitorAnalytics(currentVlogPeriod, c);
+    }
+    (window as any).setVlogCategory = setVlogCategory;
+
+    function resetVlogFilter() {
+      loadVisitorAnalytics('30d', 'all');
+    }
+    (window as any).resetVlogFilter = resetVlogFilter;
+
+    function renderVisitorCharts(data: VisitorAnalyticsData) {
+      const ChartGlobal = (window as any).Chart;
+
+      // 1. Trend Chart
+      const trendCanvas = document.getElementById('visitorTrendChart') as HTMLCanvasElement;
+      if (trendCanvas && ChartGlobal) {
+        if (trendChartInstance) {
+          trendChartInstance.destroy();
+        }
+
+        const labels = data.daily_trends.map(d => d.label);
+        const karyaData = data.daily_trends.map(d => d.karya);
+        const portalData = data.daily_trends.map(d => d.portal);
+        const otherData = data.daily_trends.map(d => d.other);
+
+        trendChartInstance = new ChartGlobal(trendCanvas, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Karya Sastra',
+                data: karyaData,
+                backgroundColor: 'rgba(124, 45, 38, 0.85)',
+                borderRadius: 4,
+                stack: 'stack0',
+              },
+              {
+                label: 'Portal & Beranda',
+                data: portalData,
+                backgroundColor: 'rgba(166, 129, 60, 0.85)',
+                borderRadius: 4,
+                stack: 'stack0',
+              },
+              {
+                label: 'Lainnya',
+                data: otherData,
+                backgroundColor: 'rgba(46, 117, 89, 0.85)',
+                borderRadius: 4,
+                stack: 'stack0',
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: { family: "'IBM Plex Mono', monospace", size: 11 },
+                  boxWidth: 12,
+                  usePointStyle: true,
+                }
+              },
+              tooltip: {
+                titleFont: { family: "'Fraunces', serif" },
+                bodyFont: { family: "'IBM Plex Mono', monospace" }
+              }
+            },
+            scales: {
+              x: {
+                stacked: true,
+                grid: { display: false },
+                ticks: {
+                  font: { family: "'IBM Plex Mono', monospace", size: 10 },
+                  maxRotation: 0,
+                  autoSkip: true,
+                  maxTicksLimit: 12
+                }
+              },
+              y: {
+                stacked: true,
+                beginAtZero: true,
+                ticks: {
+                  font: { family: "'IBM Plex Mono', monospace", size: 10 },
+                  precision: 0
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.06)'
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Category & Device Doughnut Chart
+      const doughnutCanvas = document.getElementById('visitorCategoryDoughnut') as HTMLCanvasElement;
+      if (doughnutCanvas && ChartGlobal) {
+        if (doughnutChartInstance) {
+          doughnutChartInstance.destroy();
+        }
+
+        doughnutChartInstance = new ChartGlobal(doughnutCanvas, {
+          type: 'doughnut',
+          data: {
+            labels: ['Smartphone', 'Desktop', 'Tablet'],
+            datasets: [{
+              data: [
+                data.summary.devices.mobile || 1,
+                data.summary.devices.desktop || 0,
+                data.summary.devices.tablet || 0
+              ],
+              backgroundColor: [
+                '#7c2d26',
+                '#a6813c',
+                '#2e7559'
+              ],
+              borderWidth: 2,
+              borderColor: '#efeae0'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                bodyFont: { family: "'IBM Plex Mono', monospace" }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function renderTopKaryaLeaderboard(topKarya: TopKaryaItem[]) {
+      const tbody = document.getElementById('vlog-top-karya-tbody');
+      if (!tbody) return;
+
+      if (!topKarya || topKarya.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-8 text-center text-xs mono text-[var(--ink-faint)] italic">
+              Belum ada rekaman pembaca karya pada periode ini.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = topKarya.map((item, idx) => {
+        let rankBadge = `<span class="mono text-xs font-bold text-[var(--ink-faint)]">${idx + 1}</span>`;
+        if (idx === 0) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 inline-flex items-center justify-center text-xs font-bold">🥇</span>`;
+        else if (idx === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-slate-200 text-slate-800 inline-flex items-center justify-center text-xs font-bold">🥈</span>`;
+        else if (idx === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 inline-flex items-center justify-center text-xs font-bold">🥉</span>`;
+
+        return `
+          <tr class="hover:bg-[var(--paper-deep)]/60 transition">
+            <td class="py-3 px-3 text-center">${rankBadge}</td>
+            <td class="py-3 px-3">
+              <strong class="font-['Fraunces',serif] text-sm font-semibold text-[var(--ink)] block">
+                ${item.title}
+              </strong>
+              <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
+                Oleh: ${item.author}
+              </span>
+            </td>
+            <td class="py-3 px-3">
+              <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--crimson)] font-semibold uppercase">
+                ${item.categoryLabel}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-right mono font-bold text-sm text-[var(--crimson)]">
+              👁️ ${(item.views || 0).toLocaleString('id-ID')}
+            </td>
+            <td class="py-3 px-3 text-center">
+              <a href="${basePath}/karya/${item.slug}" target="_blank" class="mono text-xs text-[var(--crimson)] hover:underline font-bold inline-flex items-center gap-1">
+                <span>Buka</span>
+                <span>→</span>
+              </a>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderVisitorReferrers(referrers: TopReferrerItem[]) {
+      const container = document.getElementById('vlog-referrers-container');
+      if (!container) return;
+
+      if (!referrers || referrers.length === 0) {
+        container.innerHTML = `
+          <div class="py-6 text-center text-xs mono text-[var(--ink-faint)] italic">
+            Belum ada data kanal rujukan.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = referrers.map(r => `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between mono text-xs">
+            <span class="font-semibold text-[var(--ink)] truncate max-w-[180px]">${r.source}</span>
+            <span class="text-[var(--ink-soft)] font-bold">${r.count.toLocaleString('id-ID')} <span class="text-[0.68rem] opacity-75">(${r.pct}%)</span></span>
+          </div>
+          <div class="w-full bg-[var(--paper-deep)] h-2 rounded-full overflow-hidden border border-[var(--rule)]">
+            <div class="bg-[var(--gold)] h-full rounded-full transition-all duration-500" style="width: ${Math.min(100, Math.max(3, r.pct))}%"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderVisitorLogsTable(logs: RecentVisitorLog[]) {
+      const tbody = document.getElementById('vlog-recent-logs-tbody');
+      if (!tbody) return;
+
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-xs mono text-[var(--ink-faint)] italic">
+              Belum ada catatan aktivitas pengunjung.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(l => {
+        let catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-[var(--paper-deep)] text-[var(--ink)] uppercase">${l.category}</span>`;
+        if (l.category === 'karya') {
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-[var(--crimson-subtle)] text-[var(--crimson)] border border-[var(--crimson)]/30 uppercase">Karya Sastra</span>`;
+        } else if (l.category === 'portal') {
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-amber-50 text-amber-800 border border-amber-300 uppercase">Portal Beranda</span>`;
+        } else if (l.category === 'quotes') {
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-purple-50 text-purple-800 border border-purple-300 uppercase">Quotes</span>`;
+        } else if (l.category === 'panggung') {
+          catBadge = `<span class="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-blue-50 text-blue-800 border border-blue-300 uppercase">Panggung</span>`;
+        }
+
+        let devIcon = `<span class="inline-flex items-center gap-1 text-[var(--ink-soft)]">💻 Desktop</span>`;
+        if (l.device_type === 'mobile') {
+          devIcon = `<span class="inline-flex items-center gap-1 text-blue-700 font-bold">📱 Smartphone</span>`;
+        } else if (l.device_type === 'tablet') {
+          devIcon = `<span class="inline-flex items-center gap-1 text-emerald-700">📟 Tablet</span>`;
+        }
+
+        return `
+          <tr class="vlog-row hover:bg-[var(--paper-deep)]/60 transition" data-path="${(l.path || '').toLowerCase()}" data-title="${(l.title || '').toLowerCase()}" data-ip="${(l.ip_masked || '').toLowerCase()}">
+            <td class="py-2.5 px-3 text-[var(--ink-soft)] whitespace-nowrap">${l.timestamp || '-'}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap">${catBadge}</td>
+            <td class="py-2.5 px-3">
+              <strong class="text-[var(--ink)] font-semibold block truncate max-w-xs">${l.title || l.path}</strong>
+              <span class="text-[0.65rem] text-[var(--ink-faint)] block truncate max-w-xs">${l.path}</span>
+            </td>
+            <td class="py-2.5 px-3 whitespace-nowrap">${devIcon}</td>
+            <td class="py-2.5 px-3 text-[var(--ink-soft)] truncate max-w-[120px]">${l.referrer || 'direct'}</td>
+            <td class="py-2.5 px-3 text-[var(--ink-faint)] font-mono text-[0.68rem]">${l.ip_masked || 'anonymized'}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function filterVlogTable(query: string) {
+      const q = query.trim().toLowerCase();
+      const rows = document.querySelectorAll('.vlog-row') as NodeListOf<HTMLTableRowElement>;
+      rows.forEach(r => {
+        const path = r.getAttribute('data-path') || '';
+        const title = r.getAttribute('data-title') || '';
+        const ip = r.getAttribute('data-ip') || '';
+        if (!q || path.includes(q) || title.includes(q) || ip.includes(q)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+    (window as any).filterVlogTable = filterVlogTable;
+
+    function exportVlogCsv() {
+      if (!currentVlogData || !currentVlogData.recent_logs || currentVlogData.recent_logs.length === 0) {
+        alert('Belum ada data log pengunjung untuk diunduh.');
+        return;
+      }
+      const headers = ['ID', 'Waktu WIB', 'Tanggal', 'Kategori', 'Path Halaman', 'Judul Karya/Halaman', 'Perangkat', 'Sumber Referrer', 'IP Masked'];
+      const rows = currentVlogData.recent_logs.map(l => [
+        `"${l.id}"`,
+        `"${l.timestamp}"`,
+        `"${l.visit_date}"`,
+        `"${l.category}"`,
+        `"${(l.path || '').replace(/"/g, '""')}"`,
+        `"${(l.title || '').replace(/"/g, '""')}"`,
+        `"${l.device_type}"`,
+        `"${(l.referrer || '').replace(/"/g, '""')}"`,
+        `"${l.ip_masked}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `log_pengunjung_ruang_sastra_${new Date().toISOString().substring(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    (window as any).exportVlogCsv = exportVlogCsv;
   </script>
 </Layout>

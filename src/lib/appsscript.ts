@@ -1308,3 +1308,205 @@ export const googleScriptRun = {
   }
 };
 
+// ==========================================================
+// 8. STATISTIK & ANALISIS PENGUNJUNG (VISITOR COUNTER)
+// ==========================================================
+
+export interface VisitorAnalyticsSummary {
+  total_views: number;
+  today_views: number;
+  unique_visitors: number;
+  today_unique: number;
+  growth_pct: number;
+  categories: {
+    karya: { total: number; unique: number };
+    portal: { total: number; unique: number };
+    quotes: { total: number; unique: number };
+    panggung: { total: number; unique: number };
+    admin: { total: number; unique: number };
+  };
+  devices: {
+    mobile: number;
+    desktop: number;
+    tablet: number;
+    mobile_pct: number;
+    desktop_pct: number;
+    tablet_pct: number;
+  };
+}
+
+export interface VisitorTrendPoint {
+  date: string;
+  label: string;
+  total: number;
+  karya: number;
+  portal: number;
+  other: number;
+  unique: number;
+}
+
+export interface TopKaryaItem {
+  id: string;
+  slug: string;
+  title: string;
+  author: string;
+  categoryLabel: string;
+  views: number;
+  readingTime: number;
+}
+
+export interface TopReferrerItem {
+  source: string;
+  count: number;
+  pct: number;
+}
+
+export interface RecentVisitorLog {
+  id: string;
+  timestamp: string;
+  visit_date: string;
+  category: string;
+  path: string;
+  title: string;
+  device_type: string;
+  referrer: string;
+  ip_masked: string;
+}
+
+export interface VisitorAnalyticsData {
+  period: string;
+  category: string;
+  summary: VisitorAnalyticsSummary;
+  daily_trends: VisitorTrendPoint[];
+  top_karya: TopKaryaItem[];
+  top_referrers: TopReferrerItem[];
+  recent_logs: RecentVisitorLog[];
+}
+
+/**
+ * Detect Client Device Type
+ */
+export function detectClientDevice(): 'mobile' | 'tablet' | 'desktop' {
+  if (typeof window === 'undefined') return 'desktop';
+  const ua = (navigator.userAgent || '').toLowerCase();
+  const width = window.innerWidth || 1024;
+  if (/ipad|tablet|playbook|silk/.test(ua) || (width >= 640 && width <= 1024 && /android/.test(ua))) {
+    return 'tablet';
+  }
+  if (/mobile|android|iphone|ipod|blackberry|windows phone/.test(ua) || width < 640) {
+    return 'mobile';
+  }
+  return 'desktop';
+}
+
+/**
+ * Universal Visitor Logger (with 15s session debounce per path)
+ */
+export async function recordVisit(options: {
+  path?: string;
+  category?: 'karya' | 'portal' | 'quotes' | 'panggung' | 'admin' | string;
+  title?: string;
+  karyaSlug?: string;
+  referrer?: string;
+}): Promise<{ success: boolean; views?: number }> {
+  if (typeof window === 'undefined') return { success: false };
+
+  const currentPath = options.path || window.location.pathname;
+  const debounceKey = `rs_vlog_debounce_${currentPath}`;
+  const lastLogged = sessionStorage.getItem(debounceKey);
+  const now = Date.now();
+
+  // Debounce 15s per path
+  if (lastLogged && (now - parseInt(lastLogged, 10)) < 15000) {
+    const cachedViews = localStorage.getItem(`rs_views_${options.karyaSlug || ''}`);
+    return { success: true, views: cachedViews ? parseInt(cachedViews, 10) : undefined };
+  }
+
+  sessionStorage.setItem(debounceKey, now.toString());
+
+  const deviceType = detectClientDevice();
+  const referrer = options.referrer || document.referrer || 'direct';
+  const payload = {
+    path: currentPath,
+    category: options.category || 'portal',
+    title: options.title || document.title,
+    karyaSlug: options.karyaSlug || '',
+    deviceType,
+    referrer,
+  };
+
+  try {
+    const res = await callAppsScript<{ success: boolean; id: string; views: number }>('catatKunjungan', [payload], 'POST', 6000);
+    if (res && res.success) {
+      if (options.karyaSlug && res.views) {
+        localStorage.setItem(`rs_views_${options.karyaSlug}`, res.views.toString());
+      }
+      return res;
+    }
+  } catch (e) {
+    console.debug('[AppsScript] recordVisit skipped/failed:', e);
+  }
+
+  return { success: true };
+}
+
+/**
+ * Fetch Full Visitor Analytics for Admin Dashboard
+ */
+export async function getVisitorAnalytics(
+  period: 'today' | '7d' | '30d' | 'all' = '30d',
+  category: string = 'all'
+): Promise<VisitorAnalyticsData | null> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+
+  if (isAppsScriptConfigured) {
+    try {
+      const res = await callAppsScript<VisitorAnalyticsData>('getVisitorAnalytics', [period, category, token], 'POST', 15000);
+      if (res && res.summary) {
+        localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(res));
+        return res;
+      }
+    } catch (e) {
+      console.warn('[AppsScript] Gagal ambil analisis pengunjung:', e);
+    }
+  }
+
+  // Fallback cache
+  const cached = localStorage.getItem('rs_visitor_analytics_cache');
+  if (cached) {
+    try {
+      return JSON.parse(cached);
+    } catch (e) {}
+  }
+
+  return null;
+}
+
+/**
+ * Fetch Latest View Counts for all Karya
+ */
+export async function fetchKaryaViewsMap(): Promise<Record<string, number>> {
+  const map: Record<string, number> = {};
+  if (typeof window === 'undefined') return map;
+
+  try {
+    const karyaList = await fetchAllKarya();
+    if (Array.isArray(karyaList)) {
+      karyaList.forEach(k => {
+        const slug = k.slug || k.id;
+        const views = parseInt(String(k.views || 0), 10);
+        if (slug) {
+          map[slug] = views;
+          localStorage.setItem(`rs_views_${slug}`, views.toString());
+        }
+      });
+    }
+  } catch (e) {
+    console.debug('[AppsScript] fetchKaryaViewsMap fallback');
+  }
+
+  return map;
+}
+
+
