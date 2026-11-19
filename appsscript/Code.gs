@@ -97,7 +97,7 @@ function initSpreadsheet() {
     'Karya': [
       'id', 'slug', 'title', 'description', 'author', 'author_grade',
       'category', 'category_label', 'tags', 'content', 'cover_image_url',
-      'reading_time', 'featured', 'status', 'abstract', 'abstract_en',
+      'reading_time', 'views', 'featured', 'status', 'abstract', 'abstract_en',
       'keywords', 'supervisor', 'pdf_url', 'audio_url', 'verse_form',
       'characters', 'duration', 'stage_setting', 'volume', 'contributors',
       'curator', 'created_at', 'updated_at'
@@ -137,6 +137,20 @@ function initSpreadsheet() {
   const defaultSheet = ss.getSheetByName('Sheet1') || ss.getSheetByName('Sheet 1');
   if (defaultSheet && ss.getSheets().length > 1) {
     try { ss.deleteSheet(defaultSheet); } catch(e) {}
+  }
+
+  // Inisialisasi Pengaturan default portal jika kosong
+  const pengaturanSheet = ss.getSheetByName('Pengaturan');
+  if (pengaturanSheet && pengaturanSheet.getLastRow() <= 1) {
+    const defaultSettings = [
+      ['nama_portal', 'Ruang Sastra — SMPI Yambu\'ul Qur\'an'],
+      ['edisi', 'Edisi I — Tahun Akademik 2026/2027'],
+      ['whatsapp', '0815-1577-7911'],
+      ['email', 'smpiyaqu@gmail.com'],
+      ['status_penerimaan', 'buka'],
+      ['manifesto', 'Sastra bukan sekadar rangkaian kata indah di atas kertas, melainkan denyut nurani yang meretas kebekuan peradaban.']
+    ];
+    pengaturanSheet.getRange(2, 1, defaultSettings.length, 2).setValues(defaultSettings);
   }
 
   // Pastikan akun Admin Redaksi ada
@@ -195,13 +209,20 @@ function resetAdminPassword() {
 // 3. SEED DATA DEMO (ARCHIVE RESMI)
 // ============================================================
 
-function isiDemoData() {
+function isiDemoData(forceReset) {
   initSpreadsheet();
   const ss = getDb_();
 
   // 1. Data Karya
   const karyaSheet = ss.getSheetByName('Karya');
-  if (karyaSheet.getLastRow() <= 1) {
+  if (forceReset && karyaSheet && karyaSheet.getLastRow() > 1) {
+    try {
+      karyaSheet.deleteRows(2, karyaSheet.getLastRow() - 1);
+    } catch(e) {
+      karyaSheet.getRange(2, 1, karyaSheet.getLastRow() - 1, karyaSheet.getLastColumn()).clearContent();
+    }
+  }
+  if (karyaSheet && (karyaSheet.getLastRow() <= 1 || forceReset)) {
     const sampleKarya = [
       [
         'kti_01',
@@ -216,6 +237,7 @@ function isiDemoData() {
         'Karya sastra, khususnya puisi, bukanlah cermin datar yang sekadar memantulkan kenyataan empiris, melainkan sebuah transformasi simbolik atas pengalaman batin pengarangnya...',
         'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80',
         9,
+        342,
         true,
         'published',
         'Penelitian ini mengkaji struktur semiotika puisi karya siswa SMPI Yambu\'ul Qur\'an dengan menerapkan teori Semiotika Michael Riffaterre...',
@@ -247,6 +269,7 @@ function isiDemoData() {
         'Di antara riak kata yang sunyi,\nada bait yang menolak berhenti.\nUjung penaku mencatat dentang jam tiga pagi,\nketika dingin merayap dari lantai marmer serambi,\ndan gemerisik dedaunan sawo kecik\nmengiringi napas para pencari cahaya.\n\nAku bukanlah perangkai kalimat ulung,\nhanya seorang musafir yang mengeja takdir\npada lembar-lembar kertas buram bergaris.\nSetiap tetes dawat adalah doa yang dipanjangkan,\nsetiap spasi adalah jeda bagi air mata\nyang enggan tumpah di hadapan fana.',
         'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&q=80',
         3,
+        518,
         true,
         'published',
         '',
@@ -278,6 +301,7 @@ function isiDemoData() {
         'Malam itu hujan gerimis membasahi pelataran masjid. Lampu neon temaram berkedip-kedip di ujung gang sempit...',
         'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&q=80',
         6,
+        289,
         true,
         'published',
         '',
@@ -309,6 +333,7 @@ function isiDemoData() {
         'BABAK I\n[Latar panggung temaram. Suara gemercik air wudhu mengalun lembut di kejauhan.]\n\nUSTADZ MANSYUR:\n(Berdiri menatap cakrawala malam)\nIlmu itu bagai bahtera di samudra raya, anakku. Tanpa keteguhan nakhoda, ia karam dihempas badai fitnah.',
         'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=1200&q=80',
         8,
+        175,
         true,
         'published',
         '',
@@ -340,6 +365,7 @@ function isiDemoData() {
         'Kompilasi karya puisi, prosa, dan renungan terpilih dari para santri penghafal Al-Qur\'an...',
         'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80',
         12,
+        420,
         true,
         'published',
         '',
@@ -561,6 +587,10 @@ function uploadFotoKarya(base64Data, fileName, mimeType, token) {
   return 'https://lh3.googleusercontent.com/d/' + file.getId();
 }
 
+function uploadFileToDrive(base64Data, fileName, mimeType, token) {
+  return uploadFotoKarya(base64Data, fileName, mimeType, token);
+}
+
 // ============================================================
 // 6. MANAJEMEN KARYA (CRUD)
 // ============================================================
@@ -681,8 +711,15 @@ function simpanKarya(karyaObj, token) {
     if (rowId === id || rowSlug === slug) {
       existingRow = i + 1;
       rowMap.created_at = data[i][headers.indexOf('created_at')] || now;
+      if (rowMap.views === undefined && headers.indexOf('views') > -1) {
+        rowMap.views = data[i][headers.indexOf('views')] || 0;
+      }
       break;
     }
+  }
+
+  if (rowMap.views === undefined) {
+    rowMap.views = 0;
   }
 
   const rowValues = headers.map(h => rowMap[h] !== undefined ? rowMap[h] : '');
@@ -777,6 +814,38 @@ function getKaryaByPenulis(authorName, authorEmail) {
   return list.reverse();
 }
 
+function tambahViewKarya(idOrSlug) {
+  if (!idOrSlug) return 0;
+  try {
+    const ss = getDb_();
+    const sheet = ss.getSheetByName('Karya');
+    if (!sheet) return 0;
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return 0;
+    const headers = data[0];
+    let viewCol = headers.indexOf('views') + 1;
+    if (viewCol <= 0) {
+      viewCol = headers.length + 1;
+      sheet.getRange(1, viewCol).setValue('views').setFontWeight('bold');
+    }
+    const target = idOrSlug.toString().toLowerCase().trim();
+    for (let i = 1; i < data.length; i++) {
+      const rowId = (data[i][0] || '').toString().toLowerCase().trim();
+      const rowSlug = (data[i][1] || '').toString().toLowerCase().trim();
+      if (rowId === target || rowSlug === target) {
+        const cell = sheet.getRange(i + 1, viewCol);
+        const currentVal = parseInt(cell.getValue() || 0, 10);
+        const newVal = currentVal + 1;
+        cell.setValue(newVal);
+        return newVal;
+      }
+    }
+    return 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
 function getQuotes() {
   const ss = getDb_();
   const sheet = ss.getSheetByName('Quotes');
@@ -792,6 +861,163 @@ function getQuotes() {
     list.push(item);
   }
   return list;
+}
+
+function simpanQuote(quoteObj, token) {
+  verifikasiAdminToken_(token);
+  if (!quoteObj || !quoteObj.quote) {
+    throw new Error('Teks kutipan sastra wajib diisi.');
+  }
+
+  const ss = getDb_();
+  const sheet = ss.getSheetByName('Quotes');
+  if (!sheet) throw new Error('Sheet Quotes tidak ditemukan.');
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const now = new Date().toISOString();
+  const id = quoteObj.id || ('q_' + Date.now());
+
+  const rowMap = {
+    ...quoteObj,
+    id: id,
+    created_at: quoteObj.created_at || now
+  };
+
+  const data = sheet.getDataRange().getValues();
+  let existingRow = -1;
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === id) {
+      existingRow = i + 1;
+      break;
+    }
+  }
+
+  const rowValues = headers.map(h => rowMap[h] !== undefined ? rowMap[h] : '');
+  if (existingRow > 1) {
+    sheet.getRange(existingRow, 1, 1, rowValues.length).setValues([rowValues]);
+    return { success: true, id: id, message: 'Kutipan berhasil diperbarui di Google Sheets DB!' };
+  } else {
+    sheet.appendRow(rowValues);
+    return { success: true, id: id, message: 'Kutipan sastra baru berhasil disimpan ke Google Sheets DB!' };
+  }
+}
+
+function hapusQuote(quoteId, token) {
+  verifikasiAdminToken_(token);
+  const ss = getDb_();
+  const sheet = ss.getSheetByName('Quotes');
+  if (!sheet) throw new Error('Sheet Quotes tidak ditemukan.');
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === quoteId) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: 'Kutipan sastra berhasil dihapus dari Google Sheets.' };
+    }
+  }
+  return { success: false, message: 'Kutipan tidak ditemukan.' };
+}
+
+function hapusKomentar(commentId, token) {
+  verifikasiAdminToken_(token);
+  const ss = getDb_();
+  const sheet = ss.getSheetByName('Komentar');
+  if (!sheet) throw new Error('Sheet Komentar tidak ditemukan.');
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === commentId) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: 'Komentar pembaca berhasil dihapus dari Google Sheets.' };
+    }
+  }
+  return { success: false, message: 'Komentar tidak ditemukan.' };
+}
+
+function getPengaturan() {
+  const ss = getDb_();
+  const sheet = ss.getSheetByName('Pengaturan');
+  if (!sheet) return {};
+  const data = sheet.getDataRange().getValues();
+  const res = {};
+  for (let i = 1; i < data.length; i++) {
+    const k = (data[i][0] || '').toString().trim();
+    if (k) res[k] = data[i][1];
+  }
+  return res;
+}
+
+function simpanPengaturan(settingsObj, token) {
+  verifikasiAdminToken_(token);
+  if (!settingsObj || typeof settingsObj !== 'object') {
+    throw new Error('Data pengaturan tidak valid.');
+  }
+  const ss = getDb_();
+  let sheet = ss.getSheetByName('Pengaturan');
+  if (!sheet) sheet = ss.insertSheet('Pengaturan');
+
+  const data = sheet.getDataRange().getValues();
+  const existingMap = {};
+  for (let i = 1; i < data.length; i++) {
+    const k = (data[i][0] || '').toString().trim().toLowerCase();
+    if (k) existingMap[k] = i + 1;
+  }
+
+  for (let key in settingsObj) {
+    const normKey = key.trim().toLowerCase();
+    const val = settingsObj[key];
+    if (existingMap[normKey]) {
+      sheet.getRange(existingMap[normKey], 2).setValue(val);
+    } else {
+      sheet.appendRow([key, val]);
+      existingMap[normKey] = sheet.getLastRow();
+    }
+  }
+  return { success: true, message: 'Pengaturan redaksi berhasil diperbarui!', data: getPengaturan() };
+}
+
+function saveData(sheetName, dataObj, rowIdOrKey, token) {
+  verifikasiAdminToken_(token);
+  if (!sheetName || !dataObj) throw new Error('Parameter saveData tidak lengkap.');
+
+  const ss = getDb_();
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) sheet = ss.insertSheet(sheetName);
+
+  const lastCol = Math.max(1, sheet.getLastColumn());
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+
+  Object.keys(dataObj).forEach(k => {
+    if (k !== '_rowId' && headers.indexOf(k) === -1) {
+      headers.push(k);
+      sheet.getRange(1, headers.length).setValue(k).setFontWeight('bold');
+    }
+  });
+
+  const rowData = headers.map(h => dataObj[h] !== undefined ? dataObj[h] : '');
+  const numRow = parseInt(rowIdOrKey, 10);
+
+  if (!isNaN(numRow) && numRow > 1 && numRow <= sheet.getLastRow()) {
+    sheet.getRange(numRow, 1, 1, rowData.length).setValues([rowData]);
+    dataObj._rowId = numRow;
+  } else {
+    sheet.appendRow(rowData);
+    dataObj._rowId = sheet.getLastRow();
+  }
+  return { success: true, data: dataObj, rowId: dataObj._rowId };
+}
+
+function deleteData(sheetName, rowId, token) {
+  verifikasiAdminToken_(token);
+  const ss = getDb_();
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) throw new Error('Sheet ' + sheetName + ' tidak ditemukan.');
+  const numRow = parseInt(rowId, 10);
+  if (!isNaN(numRow) && numRow > 1 && numRow <= sheet.getLastRow()) {
+    sheet.deleteRow(numRow);
+    return { success: true, rowId: numRow };
+  }
+  return { success: false, message: 'Baris tidak valid.' };
 }
 
 // ============================================================
@@ -1058,8 +1284,8 @@ function doGet(e) {
       hasil = { status: 'ok', project: 'Ruang Sastra — SMPI YQ', serverTime: new Date().toISOString() };
     } else if (fn === 'initSpreadsheet') {
       hasil = initSpreadsheet();
-    } else if (fn === 'isiDemoData') {
-      hasil = isiDemoData();
+    } else if (fn === 'isiDemoData' || fn === 'resetDanIsiDemoData') {
+      hasil = isiDemoData(true);
     } else if (fn === 'getFullData') {
       hasil = getFullData(p.token);
     } else if (fn === 'fetchAllKarya') {
@@ -1076,6 +1302,10 @@ function doGet(e) {
       hasil = getQuotes();
     } else if (fn === 'cekSesiAdmin') {
       hasil = cekSesiAdmin(p.token);
+    } else if (fn === 'tambahViewKarya') {
+      hasil = tambahViewKarya(p.idOrSlug || p.karyaId || p.slug || p.id);
+    } else if (fn === 'getPengaturan') {
+      hasil = getPengaturan();
     } else if (fn === 'resetAdminPassword') {
       hasil = resetAdminPassword();
     } else {
@@ -1107,8 +1337,8 @@ function doPost(e) {
 
     if (fn === 'initSpreadsheet') {
       hasil = initSpreadsheet();
-    } else if (fn === 'isiDemoData') {
-      hasil = isiDemoData();
+    } else if (fn === 'isiDemoData' || fn === 'resetDanIsiDemoData') {
+      hasil = isiDemoData(true);
     } else if (fn === 'loginAdmin') {
       hasil = loginAdmin(args[0] || body.user || body.username || body.email, args[1] || body.pass || body.password);
     } else if (fn === 'cekSesiAdmin') {
@@ -1127,12 +1357,28 @@ function doPost(e) {
       hasil = hapusKarya(args[0] || body.idOrSlug || body.id, args[1] || body.token);
     } else if (fn === 'updateStatusKarya') {
       hasil = updateStatusKarya(args[0] || body.idOrSlug || body.id, args[1] || body.status, args[2] || body.token);
-    } else if (fn === 'uploadFotoKarya') {
+    } else if (fn === 'uploadFotoKarya' || fn === 'uploadFileToDrive') {
       hasil = uploadFotoKarya(args[0] || body.base64Data || body.file, args[1] || body.fileName, args[2] || body.mimeType, args[3] || body.token);
     } else if (fn === 'tambahApresiasi') {
       hasil = tambahApresiasi(args[0] || body.karyaId || body.karya_id);
     } else if (fn === 'kirimKomentar') {
       hasil = kirimKomentar(args[0] || body.karyaId || body.karya_id, args[1] || body.payload || body);
+    } else if (fn === 'hapusKomentar') {
+      hasil = hapusKomentar(args[0] || body.id || body.commentId, args[1] || body.token);
+    } else if (fn === 'simpanQuote') {
+      hasil = simpanQuote(args[0] || body.quote || body.data, args[1] || body.token);
+    } else if (fn === 'hapusQuote') {
+      hasil = hapusQuote(args[0] || body.id || body.quoteId, args[1] || body.token);
+    } else if (fn === 'tambahViewKarya') {
+      hasil = tambahViewKarya(args[0] || body.idOrSlug || body.slug || body.id);
+    } else if (fn === 'getPengaturan') {
+      hasil = getPengaturan();
+    } else if (fn === 'simpanPengaturan') {
+      hasil = simpanPengaturan(args[0] || body.settings || body.data, args[1] || body.token);
+    } else if (fn === 'saveData') {
+      hasil = saveData(args[0] || body.sheet || body.sheetName, args[1] || body.data || body.dataObj, args[2] || body.rowId, args[3] || body.token);
+    } else if (fn === 'deleteData') {
+      hasil = deleteData(args[0] || body.sheet || body.sheetName, args[1] || body.rowId, args[2] || body.token);
     } else if (fn === 'fetchAllKarya') {
       hasil = fetchAllKarya(args[0] || body.token);
     } else if (fn === 'getFullData') {

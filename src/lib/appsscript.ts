@@ -15,7 +15,7 @@
 
 export const APPS_SCRIPT_URL = 
   (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.PUBLIC_APPS_SCRIPT_URL || import.meta.env.PUBLIC_SUPABASE_URL)) ||
-  'https://script.google.com/macros/s/AKfycbxQPg1d44-v6uS6R_cLjfVjki-PpWkKT8-VUrqz8t9yWuniNr1e8GJVewmNBTa-JqbZ8g/exec';
+  'https://script.google.com/macros/s/AKfycbygPZUVSwaoblyQOPlQOYeSPfPkWrgpD5oYe3BLbnDDGyMVS9KjtaJ4v1FMjPyWdOav/exec';
 
 export const isAppsScriptConfigured = Boolean(
   APPS_SCRIPT_URL && 
@@ -244,32 +244,115 @@ export function subscribeKomentar(karyaId: string, callback: (newComment: Koment
 // 3. UNGGAH FOTO & MEDIA KE GOOGLE DRIVE STORAGE
 // ==========================================================
 
-function fileToDataUrl(file: File): Promise<string> {
+/**
+ * Normalisasi URL Google Drive ke Google CDN cepat (lh3.googleusercontent.com)
+ */
+export function formatDriveImageUrl(url?: string): string {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (trimmed.includes('lh3.googleusercontent.com')) return trimmed;
+
+  const matchFile = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (matchFile && matchFile[1]) {
+    return `https://lh3.googleusercontent.com/d/${matchFile[1]}`;
+  }
+
+  const matchId = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (matchId && matchId[1]) {
+    return `https://lh3.googleusercontent.com/d/${matchId[1]}`;
+  }
+
+  return trimmed;
+}
+
+/**
+ * Kompresi gambar client-side via HTML5 Canvas sebelum diunggah ke Google Drive
+ * Mengurangi ukuran payload dari 5-10MB menjadi ~150-250KB dalam hitungan milidetik.
+ */
+export function compressImage(
+  file: File, 
+  maxWidth: number = 1400, 
+  quality: number = 0.82
+): Promise<{ dataUrl: string; base64: string; mimeType: string }> {
   return new Promise((resolve) => {
-    if (typeof FileReader === 'undefined') return resolve('');
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string) || '');
-    reader.onerror = () => resolve('');
-    reader.readAsDataURL(file);
+    if (typeof window === 'undefined' || !file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const full = (reader.result as string) || '';
+        resolve({
+          dataUrl: full,
+          base64: full.split(',')[1] || full,
+          mimeType: file.type || 'application/octet-stream'
+        });
+      };
+      reader.onerror = () => resolve({ dataUrl: '', base64: '', mimeType: '' });
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const img = new Image();
+    const blobUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(blobUrl);
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const full = (reader.result as string) || '';
+          resolve({ dataUrl: full, base64: full.split(',')[1] || full, mimeType: file.type });
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      const mime = 'image/jpeg';
+      const compressedDataUrl = canvas.toDataURL(mime, quality);
+      resolve({
+        dataUrl: compressedDataUrl,
+        base64: compressedDataUrl.split(',')[1] || '',
+        mimeType: mime
+      });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(blobUrl);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const full = (reader.result as string) || '';
+        resolve({ dataUrl: full, base64: full.split(',')[1] || full, mimeType: file.type });
+      };
+      reader.readAsDataURL(file);
+    };
+    img.src = blobUrl;
   });
 }
 
 export async function uploadFotoKarya(file: File): Promise<string> {
-  const dataUrl = await fileToDataUrl(file);
+  const { dataUrl, base64, mimeType } = await compressImage(file, 1400, 0.82);
   if (!dataUrl) return '';
 
   if (isAppsScriptConfigured) {
     try {
       const admin = await getAdminUser();
-      const token = admin?.token || '';
+      const penulis = await getPenulisUser();
+      const token = admin?.token || penulis?.token || '';
+
       const driveUrl = await callAppsScript<string>(
         'uploadFotoKarya', 
-        [dataUrl, file.name || 'sampul.jpg', file.type || 'image/jpeg', token],
-        'POST'
+        [base64, file.name || 'sampul.jpg', mimeType, token],
+        'POST',
+        30000 // Timeout 30 detik untuk unggahan media
       );
 
       if (driveUrl && typeof driveUrl === 'string' && driveUrl.startsWith('http')) {
-        return driveUrl;
+        return formatDriveImageUrl(driveUrl);
       }
     } catch (e: any) {
       console.warn('[AppsScript Drive] Gagal unggah foto ke Drive, gunakan fallback Data URL:', e?.message || e);
@@ -297,6 +380,7 @@ export interface KaryaInput {
   content: string;
   cover_image_url?: string;
   reading_time?: number;
+  views?: number;
   featured?: boolean;
   status?: 'draft' | 'menunggu_kurasi' | 'published';
   abstract?: string;
@@ -497,6 +581,29 @@ export interface AdminUser {
   role: string;
   token?: string;
   source: 'appsscript' | 'supabase' | 'local';
+}
+
+/**
+ * Tambah counter pembaca (views) karya sastra di database Spreadsheet
+ */
+export async function tambahViewKarya(idOrSlug: string): Promise<number> {
+  if (typeof window === 'undefined' || !idOrSlug) return 0;
+
+  if (isAppsScriptConfigured) {
+    try {
+      const res = await callAppsScript<number>('tambahViewKarya', [idOrSlug], 'POST');
+      if (typeof res === 'number') {
+        localStorage.setItem(`rs_views_${idOrSlug}`, res.toString());
+        return res;
+      }
+    } catch (e) {
+      console.warn('[AppsScript] Gagal tambah views cloud:', e);
+    }
+  }
+
+  const curr = parseInt(localStorage.getItem(`rs_views_${idOrSlug}`) || '0', 10) + 1;
+  localStorage.setItem(`rs_views_${idOrSlug}`, curr.toString());
+  return curr;
 }
 
 export async function getAdminUser(): Promise<AdminUser | null> {
@@ -944,7 +1051,7 @@ export async function getFullData(): Promise<FullDatabaseDump> {
 }
 
 /**
- * Menyimpan quote baru ke Database
+ * Menyimpan quote baru ke Database Google Sheets
  */
 export async function simpanQuote(quote: Omit<QuoteItem, 'id' | 'created_at'> & { id?: string }): Promise<{ success: boolean; message: string }> {
   const id = quote.id || ('q_' + Date.now());
@@ -955,6 +1062,32 @@ export async function simpanQuote(quote: Omit<QuoteItem, 'id' | 'created_at'> & 
     created_at: now
   };
 
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; id: string; message: string }>(
+        'simpanQuote',
+        [newQuote, token],
+        'POST'
+      );
+      if (res && res.success) {
+        if (typeof window !== 'undefined') {
+          const list: QuoteItem[] = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
+          const idx = list.findIndex(q => q.id === id);
+          if (idx >= 0) list[idx] = newQuote;
+          else list.unshift(newQuote);
+          localStorage.setItem('rs_quotes_cache', JSON.stringify(list));
+        }
+        return res;
+      }
+    } catch (e: any) {
+      console.warn('[AppsScript] Gagal simpan quote cloud:', e);
+    }
+  }
+
+  // Fallback LocalStorage
   if (typeof window !== 'undefined') {
     const list: QuoteItem[] = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
     const idx = list.findIndex(q => q.id === id);
@@ -966,13 +1099,37 @@ export async function simpanQuote(quote: Omit<QuoteItem, 'id' | 'created_at'> & 
     localStorage.setItem('rs_quotes_cache', JSON.stringify(list));
   }
 
-  return { success: true, message: 'Kutipan sastra berhasil disimpan!' };
+  return { success: true, message: 'Kutipan sastra berhasil disimpan (lokal)!' };
 }
 
 /**
- * Menghapus quote dari Database
+ * Menghapus quote dari Database Google Sheets
  */
 export async function hapusQuote(id: string): Promise<{ success: boolean; message: string }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string }>(
+        'hapusQuote',
+        [id, token],
+        'POST'
+      );
+      if (res && res.success) {
+        if (typeof window !== 'undefined') {
+          const list: QuoteItem[] = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
+          const filtered = list.filter(q => q.id !== id);
+          localStorage.setItem('rs_quotes_cache', JSON.stringify(filtered));
+        }
+        return res;
+      }
+    } catch (e: any) {
+      console.warn('[AppsScript] Gagal hapus quote cloud:', e);
+    }
+  }
+
+  // Fallback LocalStorage
   if (typeof window !== 'undefined') {
     const list: QuoteItem[] = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
     const filtered = list.filter(q => q.id !== id);
@@ -982,9 +1139,33 @@ export async function hapusQuote(id: string): Promise<{ success: boolean; messag
 }
 
 /**
- * Menghapus komentar pembaca (Moderasi Redaksi)
+ * Menghapus komentar pembaca (Moderasi Redaksi di Google Sheets)
  */
 export async function hapusKomentar(id: string): Promise<{ success: boolean; message: string }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string }>(
+        'hapusKomentar',
+        [id, token],
+        'POST'
+      );
+      if (res && res.success) {
+        if (typeof window !== 'undefined') {
+          const list: KomentarModerasiItem[] = JSON.parse(localStorage.getItem('rs_komentar_cache') || '[]');
+          const filtered = list.filter(k => k.id !== id);
+          localStorage.setItem('rs_komentar_cache', JSON.stringify(filtered));
+        }
+        return res;
+      }
+    } catch (e: any) {
+      console.warn('[AppsScript] Gagal hapus komentar cloud:', e);
+    }
+  }
+
+  // Fallback LocalStorage
   if (typeof window !== 'undefined') {
     const list: KomentarModerasiItem[] = JSON.parse(localStorage.getItem('rs_komentar_cache') || '[]');
     const filtered = list.filter(k => k.id !== id);
@@ -992,4 +1173,138 @@ export async function hapusKomentar(id: string): Promise<{ success: boolean; mes
   }
   return { success: true, message: 'Komentar pembaca berhasil dihapus.' };
 }
+
+// ==========================================================
+// 8. PENGATURAN PORTAL & REDAKSI
+// ==========================================================
+
+export interface PengaturanPortal {
+  nama_portal?: string;
+  edisi?: string;
+  whatsapp?: string;
+  email?: string;
+  status_penerimaan?: string;
+  manifesto?: string;
+  [key: string]: any;
+}
+
+export async function getPengaturan(): Promise<PengaturanPortal> {
+  if (isAppsScriptConfigured) {
+    try {
+      const res = await callAppsScript<PengaturanPortal>('getPengaturan', [], 'GET');
+      if (res && typeof res === 'object') {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rs_pengaturan_cache', JSON.stringify(res));
+        }
+        return res;
+      }
+    } catch (e) {}
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('rs_pengaturan_cache');
+      if (stored) return JSON.parse(stored);
+    } catch {}
+  }
+  return {
+    nama_portal: "Ruang Sastra — SMPI Yambu'ul Qur'an",
+    edisi: "Edisi I — Tahun Akademik 2026/2027",
+    whatsapp: "0815-1577-7911",
+    email: "smpiyaqu@gmail.com",
+    status_penerimaan: "buka",
+    manifesto: "Sastra bukan sekadar rangkaian kata indah di atas kertas, melainkan denyut nurani yang meretas kebekuan peradaban."
+  };
+}
+
+export async function simpanPengaturan(settings: PengaturanPortal): Promise<{ success: boolean; message: string }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string }>(
+        'simpanPengaturan',
+        [settings, token],
+        'POST'
+      );
+      if (res && res.success) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rs_pengaturan_cache', JSON.stringify(settings));
+        }
+        return res;
+      }
+    } catch (e: any) {
+      console.warn('[AppsScript] Gagal simpan pengaturan:', e);
+    }
+  }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('rs_pengaturan_cache', JSON.stringify(settings));
+  }
+  return { success: true, message: 'Pengaturan berhasil disimpan!' };
+}
+
+// ==========================================================
+// 9. UNIVERSAL SHEET CRUD & GOOGLE SCRIPT RUN COMPATIBILITY
+// ==========================================================
+
+export async function saveData(sheetName: string, dataObj: any, rowId?: number | string | null): Promise<any> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript('saveData', [sheetName, dataObj, rowId, token], 'POST');
+      if (res && res.success) return res.data || res;
+    } catch (e) {
+      console.warn(`[AppsScript] Gagal saveData ${sheetName}:`, e);
+    }
+  }
+  return dataObj;
+}
+
+export async function deleteData(sheetName: string, rowId: number | string): Promise<{ success: boolean }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean }>('deleteData', [sheetName, rowId, token], 'POST');
+      if (res && res.success) return res;
+    } catch (e) {
+      console.warn(`[AppsScript] Gagal deleteData ${sheetName}:`, e);
+    }
+  }
+  return { success: true };
+}
+
+/**
+ * googleScriptRun Emulator
+ * Memberikan kompatibilitas API yang sama persis seperti di proyek portal sekolah (smpalmubarokweb)
+ * Pola pemanggilan:
+ * googleScriptRun.withSuccessHandler(cb).withFailureHandler(cb).saveData(...)
+ */
+export const googleScriptRun = {
+  withSuccessHandler(successCb: (result: any) => void) {
+    let failureCb: ((error: any) => void) | null = null;
+    const proxyHandler = {
+      withFailureHandler(failCb: (error: any) => void) {
+        failureCb = failCb;
+        return runner;
+      }
+    };
+    const runner: any = new Proxy(proxyHandler, {
+      get(target, prop: string) {
+        if (prop in target) return (target as any)[prop];
+        return async (...args: any[]) => {
+          try {
+            const res = await callAppsScript(prop, args, 'POST', 30000);
+            if (successCb) successCb(res);
+            return res;
+          } catch (err: any) {
+            if (failureCb) failureCb(err);
+            else console.error(`[googleScriptRun ${prop}] Error:`, err);
+          }
+        };
+      }
+    });
+    return runner;
+  }
+};
 

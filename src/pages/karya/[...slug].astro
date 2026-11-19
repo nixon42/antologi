@@ -88,6 +88,13 @@ const categoryColor =
           {entry.data.readingTime && (
             <span>· ± {entry.data.readingTime} Menit Baca</span>
           )}
+          <span class="inline-flex items-center gap-1 text-[var(--ink-soft)]" id="views-badge" data-karya-id={entry.id}>
+            <svg class="w-3.5 h-3.5 text-[var(--gold)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span id="views-count">Memuat...</span>
+          </span>
         </div>
       </div>
     </header>
@@ -224,6 +231,8 @@ const categoryColor =
   </article>
 
   <script>
+    import { tambahViewKarya } from '../../lib/appsscript';
+
     // Share Buttons Logic
     const copyBtn = document.getElementById('share-copy-btn');
     const waBtn = document.getElementById('share-wa-btn');
@@ -244,6 +253,23 @@ const categoryColor =
       waBtn.addEventListener('click', () => {
         const text = encodeURIComponent(`Mari membaca "${document.title}" di Ruang Sastra SMPI Yambu'ul Qur'an: ${window.location.href}`);
         window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      });
+    }
+
+    // View Counter Logic (Apps Script Backend Sync)
+    const viewsBadge = document.getElementById('views-badge');
+    const viewsCount = document.getElementById('views-count');
+    const karyaId = viewsBadge?.getAttribute('data-karya-id') || window.location.pathname.split('/').filter(Boolean).pop();
+
+    if (karyaId) {
+      tambahViewKarya(karyaId).then((newCount) => {
+        if (viewsCount && newCount > 0) {
+          viewsCount.textContent = `${newCount.toLocaleString('id-ID')} pembaca`;
+        } else if (viewsCount) {
+          viewsCount.textContent = '1 pembaca';
+        }
+      }).catch(() => {
+        if (viewsCount) viewsCount.textContent = 'Dibaca';
       });
     }
   </script>

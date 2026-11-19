@@ -156,6 +156,22 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <span id="sidebar-badge-penulis" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
           </button>
 
+          <button 
+            type="button" 
+            onclick="switchAdminSection('pengaturan')" 
+            id="nav-btn-pengaturan" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-[var(--ink-soft)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Pengaturan Portal</span>
+            </div>
+            <span class="mono text-[0.62rem] text-[var(--gold)]">Cloud</span>
+          </button>
+
           <div class="pt-2">
             <button 
               type="button" 
@@ -222,6 +238,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <option value="komentar">💬 Catatan &amp; Komentar</option>
             <option value="quotes">📜 Quotes &amp; Mutiara</option>
             <option value="penulis">👥 Penulis Santri</option>
+            <option value="pengaturan">⚙️ Pengaturan Portal</option>
           </select>
 
           <div class="hidden md:block">
@@ -429,13 +446,14 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                     <th class="px-4 py-3">Judul Karya</th>
                     <th class="px-4 py-3">Penulis &amp; Kelas</th>
                     <th class="px-4 py-3">Kategori</th>
+                    <th class="px-4 py-3">Pembaca</th>
                     <th class="px-4 py-3">Status</th>
                     <th class="px-4 py-3 text-right">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="karya-table-body" class="divide-y divide-[var(--rule)]">
                   <tr>
-                    <td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+                    <td colspan="7" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
                       Memuat katalog karya...
                     </td>
                   </tr>
@@ -544,6 +562,113 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <!-- SECTION 7: PENGATURAN REDAKSI & PORTAL -->
+        <div id="section-pengaturan" class="admin-section hidden space-y-6">
+          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
+                Pengaturan Redaksi &amp; Portal
+              </h2>
+              <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Konfigurasi portal sekolah langsung tersinkronisasi ke Google Spreadsheet &amp; Apps Script.
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl p-6 shadow-xs max-w-2xl">
+            <form id="form-pengaturan" class="space-y-4">
+              <div>
+                <label class="mono text-[0.68rem] font-bold text-[var(--ink)] uppercase tracking-wider block mb-1">
+                  Nama Portal Publikasi
+                </label>
+                <input 
+                  type="text" 
+                  id="setting-nama-portal" 
+                  class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+                  placeholder="Ruang Sastra — SMPI Yambu'ul Qur'an"
+                />
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="mono text-[0.68rem] font-bold text-[var(--ink)] uppercase tracking-wider block mb-1">
+                    Edisi / Tahun Akademik
+                  </label>
+                  <input 
+                    type="text" 
+                    id="setting-edisi" 
+                    class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+                    placeholder="Edisi I — Tahun Akademik 2026/2027"
+                  />
+                </div>
+                <div>
+                  <label class="mono text-[0.68rem] font-bold text-[var(--ink)] uppercase tracking-wider block mb-1">
+                    Status Penerimaan Naskah
+                  </label>
+                  <select 
+                    id="setting-status-penerimaan" 
+                    class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+                  >
+                    <option value="buka">Buka (Terima Pengiriman Santri)</option>
+                    <option value="tutup">Tutup Sementara</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="mono text-[0.68rem] font-bold text-[var(--ink)] uppercase tracking-wider block mb-1">
+                    WhatsApp Kontak Redaksi
+                  </label>
+                  <input 
+                    type="text" 
+                    id="setting-whatsapp" 
+                    class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+                    placeholder="0815-1577-7911"
+                  />
+                </div>
+                <div>
+                  <label class="mono text-[0.68rem] font-bold text-[var(--ink)] uppercase tracking-wider block mb-1">
+                    Email Redaksi
+                  </label>
+                  <input 
+                    type="email" 
+                    id="setting-email" 
+                    class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+                    placeholder="smpiyaqu@gmail.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="mono text-[0.68rem] font-bold text-[var(--ink)] uppercase tracking-wider block mb-1">
+                  Manifesto Sastra SMPI YQ
+                </label>
+                <textarea 
+                  id="setting-manifesto" 
+                  rows="3" 
+                  class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)] leading-relaxed"
+                  placeholder="Tuliskan visi & manifesto kepenulisan santri..."
+                ></textarea>
+              </div>
+
+              <div class="pt-2 flex items-center justify-between gap-4">
+                <span id="setting-save-status" class="mono text-xs text-[var(--ink-soft)]"></span>
+                <button 
+                  type="submit" 
+                  id="btn-save-pengaturan" 
+                  class="px-5 py-2.5 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-['Fraunces',serif] font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span>Simpan Pengaturan Portal</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -854,6 +979,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       simpanQuote, 
       hapusQuote, 
       hapusKomentar,
+      getPengaturan,
+      simpanPengaturan,
+      formatDriveImageUrl,
       type KaryaInput,
       type FullDatabaseDump 
     } from '../../lib/supabase';
@@ -937,6 +1065,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         renderKomentarList();
         renderQuotesGrid();
         renderPenulisList();
+        await loadPengaturanData();
       } catch (err) {
         console.warn('Gagal memuat database cloud:', err);
       } finally {
@@ -970,7 +1099,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     // 4. Section Switcher (like smpalmubarokweb)
     function switchAdminSection(sectionKey: string) {
-      const sections = ['ringkasan', 'kurasi', 'karya', 'komentar', 'quotes', 'penulis'];
+      const sections = ['ringkasan', 'kurasi', 'karya', 'komentar', 'quotes', 'penulis', 'pengaturan'];
       const titles: Record<string, string> = {
         ringkasan: 'Ringkasan & Statistik',
         kurasi: 'Antrean Kurasi Naskah Masuk',
@@ -978,6 +1107,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         komentar: 'Moderasi Catatan & Komentar',
         quotes: 'Quotes & Mutiara Sastra',
         penulis: 'Direktori Penulis Santri',
+        pengaturan: 'Pengaturan Redaksi & Portal',
       };
 
       sections.forEach(k => {
@@ -1207,7 +1337,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       }
 
       if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Tidak ada karya yang sesuai dengan filter.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Tidak ada karya yang sesuai dengan filter.</td></tr>';
         return;
       }
 
@@ -1221,8 +1351,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-amber-100 text-amber-800">Draf</span>';
         }
 
-        const coverImg = k.cover_image_url 
-          ? `<img src="${k.cover_image_url}" class="w-9 h-9 rounded object-cover border border-[var(--rule)]" alt="Sampul" />`
+        const formattedImgUrl = k.cover_image_url ? formatDriveImageUrl(k.cover_image_url) : '';
+        const coverImg = formattedImgUrl 
+          ? `<img src="${formattedImgUrl}" class="w-9 h-9 rounded object-cover border border-[var(--rule)]" alt="Sampul" />`
           : `<div class="w-9 h-9 rounded bg-[var(--paper-deep)] border border-[var(--rule)] flex items-center justify-center mono text-[0.55rem] text-[var(--ink-faint)]">N/A</div>`;
 
         return `
@@ -1242,6 +1373,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               <span class="mono text-[0.65rem] px-2 py-0.5 rounded border border-[var(--rule)] text-[var(--ink-soft)] uppercase">
                 ${k.category_label || k.category}
               </span>
+            </td>
+            <td class="px-4 py-3 mono text-xs font-semibold text-[var(--ink)]">
+              👁️ ${(k.views || 0).toLocaleString('id-ID')}
             </td>
             <td class="px-4 py-3">${statusBadge}</td>
             <td class="px-4 py-3 text-right whitespace-nowrap">
@@ -1529,7 +1663,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     function updateCoverPreview(url?: string) {
       if (!coverPreviewBox) return;
       if (url) {
-        coverPreviewBox.innerHTML = `<img src="${url}" class="w-full h-full object-cover" alt="Sampul" />`;
+        const directUrl = formatDriveImageUrl(url);
+        coverPreviewBox.innerHTML = `<img src="${directUrl}" class="w-full h-full object-cover" alt="Sampul" />`;
       } else {
         coverPreviewBox.innerHTML = '<span class="mono text-[0.6rem] text-[var(--ink-faint)]">Foto</span>';
       }
@@ -1667,6 +1802,68 @@ ${formContent.value}
 
       closeQuoteModal();
       await loadAllAdminData();
+    });
+
+    // 15. Pengaturan Redaksi & Portal
+    async function loadPengaturanData() {
+      try {
+        const settings = await getPengaturan();
+        if (settings) {
+          const namaEl = document.getElementById('setting-nama-portal') as HTMLInputElement;
+          const edisiEl = document.getElementById('setting-edisi') as HTMLInputElement;
+          const statusEl = document.getElementById('setting-status-penerimaan') as HTMLSelectElement;
+          const waEl = document.getElementById('setting-whatsapp') as HTMLInputElement;
+          const emailEl = document.getElementById('setting-email') as HTMLInputElement;
+          const manifestoEl = document.getElementById('setting-manifesto') as HTMLTextAreaElement;
+
+          if (namaEl && settings.nama_portal) namaEl.value = settings.nama_portal;
+          if (edisiEl && settings.edisi) edisiEl.value = settings.edisi;
+          if (statusEl && settings.status_penerimaan) statusEl.value = settings.status_penerimaan;
+          if (waEl && settings.whatsapp) waEl.value = settings.whatsapp;
+          if (emailEl && settings.email) emailEl.value = settings.email;
+          if (manifestoEl && settings.manifesto) manifestoEl.value = settings.manifesto;
+        }
+      } catch (err) {
+        console.warn('Gagal memuat pengaturan:', err);
+      }
+    }
+    (window as any).loadPengaturanData = loadPengaturanData;
+
+    document.getElementById('form-pengaturan')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusSpan = document.getElementById('setting-save-status');
+      const btn = document.getElementById('btn-save-pengaturan') as HTMLButtonElement;
+      if (btn) btn.disabled = true;
+      if (statusSpan) {
+        statusSpan.textContent = 'Menyimpan ke Google Sheets...';
+        statusSpan.className = 'mono text-xs text-[var(--gold)]';
+      }
+
+      const payload = {
+        nama_portal: (document.getElementById('setting-nama-portal') as HTMLInputElement)?.value || '',
+        edisi: (document.getElementById('setting-edisi') as HTMLInputElement)?.value || '',
+        status_penerimaan: (document.getElementById('setting-status-penerimaan') as HTMLSelectElement)?.value || 'buka',
+        whatsapp: (document.getElementById('setting-whatsapp') as HTMLInputElement)?.value || '',
+        email: (document.getElementById('setting-email') as HTMLInputElement)?.value || '',
+        manifesto: (document.getElementById('setting-manifesto') as HTMLTextAreaElement)?.value || '',
+      };
+
+      try {
+        await simpanPengaturan(payload);
+        if (statusSpan) {
+          statusSpan.textContent = '✓ Pengaturan berhasil disimpan!';
+          statusSpan.className = 'mono text-xs text-emerald-700 font-bold';
+          setTimeout(() => { if (statusSpan) statusSpan.textContent = ''; }, 3000);
+        }
+        confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 } });
+      } catch (err: any) {
+        if (statusSpan) {
+          statusSpan.textContent = 'Gagal menyimpan: ' + (err.message || 'Error');
+          statusSpan.className = 'mono text-xs text-rose-700';
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     });
   </script>
 </Layout>
