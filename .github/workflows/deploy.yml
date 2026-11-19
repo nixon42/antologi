@@ -35,7 +35,7 @@ jobs:
         env:
           # Custom domain serves at root /
           BASE_PATH: ${{ secrets.BASE_PATH || '/' }}
-          PUBLIC_APPS_SCRIPT_URL: ${{ secrets.PUBLIC_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxQPg1d44-v6uS6R_cLjfVjki-PpWkKT8-VUrqz8t9yWuniNr1e8GJVewmNBTa-JqbZ8g/exec' }}
+          PUBLIC_APPS_SCRIPT_URL: ${{ secrets.PUBLIC_APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbygPZUVSwaoblyQOPlQOYeSPfPkWrgpD5oYe3BLbnDDGyMVS9KjtaJ4v1FMjPyWdOav/exec' }}
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL || 'https://qghplpukecnnihklvrnh.supabase.co' }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnaHBscHVrZWNubmloa2x2cm5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0Nzc5ODksImV4cCI6MjEwODA1Mzk4OX0.w4oafFLvqogvkN1RCkIIiFopuWR2NA-WKhCgDovfyt0' }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://qghplpukecnnihklvrnh.supabase.co' }}

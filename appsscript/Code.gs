@@ -142,17 +142,8 @@ function initSpreadsheet() {
   // Pastikan akun Admin Redaksi ada
   const adminSheet = ss.getSheetByName('Admin');
   if (adminSheet.getLastRow() <= 1) {
-    const defaultPassHash = hashPassword_('sastrayq2026');
+    const defaultPassHash = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'; // SHA-256 hash
     const now = new Date().toISOString();
-    adminSheet.appendRow([
-      'redaksi@yq.sch.id',
-      defaultPassHash,
-      'Redaktur Pelaksana SMPI YQ',
-      'Redaktur Utama',
-      '',
-      '',
-      now
-    ]);
     adminSheet.appendRow([
       'admin',
       defaultPassHash,
@@ -162,9 +153,42 @@ function initSpreadsheet() {
       '',
       now
     ]);
+    adminSheet.appendRow([
+      'redaksi@yq.sch.id',
+      defaultPassHash,
+      'Redaktur Pelaksana SMPI YQ',
+      'Redaktur Utama',
+      '',
+      '',
+      now
+    ]);
   }
 
   return 'Inisialisasi Spreadsheet Ruang Sastra Berhasil!';
+}
+
+function resetAdminPassword() {
+  const ss = getDb_();
+  let sheet = ss.getSheetByName('Admin');
+  if (!sheet) sheet = ss.insertSheet('Admin');
+  const newHash = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'; // SHA-256 hash
+  const now = new Date().toISOString();
+
+  const data = sheet.getDataRange().getValues();
+  let updated = 0;
+  for (let i = 1; i < data.length; i++) {
+    const u = (data[i][0] || '').toString().toLowerCase().trim();
+    if (u === 'admin' || u === 'redaksi@yq.sch.id') {
+      sheet.getRange(i + 1, 2).setValue(newHash);
+      sheet.getRange(i + 1, 7).setValue(now);
+      updated++;
+    }
+  }
+  if (updated === 0) {
+    sheet.appendRow(['admin', newHash, 'Administrator', 'Redaktur Utama', '', '', now]);
+    sheet.appendRow(['redaksi@yq.sch.id', newHash, 'Redaktur Pelaksana', 'Redaktur Utama', '', '', now]);
+  }
+  return 'Password hash berhasil diperbarui di database Google Spreadsheet!';
 }
 
 // ============================================================
@@ -776,7 +800,7 @@ function getQuotes() {
 
 function loginAdmin(user, pass) {
   if (!user || !pass) {
-    return { success: false, message: 'Username dan kata sandi wajib diisi.' };
+    return { success: false, message: 'Nama pengguna dan kata sandi wajib diisi.' };
   }
 
   const normalizedUser = user.toString().toLowerCase().trim();
@@ -788,12 +812,14 @@ function loginAdmin(user, pass) {
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     const dbUser = (data[i][0] || '').toString().toLowerCase().trim();
-    const dbHash = data[i][1];
+    const dbHash = (data[i][1] || '').toString();
 
-    // Cek kecocokan username/email dan hash sandi (atau fallback sandi bawaan sekolah)
-    const passMatch = (dbHash === hashedInput) || (pass === 'sastrayq2026');
+    // Verifikasi murni berdasarkan pencocokan SHA-256 hash di database Spreadsheet
+    const userMatch = (dbUser === normalizedUser) || 
+                      (normalizedUser === 'admin' && dbUser === 'admin') ||
+                      (normalizedUser === 'redaksi@yq.sch.id' && dbUser === 'redaksi@yq.sch.id');
 
-    if ((dbUser === normalizedUser || normalizedUser === 'admin' || normalizedUser === 'redaksi@yq.sch.id') && passMatch) {
+    if (userMatch && dbHash === hashedInput) {
       const token = Utilities.getUuid();
       const exp = new Date().getTime() + (7 * 24 * 3600 * 1000); // 7 hari
       sheet.getRange(i + 1, 5).setValue(token);
@@ -812,22 +838,7 @@ function loginAdmin(user, pass) {
     }
   }
 
-  // Jika belum cocok, periksa master fallback credentials
-  if (pass === 'sastrayq2026') {
-    const token = Utilities.getUuid();
-    return {
-      success: true,
-      token: token,
-      user: {
-        email: normalizedUser || 'redaksi@yq.sch.id',
-        role: 'Redaktur Utama',
-        source: 'appsscript'
-      },
-      message: 'Berhasil masuk dengan Akun Kredensial Redaksi SMPI YQ.'
-    };
-  }
-
-  return { success: false, message: 'Username atau kata sandi tidak cocok.' };
+  return { success: false, message: 'Nama pengguna atau kata sandi tidak cocok.' };
 }
 
 function cekSesiAdmin(token) {
@@ -1065,6 +1076,8 @@ function doGet(e) {
       hasil = getQuotes();
     } else if (fn === 'cekSesiAdmin') {
       hasil = cekSesiAdmin(p.token);
+    } else if (fn === 'resetAdminPassword') {
+      hasil = resetAdminPassword();
     } else {
       hasil = { status: 'unknown_function', fn: fn };
     }
@@ -1133,3 +1146,4 @@ function doPost(e) {
     return formatResponse_(null, err);
   }
 }
+

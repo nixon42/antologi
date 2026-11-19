@@ -526,7 +526,7 @@ export async function loginAdmin(
 ): Promise<{ success: boolean; user?: AdminUser; message: string }> {
   const normalizedEmail = email.trim().toLowerCase();
 
-  // 1. Coba login via Google Apps Script Backend
+  // Autentikasi aman melalui Google Apps Script Cloud Backend
   if (isAppsScriptConfigured) {
     try {
       const res = await callAppsScript<{ success: boolean; token?: string; user?: any; message?: string }>(
@@ -550,37 +550,24 @@ export async function loginAdmin(
           user, 
           message: res.message || 'Berhasil masuk ke Studio Redaksi via Google Apps Script DB!' 
         };
+      } else if (res && !res.success) {
+        return {
+          success: false,
+          message: res.message || 'Nama pengguna atau kata sandi tidak cocok. Silakan periksa kembali.',
+        };
       }
     } catch (e: any) {
       console.warn('[AppsScript] Gagal login online:', e);
+      return {
+        success: false,
+        message: 'Gagal terhubung ke server autentikasi. Pastikan koneksi internet aktif.',
+      };
     }
-  }
-
-  // 2. Zero-Fragility Fallback: Akun Redaksi Bawaan Sekolah (SMPI YQ)
-  const validLocalAdmins = [
-    'redaksi@yq.sch.id',
-    'admin@yq.sch.id',
-    'sastra@yq.sch.id',
-    'santri@yq.sch.id',
-    'admin'
-  ];
-
-  if ((validLocalAdmins.includes(normalizedEmail) && password === 'sastrayq2026') || (password === 'sastrayq2026')) {
-    const user: AdminUser = {
-      email: normalizedEmail || 'redaksi@yq.sch.id',
-      role: 'Redaktur Utama',
-      token: 'local_token_' + Date.now(),
-      source: 'local',
-    };
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('rs_admin_session', JSON.stringify(user));
-    }
-    return { success: true, user, message: 'Berhasil masuk dengan Akun Kredensial Redaksi SMPI YQ.' };
   }
 
   return {
     success: false,
-    message: 'Email atau kata sandi tidak cocok. Silakan periksa kembali email dan kata sandi Anda.',
+    message: 'Layanan autentikasi backend belum terkonfigurasi.',
   };
 }
 
