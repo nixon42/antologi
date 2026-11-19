@@ -8,6 +8,7 @@ categoryLabel: "Karya Tulis Ilmiah"
 tags: ["Semiotika", "Karya Tulis Ilmiah", "Puisi", "Sastra Santri", "Linguistik"]
 publishDate: 2026-08-15
 featured: true
+coverImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80"
 readingTime: 9
 abstract: "Penelitian ini mengkaji struktur semiotika puisi karya siswa SMPI Yambu'ul Qur'an dengan menerapkan teori Semiotika Michael Riffaterre. Masalah utama yang diteliti adalah bagaimana ketaklangsungan ekspresi (displacing, distorting, dan creating of meaning) terbangun serta bagaimana model dan varian berkonvergensi pada satu matriks sentral spiritualitas. Menggunakan metode kualitatif deskriptif analitis, ditemukan bahwa metafora sufistik dan lanskap pesantren menjadi piranti dominan dalam menghasilkan makna puitik yang transendental namun kontekstual terhadap realitas sosial modern."
 abstractEn: "This study examines the semiotic structure of poetry authored by students of SMPI Yambu'ul Qur'an using Michael Riffaterre's semiotic theory. The central research questions address the indirectness of poetic expression—encompassing displacing, distorting, and creating of meaning—and the convergence of models and variants toward a unifying transcendental matrix. Utilizing a qualitative descriptive-analytical method, the findings reveal that mystical metaphors and Islamic boarding school motifs serve as primary instruments bridging spiritual tradition with contemporary adolescent experiences."

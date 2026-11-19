@@ -8,6 +8,7 @@ categoryLabel: "Naskah Drama"
 tags: ["Naskah Drama", "Teater", "Lakon", "Panggung Sastra"]
 publishDate: 2026-09-18
 featured: true
+coverImage: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=1200&q=80"
 readingTime: 8
 characters:
   - "MALIK (16 tahun) — Santri tingkat akhir, gemar membaca naskah teater, memendam impian menjadi sastrawan."

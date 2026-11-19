@@ -8,6 +8,7 @@ categoryLabel: "Puisi & Prosa"
 tags: ["Puisi", "Sajak", "Refleksi", "Karya Pilihan"]
 publishDate: 2026-09-02
 featured: true
+coverImage: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&q=80"
 readingTime: 3
 verseForm: "Puisi Liris Berbait"
 audioUrl: "https://ia800905.us.archive.org/19/items/audio-poetry-sample/poetry-ambient.mp3"

@@ -8,6 +8,7 @@ categoryLabel: "Cerpen"
 tags: ["Cerpen", "Persahabatan", "Kisah Santri", "Karya Pilihan"]
 publishDate: 2026-09-10
 featured: true
+coverImage: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&q=80"
 readingTime: 6
 ---
 

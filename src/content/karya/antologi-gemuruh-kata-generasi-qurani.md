@@ -8,6 +8,7 @@ categoryLabel: "Antologi"
 tags: ["Antologi", "Kumpulan Karya", "Buku Sastra", "Karya Bersama"]
 publishDate: 2026-08-20
 featured: true
+coverImage: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80"
 readingTime: 12
 volume: "Jilid I — Edisi Perdana"
 curator: "Ustazah Nurul Hidayah, S.S. & Tim Bahasa SMPI YQ"

@@ -4,6 +4,7 @@ import AudioPlayer from '../../components/AudioPlayer.astro';
 import ApresiasiButton from '../../components/ApresiasiButton.astro';
 import KomentarSection from '../../components/KomentarSection.astro';
 import { getCollection, render } from 'astro:content';
+import { formatDriveImageUrl } from '../../lib/appsscript';
 
 export async function getStaticPaths() {
   const karyaEntries = await getCollection('karya');
@@ -98,6 +99,26 @@ const categoryColor =
         </div>
       </div>
     </header>
+
+    <!-- Featured Archival Cover Plate (Plat Sampul Naskah) -->
+    {entry.data.coverImage && (
+      <div class="reading-well mb-10">
+        <figure class="m-0 p-1.5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xs shadow-xs">
+          <div class="relative aspect-[16/9] sm:aspect-[21/9] md:aspect-[2/1] overflow-hidden rounded-[1px] bg-[var(--paper-deep)]">
+            <img 
+              src={formatDriveImageUrl(entry.data.coverImage)} 
+              alt={`Sampul ${entry.data.title}`}
+              class="w-full h-full object-cover sepia-[0.06] contrast-[1.02]"
+            />
+            <div class="absolute inset-0 bg-radial from-transparent to-black/15 pointer-events-none mix-blend-multiply opacity-40"></div>
+          </div>
+          <figcaption class="mt-2 px-1 flex items-center justify-between text-[0.68rem] mono text-[var(--ink-faint)]">
+            <span>Plat Sampul &amp; Ilustrasi Naskah · Dok. Ruang Sastra SMPI YQ</span>
+            <span class="text-[var(--gold)]">❧</span>
+          </figcaption>
+        </figure>
+      </div>
+    )}
 
     <!-- SPECIFIC CATEGORY FEATURE BLOCKS -->
 

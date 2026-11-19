@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import QuoteCard from '../components/QuoteCard.astro';
 import { getCollection } from 'astro:content';
+import { formatDriveImageUrl } from '../lib/appsscript';
 
 const allKarya = await getCollection('karya');
 const featuredKarya = allKarya.filter(k => k.data.featured).slice(0, 4);
@@ -183,42 +184,67 @@ const countAntologi = allKarya.filter(k => k.data.category === 'antologi').lengt
               </span>
 
               <!-- Content Summary -->
-              <div>
-                <div class="flex items-baseline gap-2.5 flex-wrap mb-1">
-                  <h3 class="font-['Fraunces',serif] font-semibold text-lg md:text-xl text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors m-0">
-                    <a href={`${basePath}/karya/${item.id}`} class="no-underline">
-                      {item.data.title}
-                    </a>
-                  </h3>
-                  <span class={`mono text-[0.72rem] italic font-medium ${
-                    item.data.category === 'puisi' ? 'text-[var(--crimson)]' :
-                    item.data.category === 'cerpen' ? 'text-[var(--sage)]' :
-                    item.data.category === 'ilmiah' ? 'text-[var(--gold)]' :
-                    'text-[var(--ink-faint)]'
-                  }`}>
-                    {item.data.categoryLabel}
-                  </span>
-                </div>
+              <div class="min-w-0">
+                <div class="flex flex-col md:flex-row gap-5 lg:gap-6 items-start justify-between">
+                  <div class="flex-1 min-w-0 order-2 md:order-1">
+                    <div class="flex items-baseline gap-2.5 flex-wrap mb-1">
+                      <h3 class="font-['Fraunces',serif] font-semibold text-lg md:text-xl text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors m-0">
+                        <a href={`${basePath}/karya/${item.id}`} class="no-underline">
+                          {item.data.title}
+                        </a>
+                      </h3>
+                      <span class={`mono text-[0.72rem] italic font-medium ${
+                        item.data.category === 'puisi' ? 'text-[var(--crimson)]' :
+                        item.data.category === 'cerpen' ? 'text-[var(--sage)]' :
+                        item.data.category === 'ilmiah' ? 'text-[var(--gold)]' :
+                        'text-[var(--ink-faint)]'
+                      }`}>
+                        {item.data.categoryLabel}
+                      </span>
+                    </div>
 
-                <p class="mono text-xs text-[var(--ink-faint)] m-0 mb-2.5 flex items-center gap-2 flex-wrap">
-                  <span>{item.data.author} {item.data.authorGrade ? `— ${item.data.authorGrade}` : ''}</span>
-                  <span class="inline-flex items-center gap-1 text-[var(--ink-soft)]" data-views-slug={item.id}>
-                    <svg class="w-3.5 h-3.5 text-[var(--gold)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span class="karya-views-num">...</span>
-                  </span>
-                </p>
+                    <p class="mono text-xs text-[var(--ink-faint)] m-0 mb-2.5 flex items-center gap-2 flex-wrap">
+                      <span>{item.data.author} {item.data.authorGrade ? `— ${item.data.authorGrade}` : ''}</span>
+                      <span class="inline-flex items-center gap-1 text-[var(--ink-soft)]" data-views-slug={item.id}>
+                        <svg class="w-3.5 h-3.5 text-[var(--gold)]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span class="karya-views-num">...</span>
+                      </span>
+                    </p>
 
-                <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] m-0 pl-3.5 border-l border-[var(--rule-strong)] leading-relaxed">
-                  "{item.data.description}"
-                </p>
+                    <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] m-0 pl-3.5 border-l border-[var(--rule-strong)] leading-relaxed">
+                      "{item.data.description}"
+                    </p>
 
-                <div class="mt-3">
-                  <a href={`${basePath}/karya/${item.id}`} class="mono text-xs text-[var(--crimson)] hover:underline inline-flex items-center gap-1 font-medium">
-                    Baca selengkapnya <span>→</span>
-                  </a>
+                    <div class="mt-3">
+                      <a href={`${basePath}/karya/${item.id}`} class="mono text-xs text-[var(--crimson)] hover:underline inline-flex items-center gap-1 font-medium">
+                        Baca selengkapnya <span>→</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Cover Plate Thumbnail -->
+                  {item.data.coverImage && (
+                    <div class="w-full sm:w-40 md:w-36 lg:w-48 flex-shrink-0 self-start order-1 md:order-2">
+                      <a 
+                        href={`${basePath}/karya/${item.id}`}
+                        class="block relative group/thumb overflow-hidden rounded-xs border border-[var(--rule-strong)] bg-[var(--paper-deep)] p-1 shadow-2xs hover:border-[var(--crimson)] transition-all duration-300"
+                        aria-label={`Buka naskah: ${item.data.title}`}
+                      >
+                        <div class="relative aspect-[16/10] sm:aspect-[4/3] overflow-hidden rounded-[1px] bg-[var(--paper)]">
+                          <img 
+                            src={formatDriveImageUrl(item.data.coverImage)} 
+                            alt={`Sampul ${item.data.title}`}
+                            class="w-full h-full object-cover sepia-[0.08] contrast-[1.02] group-hover/thumb:sepia-0 group-hover/thumb:scale-105 group-hover:scale-105 transition-all duration-500 ease-out"
+                            loading="lazy"
+                          />
+                          <div class="absolute inset-0 bg-radial from-transparent to-black/15 pointer-events-none mix-blend-multiply opacity-50"></div>
+                        </div>
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             </article>
