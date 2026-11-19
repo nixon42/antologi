@@ -1717,6 +1717,19 @@ function doGet(e) {
       hasil = getPengaturan();
     } else if (fn === 'resetAdminPassword') {
       hasil = resetAdminPassword();
+    } else if (fn === 'loginAdmin') {
+      let u = p.user || p.username || p.email;
+      let pass = p.pass || p.password;
+      if (!u && p.args) {
+        try {
+          const parsedArgs = typeof p.args === 'string' ? JSON.parse(p.args) : p.args;
+          if (Array.isArray(parsedArgs)) {
+            u = parsedArgs[0];
+            pass = parsedArgs[1];
+          }
+        } catch (ex) {}
+      }
+      hasil = loginAdmin(u, pass);
     } else {
       hasil = { status: 'unknown_function', fn: fn };
     }

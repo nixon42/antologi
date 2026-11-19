@@ -380,16 +380,38 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
           <!-- Recently Published Works -->
           <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-sm overflow-hidden">
-            <div class="p-4 border-b border-[var(--rule)] flex items-center justify-between">
-              <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
-                Karya Sastra Terpublikasi Terbaru
-              </h3>
+            <div class="p-4 border-b border-[var(--rule)] flex items-center justify-between gap-2 flex-wrap">
+              <div class="flex items-center gap-2">
+                <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+                  Karya Sastra Terpublikasi Terbaru
+                </h3>
+                <span id="overview-published-total-badge" class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)] border border-[var(--rule)] font-semibold">0</span>
+              </div>
               <button onclick="switchAdminSection('karya')" class="mono text-xs text-[var(--crimson)] hover:underline font-semibold cursor-pointer">
                 Kelola Semua Karya →
               </button>
             </div>
-            <div id="overview-published-container" class="divide-y divide-[var(--rule)]">
+            
+            <div id="overview-published-container" class="divide-y divide-[var(--rule)] min-h-[120px]">
               <p class="p-6 text-center mono text-xs text-[var(--ink-faint)] italic">Memuat karya terpublikasi...</p>
+            </div>
+
+            <!-- Overview Pagination Bar -->
+            <div id="overview-published-pagination" class="hidden p-3 bg-[var(--paper-deep)]/40 border-t border-[var(--rule)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mono">
+              <div class="flex items-center gap-2 text-[var(--ink-soft)] text-[0.72rem] flex-wrap">
+                <span id="overview-pub-page-info">Menampilkan 0 dari 0 karya</span>
+                <span class="text-[var(--rule-strong)]">•</span>
+                <label for="overview-pub-per-page" class="text-[var(--ink-faint)]">Per hal:</label>
+                <select id="overview-pub-per-page" onchange="changeOverviewPubPerPage(this.value)" class="bg-[var(--paper)] border border-[var(--rule-strong)] rounded px-1.5 py-0.5 text-xs text-[var(--ink)] outline-none cursor-pointer">
+                  <option value="5" selected>5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="all">Semua</option>
+                </select>
+              </div>
+              <div id="overview-pub-nav" class="flex items-center gap-1 self-end sm:self-auto flex-wrap">
+                <!-- Dynamically rendered -->
+              </div>
             </div>
           </div>
 
@@ -782,12 +804,12 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                 type="search" 
                 id="search-karya" 
                 placeholder="Cari judul / penulis..." 
-                oninput="renderKaryaCatalog()"
+                oninput="renderKaryaCatalog(true)"
                 class="px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
               />
               <select 
                 id="filter-karya-kategori" 
-                onchange="renderKaryaCatalog()"
+                onchange="renderKaryaCatalog(true)"
                 class="px-2.5 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs mono text-[var(--ink)] outline-none"
               >
                 <option value="all">Semua Kategori</option>
@@ -799,7 +821,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               </select>
               <select 
                 id="filter-karya-status" 
-                onchange="renderKaryaCatalog()"
+                onchange="renderKaryaCatalog(true)"
                 class="px-2.5 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs mono text-[var(--ink)] outline-none"
               >
                 <option value="all">Semua Status</option>
@@ -833,6 +855,24 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Catalog Pagination Bar -->
+            <div id="karya-catalog-pagination" class="hidden p-3 bg-[var(--paper-deep)]/40 border-t border-[var(--rule)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs mono">
+              <div class="flex items-center gap-2 text-[var(--ink-soft)] text-[0.72rem] flex-wrap">
+                <span id="karya-catalog-page-info">Menampilkan 0 dari 0 karya</span>
+                <span class="text-[var(--rule-strong)]">•</span>
+                <label for="karya-catalog-per-page" class="text-[var(--ink-faint)]">Per hal:</label>
+                <select id="karya-catalog-per-page" onchange="changeKaryaCatalogPerPage(this.value)" class="bg-[var(--paper)] border border-[var(--rule-strong)] rounded px-1.5 py-0.5 text-xs text-[var(--ink)] outline-none cursor-pointer">
+                  <option value="10" selected>10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="all">Semua</option>
+                </select>
+              </div>
+              <div id="karya-catalog-nav" class="flex items-center gap-1 self-end sm:self-auto flex-wrap">
+                <!-- Dynamically rendered -->
+              </div>
             </div>
           </div>
         </div>
@@ -1574,18 +1614,68 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       `).join('');
     }
 
-    // 6. Render Overview Recently Published
+    // Helper: Build Pagination Range with Ellipsis
+    function getPaginationRange(current: number, total: number): (number | string)[] {
+      if (total <= 7) {
+        return Array.from({ length: total }, (_, i) => i + 1);
+      }
+      if (current <= 3) {
+        return [1, 2, 3, 4, '...', total];
+      }
+      if (current >= total - 2) {
+        return [1, '...', total - 3, total - 2, total - 1, total];
+      }
+      return [1, '...', current - 1, current, current + 1, '...', total];
+    }
+
+    // Pagination state for Overview Published Works
+    let overviewPubPage = 1;
+    let overviewPubPerPage = 5;
+
+    (window as any).changeOverviewPubPerPage = function(val: string) {
+      overviewPubPerPage = val === 'all' ? 999999 : (parseInt(val, 10) || 5);
+      overviewPubPage = 1;
+      renderOverviewPublished();
+    };
+
+    (window as any).goToOverviewPubPage = function(page: number) {
+      overviewPubPage = page;
+      renderOverviewPublished();
+    };
+
+    // 6. Render Overview Recently Published (with Interactive Pagination)
     function renderOverviewPublished() {
       const container = document.getElementById('overview-published-container');
+      const badgeTotal = document.getElementById('overview-published-total-badge');
+      const paginationBar = document.getElementById('overview-published-pagination');
+      const pageInfo = document.getElementById('overview-pub-page-info');
+      const pageNav = document.getElementById('overview-pub-nav');
       if (!container) return;
-      const published = fullDb.karya.filter(k => k.status === 'published');
 
-      if (published.length === 0) {
+      const published = fullDb.karya.filter(k => k.status === 'published');
+      const totalItems = published.length;
+      if (badgeTotal) badgeTotal.textContent = totalItems.toString();
+
+      if (totalItems === 0) {
         container.innerHTML = '<div class="p-6 text-center text-xs mono text-[var(--ink-faint)] italic">Belum ada karya yang terpublikasi.</div>';
+        if (paginationBar) paginationBar.classList.add('hidden');
         return;
       }
 
-      container.innerHTML = published.slice(0, 5).map(k => `
+      if (paginationBar) paginationBar.classList.remove('hidden');
+
+      const isAll = (overviewPubPerPage >= 999999);
+      const perPage = isAll ? totalItems : overviewPubPerPage;
+      const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+
+      if (overviewPubPage < 1) overviewPubPage = 1;
+      if (overviewPubPage > totalPages) overviewPubPage = totalPages;
+
+      const startIndex = (overviewPubPage - 1) * perPage;
+      const endIndex = Math.min(startIndex + perPage, totalItems);
+      const pageItems = published.slice(startIndex, endIndex);
+
+      container.innerHTML = pageItems.map(k => `
         <div class="p-4 flex items-center justify-between gap-3 hover:bg-[var(--paper-deep)]/50 transition-colors">
           <div class="min-w-0">
             <span class="mono text-[0.62rem] text-[var(--gold)] uppercase font-semibold">
@@ -1598,7 +1688,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               Oleh ${k.author}
             </p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-shrink-0">
             <a 
               href="${basePath}/karya/${k.slug}" 
               target="_blank" 
@@ -1619,6 +1709,75 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
         </div>
       `).join('');
+
+      // Update Page Info
+      if (pageInfo) {
+        if (isAll) {
+          pageInfo.textContent = `Menampilkan semua ${totalItems} karya`;
+        } else {
+          pageInfo.textContent = `Menampilkan ${startIndex + 1}–${endIndex} dari ${totalItems} karya`;
+        }
+      }
+
+      // Render Pagination Buttons
+      if (pageNav) {
+        if (totalPages <= 1) {
+          pageNav.innerHTML = '';
+          return;
+        }
+
+        let navHtml = '';
+        const prevDisabled = overviewPubPage <= 1;
+        navHtml += `
+          <button type="button" onclick="goToOverviewPubPage(${overviewPubPage - 1})"
+                  ${prevDisabled ? 'disabled' : ''}
+                  class="px-2 py-1 text-xs rounded border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] disabled:opacity-30 disabled:pointer-events-none transition flex items-center gap-1 cursor-pointer font-medium"
+                  title="Halaman Sebelumnya">
+            <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span class="hidden sm:inline">Sebelumnya</span>
+          </button>
+        `;
+
+        const pages = getPaginationRange(overviewPubPage, totalPages);
+        pages.forEach(p => {
+          if (p === '...') {
+            navHtml += `<span class="px-1.5 py-0.5 text-xs text-[var(--ink-faint)] select-none">…</span>`;
+          } else {
+            const isActive = (p === overviewPubPage);
+            if (isActive) {
+              navHtml += `
+                <button type="button" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded bg-[var(--crimson)] text-[var(--paper)] shadow-2xs select-none">
+                  ${p}
+                </button>
+              `;
+            } else {
+              navHtml += `
+                <button type="button" onclick="goToOverviewPubPage(${p})"
+                        class="w-7 h-7 flex items-center justify-center text-xs font-medium rounded border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] transition cursor-pointer select-none">
+                  ${p}
+                </button>
+              `;
+            }
+          }
+        });
+
+        const nextDisabled = overviewPubPage >= totalPages;
+        navHtml += `
+          <button type="button" onclick="goToOverviewPubPage(${overviewPubPage + 1})"
+                  ${nextDisabled ? 'disabled' : ''}
+                  class="px-2 py-1 text-xs rounded border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] disabled:opacity-30 disabled:pointer-events-none transition flex items-center gap-1 cursor-pointer font-medium"
+                  title="Halaman Selanjutnya">
+            <span class="hidden sm:inline">Selanjutnya</span>
+            <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        `;
+
+        pageNav.innerHTML = navHtml;
+      }
     }
 
     // 7. Render Antrean Kurasi (Curator Hub)
@@ -1703,10 +1862,30 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       `).join('');
     }
 
-    // 8. Render Karya Catalog Table
-    function renderKaryaCatalog() {
+    // Pagination state for Catalog Table
+    let karyaCatalogPage = 1;
+    let karyaCatalogPerPage = 10;
+
+    (window as any).changeKaryaCatalogPerPage = function(val: string) {
+      karyaCatalogPerPage = val === 'all' ? 999999 : (parseInt(val, 10) || 10);
+      karyaCatalogPage = 1;
+      renderKaryaCatalog();
+    };
+
+    (window as any).goToKaryaCatalogPage = function(page: number) {
+      karyaCatalogPage = page;
+      renderKaryaCatalog();
+    };
+
+    // 8. Render Karya Catalog Table (with Interactive Pagination)
+    function renderKaryaCatalog(resetPage = false) {
       const tbody = document.getElementById('karya-table-body');
+      const paginationBar = document.getElementById('karya-catalog-pagination');
+      const pageInfo = document.getElementById('karya-catalog-page-info');
+      const pageNav = document.getElementById('karya-catalog-nav');
       if (!tbody) return;
+
+      if (resetPage) karyaCatalogPage = 1;
 
       const searchVal = ((document.getElementById('search-karya') as HTMLInputElement)?.value || '').toLowerCase();
       const filterCat = (document.getElementById('filter-karya-kategori') as HTMLSelectElement)?.value || 'all';
@@ -1723,12 +1902,28 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         list = list.filter(k => k.status === filterStat);
       }
 
-      if (list.length === 0) {
+      const totalFiltered = list.length;
+
+      if (totalFiltered === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Tidak ada karya yang sesuai dengan filter.</td></tr>';
+        if (paginationBar) paginationBar.classList.add('hidden');
         return;
       }
 
-      tbody.innerHTML = list.map(k => {
+      if (paginationBar) paginationBar.classList.remove('hidden');
+
+      const isAll = (karyaCatalogPerPage >= 999999);
+      const perPage = isAll ? totalFiltered : karyaCatalogPerPage;
+      const totalPages = Math.max(1, Math.ceil(totalFiltered / perPage));
+
+      if (karyaCatalogPage < 1) karyaCatalogPage = 1;
+      if (karyaCatalogPage > totalPages) karyaCatalogPage = totalPages;
+
+      const startIndex = (karyaCatalogPage - 1) * perPage;
+      const endIndex = Math.min(startIndex + perPage, totalFiltered);
+      const pageList = list.slice(startIndex, endIndex);
+
+      tbody.innerHTML = pageList.map(k => {
         let statusBadge = '';
         if (k.status === 'published') {
           statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-emerald-100 text-emerald-800">Tayang</span>';
@@ -1784,6 +1979,77 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </tr>
         `;
       }).join('');
+
+      // Update Page Info
+      if (pageInfo) {
+        const isFiltered = totalFiltered < fullDb.karya.length;
+        const filterNote = isFiltered ? ` (difilter dari ${fullDb.karya.length} karya)` : '';
+        if (isAll) {
+          pageInfo.textContent = `Menampilkan semua ${totalFiltered} karya${filterNote}`;
+        } else {
+          pageInfo.textContent = `Menampilkan ${startIndex + 1}–${endIndex} dari ${totalFiltered} karya${filterNote}`;
+        }
+      }
+
+      // Render Pagination Buttons
+      if (pageNav) {
+        if (totalPages <= 1) {
+          pageNav.innerHTML = '';
+          return;
+        }
+
+        let navHtml = '';
+        const prevDisabled = karyaCatalogPage <= 1;
+        navHtml += `
+          <button type="button" onclick="goToKaryaCatalogPage(${karyaCatalogPage - 1})"
+                  ${prevDisabled ? 'disabled' : ''}
+                  class="px-2 py-1 text-xs rounded border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] disabled:opacity-30 disabled:pointer-events-none transition flex items-center gap-1 cursor-pointer font-medium"
+                  title="Halaman Sebelumnya">
+            <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span class="hidden sm:inline">Sebelumnya</span>
+          </button>
+        `;
+
+        const pages = getPaginationRange(karyaCatalogPage, totalPages);
+        pages.forEach(p => {
+          if (p === '...') {
+            navHtml += `<span class="px-1.5 py-0.5 text-xs text-[var(--ink-faint)] select-none">…</span>`;
+          } else {
+            const isActive = (p === karyaCatalogPage);
+            if (isActive) {
+              navHtml += `
+                <button type="button" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded bg-[var(--crimson)] text-[var(--paper)] shadow-2xs select-none">
+                  ${p}
+                </button>
+              `;
+            } else {
+              navHtml += `
+                <button type="button" onclick="goToKaryaCatalogPage(${p})"
+                        class="w-7 h-7 flex items-center justify-center text-xs font-medium rounded border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] transition cursor-pointer select-none">
+                  ${p}
+                </button>
+              `;
+            }
+          }
+        });
+
+        const nextDisabled = karyaCatalogPage >= totalPages;
+        navHtml += `
+          <button type="button" onclick="goToKaryaCatalogPage(${karyaCatalogPage + 1})"
+                  ${nextDisabled ? 'disabled' : ''}
+                  class="px-2 py-1 text-xs rounded border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] disabled:opacity-30 disabled:pointer-events-none transition flex items-center gap-1 cursor-pointer font-medium"
+                  title="Halaman Selanjutnya">
+            <span class="hidden sm:inline">Selanjutnya</span>
+            <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        `;
+
+        pageNav.innerHTML = navHtml;
+      }
     }
 
     // 9. Render Komentar List
