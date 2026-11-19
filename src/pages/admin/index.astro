@@ -5,24 +5,26 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <Layout 
-  title="Studio Redaksi & Manajemen Karya — Ruang Sastra SMPI YQ"
-  description="Pusat kerja dewan redaksi untuk mengurasi kiriman naskah santri, mengelola karya terpublikasi, dan menyunting literatur secara real-time ke Cloud Database Google Spreadsheet & Drive."
+  title="Studio Redaksi & Dashboard Admin — Ruang Sastra SMPI YQ"
+  description="Pusat kerja dewan redaksi SMPI Yambu'ul Qur'an: kurasi kiriman santri, kelola karya sastra terpublikasi, moderasi komentar, dan kutipan sastra real-time ke Cloud Database."
 >
-  <div class="wrap py-8 md:py-12">
-    
-    <!-- AUTH GUARD BARRIER (Shown when not authenticated) -->
-    <div id="auth-guard-barrier" class="hidden text-center py-16 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm p-8 my-6">
-      <div class="w-12 h-12 rounded-full border-[1.5px] border-[var(--crimson)] flex items-center justify-center font-['Fraunces',serif] font-bold text-base text-[var(--crimson)] mx-auto mb-3">
+  <!-- AUTH GUARD BARRIER (Shown when not logged in) -->
+  <div id="auth-guard-barrier" class="wrap py-16 md:py-24 text-center hidden">
+    <div class="max-w-md mx-auto bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl p-8 shadow-xl">
+      <div class="w-14 h-14 rounded-full border-2 border-[var(--crimson)] bg-[var(--paper)] flex items-center justify-center font-['Fraunces',serif] font-bold text-lg text-[var(--crimson)] mx-auto mb-4 shadow-inner">
         YQ
       </div>
-      <h2 class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] m-0">
-        Akses Khusus Dewan Redaksi
+      <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-widest font-semibold block mb-1">
+        Akses Terproteksi
+      </span>
+      <h2 class="font-['Fraunces',serif] font-bold text-2xl text-[var(--ink)] m-0">
+        Studio Dewan Redaksi
       </h2>
-      <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] mt-2 max-w-md mx-auto">
-        Anda harus masuk terlebih dahulu dengan akun dewan redaksi SMPI YQ untuk mengakses panel kurasi dan studio penulisan.
+      <p class="font-['Source_Serif_4',serif] italic text-xs sm:text-sm text-[var(--ink-soft)] mt-2 leading-relaxed">
+        Anda harus masuk dengan kredensial Dewan Redaksi SMPI Yambu'ul Qur'an untuk mengakses dashboard manajemen literatur ini.
       </p>
-      <div class="mt-6 flex items-center justify-center gap-4">
-        <a href={`${basePath}/admin/login`} class="btn-literary btn-literary-solid !py-2.5 !px-5 text-sm no-underline">
+      <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a href={`${basePath}/admin/login`} class="btn-literary btn-literary-solid !w-full sm:!w-auto !py-2.5 !px-5 text-xs no-underline text-center">
           Masuk ke Studio Redaksi →
         </a>
         <a href={`${basePath}/`} class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] no-underline">
@@ -30,1077 +32,1641 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </a>
       </div>
     </div>
+  </div>
 
-    <!-- MAIN ADMIN DASHBOARD (Protected Content) -->
-    <div id="admin-dashboard" class="hidden space-y-8">
+  <!-- MAIN ADMIN DASHBOARD INTERFACE (like smpalmubarokweb) -->
+  <div id="admin-panel" class="hidden min-h-[85vh] bg-[var(--paper)] flex flex-col md:flex-row border-t border-[var(--rule)]">
+    
+    <!-- DESKTOP LEFT SIDEBAR -->
+    <aside class="w-full md:w-64 lg:w-72 bg-[var(--paper-card)] border-r border-[var(--rule-strong)] flex-shrink-0 flex flex-col justify-between hidden md:flex">
       
-      <!-- Top Header -->
-      <header class="pb-6 border-b border-[var(--rule-strong)] flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <div class="flex items-center gap-2 mono text-xs text-[var(--crimson)] mb-1.5 uppercase tracking-wider">
-            <a href={`${basePath}/`} class="no-underline hover:underline">Beranda</a>
-            <span>/</span>
-            <span>Studio Redaksi &amp; Kurasi</span>
+      <!-- Top Brand Section -->
+      <div>
+        <div class="p-5 border-b border-[var(--rule)] flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full border border-[var(--crimson)] bg-[var(--paper)] flex items-center justify-center font-['Fraunces',serif] font-bold text-sm text-[var(--crimson)] flex-shrink-0 shadow-inner">
+            YQ
           </div>
-          <h1 class="font-['Fraunces',serif] font-semibold text-2xl md:text-4xl text-[var(--ink)] m-0">
-            Studio Redaksi &amp; Manajemen Karya
-          </h1>
-          <p class="font-['Source_Serif_4',serif] italic text-sm md:text-base text-[var(--ink-soft)] mt-1.5">
-            Kurasi kiriman naskah santri, kelola karya terpublikasi, atau terbitkan karya sastra baru ke Google Sheets DB.
-          </p>
+          <div class="min-w-0">
+            <h2 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0 truncate">
+              Studio Redaksi
+            </h2>
+            <p class="mono text-[0.65rem] text-[var(--gold)] font-medium uppercase tracking-wider m-0 truncate">
+              SMPI Yambu'ul Qur'an
+            </p>
+          </div>
         </div>
 
-        <!-- Redaksi User Badge & Controls -->
-        <div class="flex items-center gap-3 flex-wrap">
-          <div id="supabase-status-badge" class="mono text-xs px-3 py-1.5 rounded-full border border-[var(--rule-strong)] bg-[var(--paper-card)] flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
-            <span id="status-text">Apps Script Cloud Aktif ⚡</span>
+        <!-- Cloud Status Pill -->
+        <div class="px-5 py-3 border-b border-[var(--rule)] bg-[var(--paper-deep)] flex items-center justify-between">
+          <div class="flex items-center gap-2 mono text-[0.68rem] text-[var(--ink)]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Cloud Database Aktif</span>
           </div>
+          <span class="mono text-[0.62rem] text-[var(--gold)] font-bold">Sheets &amp; Drive</span>
+        </div>
 
-          <div class="flex items-center gap-2 px-3 py-1.5 bg-[var(--paper-deep)] border border-[var(--rule-strong)] rounded-full mono text-xs text-[var(--ink)]">
-            <span class="w-2 h-2 rounded-full bg-[var(--crimson)]"></span>
-            <span id="admin-user-email">redaksi@yq.sch.id</span>
-            <button 
-              id="btn-logout" 
-              type="button" 
-              class="ml-2 px-2.5 py-0.5 rounded bg-[var(--paper)] border border-[var(--rule-strong)] text-[var(--crimson)] hover:bg-[var(--crimson)] hover:text-[var(--paper)] transition-colors font-semibold cursor-pointer flex items-center gap-1" 
-              title="Keluar dari sesi redaksi"
-            >
-              <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        <!-- Sidebar Navigation Menu Items -->
+        <nav class="py-3 px-3 space-y-1">
+          <button 
+            type="button" 
+            onclick="switchAdminSection('ringkasan')" 
+            id="nav-btn-ringkasan" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer bg-[var(--paper-deep)] text-[var(--crimson)] font-bold border-l-4 border-[var(--crimson)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-[var(--crimson)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
               </svg>
-              <span>Keluar</span>
+              <span>Ringkasan &amp; Statistik</span>
+            </div>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="switchAdminSection('kurasi')" 
+            id="nav-btn-kurasi" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-[var(--gold)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
+              <span>Antrean Kurasi</span>
+            </div>
+            <span id="sidebar-badge-kurasi" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-rose-100 text-rose-800">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="switchAdminSection('karya')" 
+            id="nav-btn-karya" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-[var(--crimson)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <span>Karya Sastra (Katalog)</span>
+            </div>
+            <span id="sidebar-badge-karya" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="switchAdminSection('komentar')" 
+            id="nav-btn-komentar" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-emerald-700" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              <span>Catatan &amp; Komentar</span>
+            </div>
+            <span id="sidebar-badge-komentar" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="switchAdminSection('quotes')" 
+            id="nav-btn-quotes" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-[var(--gold)]" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+              </svg>
+              <span>Quotes &amp; Mutiara</span>
+            </div>
+            <span id="sidebar-badge-quotes" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="switchAdminSection('penulis')" 
+            id="nav-btn-penulis" 
+            class="admin-nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]"
+          >
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 text-blue-700" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <span>Penulis Santri</span>
+            </div>
+            <span id="sidebar-badge-penulis" class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
+          </button>
+
+          <div class="pt-2">
+            <button 
+              type="button" 
+              onclick="openEditorModal(null)" 
+              class="w-full py-2.5 px-3.5 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-['Fraunces',serif] font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>+ Tulis Karya Baru</span>
             </button>
           </div>
-        </div>
-      </header>
-
-      <!-- STATS OVERVIEW STRIP -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Antrean Kiriman -->
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--crimson)] rounded-sm relative overflow-hidden">
-          <div class="mono text-[0.68rem] text-[var(--crimson)] uppercase tracking-wider font-semibold">Antrean Kiriman Santri</div>
-          <div class="flex items-baseline justify-between mt-2">
-            <span id="stat-submissions" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--crimson)]">0</span>
-            <span class="mono text-xs text-[var(--crimson)] font-medium">Perlu Kurasi</span>
-          </div>
-          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Naskah dari siswa yang menunggu persetujuan</p>
-        </div>
-
-        <!-- Terpublikasi -->
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-          <div class="mono text-[0.68rem] text-[var(--sage)] uppercase tracking-wider font-semibold">Karya Terpublikasi</div>
-          <div class="flex items-baseline justify-between mt-2">
-            <span id="stat-published" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
-            <span class="mono text-xs text-[var(--sage)] font-medium">Tayang</span>
-          </div>
-          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Dapat dibaca oleh publik di Pojok Baca</p>
-        </div>
-
-        <!-- Draf -->
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-          <div class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-wider font-semibold">Draf Redaksi</div>
-          <div class="flex items-baseline justify-between mt-2">
-            <span id="stat-drafts" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
-            <span class="mono text-xs text-[var(--gold)] font-medium">Belum Tayang</span>
-          </div>
-          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Naskah dalam tahap penyuntingan</p>
-        </div>
-
-        <!-- Total Karya -->
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-          <div class="mono text-[0.68rem] text-[var(--ink-faint)] uppercase tracking-wider font-semibold">Total Koleksi Database</div>
-          <div class="flex items-baseline justify-between mt-2">
-            <span id="stat-total" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
-            <span class="mono text-xs text-[var(--ink-faint)]">Karya</span>
-          </div>
-          <p class="mono text-[0.68rem] text-[var(--ink-faint)] mt-1 mb-0">Keseluruhan naskah tersimpan di Cloud Database</p>
-        </div>
+        </nav>
       </div>
 
-      <!-- NAVIGATION TABS -->
-      <div class="flex items-center gap-2 border-b border-[var(--rule)] pb-3 flex-wrap">
-        <button 
-          id="tab-btn-submissions" 
-          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors flex items-center gap-1.5"
-        >
-          <span>Antrean Kiriman Santri</span>
-          <span id="badge-submissions" class="px-2 py-0.2 rounded-full bg-white/20 text-xs">0</span>
-        </button>
+      <!-- Bottom Profile & Logout -->
+      <div class="p-4 border-t border-[var(--rule)] bg-[var(--paper)] space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="min-w-0">
+            <p id="admin-user-display-email" class="mono text-[0.72rem] font-bold text-[var(--ink)] truncate m-0">
+              redaksi@yq.sch.id
+            </p>
+            <p id="admin-user-display-role" class="mono text-[0.62rem] text-[var(--crimson)] uppercase font-semibold m-0">
+              Redaktur Utama
+            </p>
+          </div>
+          <a href={`${basePath}/`} target="_blank" class="p-1.5 rounded-lg border border-[var(--rule)] text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] transition-colors" title="Buka Portal Beranda di tab baru">
+            <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </div>
 
         <button 
-          id="tab-btn-published" 
-          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5"
+          type="button" 
+          id="btn-admin-logout" 
+          class="w-full py-2 px-3 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-800 mono text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
         >
-          <span>Karya Terpublikasi</span>
-          <span id="badge-published" class="px-1.5 py-0.2 rounded-full bg-[var(--paper-deep)] text-xs">0</span>
+          <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span>Keluar dari Sesi</span>
         </button>
+      </div>
 
-        <button 
-          id="tab-btn-drafts" 
-          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5"
-        >
-          <span>Draf Redaksi</span>
-          <span id="badge-drafts" class="px-1.5 py-0.2 rounded-full bg-[var(--paper-deep)] text-xs">0</span>
-        </button>
+    </aside>
 
-        <button 
-          id="tab-btn-editor" 
-          class="tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5"
-        >
-          <span>Studio Tulis / Sunting Naskah ✎</span>
-        </button>
+    <!-- RIGHT MAIN CONTENT AREA -->
+    <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
+      
+      <!-- TOP ACTION BAR -->
+      <div class="bg-[var(--paper-card)] border-b border-[var(--rule-strong)] px-5 py-3.5 flex items-center justify-between gap-3 flex-wrap">
+        
+        <!-- Mobile Selector & Title -->
+        <div class="flex items-center gap-3">
+          <select 
+            id="admin-mobile-nav" 
+            onchange="switchAdminSection(this.value)" 
+            class="md:hidden px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs mono font-bold text-[var(--ink)] outline-none"
+          >
+            <option value="ringkasan">📊 Ringkasan &amp; Statistik</option>
+            <option value="kurasi">📥 Antrean Kurasi Naskah</option>
+            <option value="karya">📚 Seluruh Karya Sastra</option>
+            <option value="komentar">💬 Catatan &amp; Komentar</option>
+            <option value="quotes">📜 Quotes &amp; Mutiara</option>
+            <option value="penulis">👥 Penulis Santri</option>
+          </select>
 
-        <div class="ml-auto">
-          <button id="btn-refresh-all" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] cursor-pointer flex items-center gap-1 p-1" title="Segarkan Data dari Cloud Google Sheets">
-            <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="hidden md:block">
+            <h1 id="topbar-section-title" class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0">
+              Ringkasan &amp; Statistik
+            </h1>
+            <p id="topbar-section-sub" class="mono text-[0.68rem] text-[var(--ink-soft)] m-0">
+              Studio Redaksi SMPI Yambu'ul Qur'an
+            </p>
+          </div>
+        </div>
+
+        <!-- Top Right Actions -->
+        <div class="flex items-center gap-2">
+          <button 
+            type="button" 
+            id="btn-sync-cloud" 
+            onclick="loadAllAdminData()" 
+            class="px-3 py-1.5 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] hover:bg-[var(--paper-deep)] text-[var(--ink)] mono text-xs font-medium cursor-pointer transition-colors flex items-center gap-1.5"
+            title="Segarkan data dari Google Sheets &amp; Drive"
+          >
+            <svg id="sync-icon" class="w-3.5 h-3.5 text-[var(--crimson)]" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
-            <span>Segarkan</span>
+            <span id="sync-text">Segarkan Data</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="openEditorModal(null)" 
+            class="px-3.5 py-1.5 rounded-lg bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-['Fraunces',serif] font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <span>+ Tulis Naskah</span>
           </button>
         </div>
       </div>
 
-      <!-- ========================================================== -->
-      <!-- VIEW 1: ANTREAN SUBMISI KIRIMAN SANTRI -->
-      <!-- ========================================================== -->
-      <section id="view-submissions" class="tab-view space-y-4">
-        <div class="flex items-center justify-between pb-2">
-          <div>
-            <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
-              Antrean Kiriman Naskah Siswa
-            </h2>
-            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
-              Naskah masuk dari formulir submisi siswa yang membutuhkan kurasi atau penyuntingan dewan redaksi sebelum diterbitkan.
+      <!-- BODY SECTIONS CONTAINER -->
+      <div class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto space-y-6">
+        
+        <!-- SECTION 1: RINGKASAN & OVERVIEW -->
+        <div id="section-ringkasan" class="admin-section space-y-6">
+          
+          <!-- 4 KPI Metrics Strip -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Antrean Kurasi -->
+            <div class="p-4 bg-[var(--paper-card)] border border-[var(--crimson)] rounded-xl shadow-xs relative overflow-hidden">
+              <span class="mono text-[0.68rem] text-[var(--crimson)] uppercase tracking-wider font-bold">Antrean Kurasi</span>
+              <div class="flex items-baseline justify-between mt-2">
+                <span id="kpi-submissions" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--crimson)]">0</span>
+                <span class="mono text-[0.68rem] text-rose-700 font-semibold bg-rose-50 px-2 py-0.5 rounded-full">Perlu Review</span>
+              </div>
+              <p class="mono text-[0.65rem] text-[var(--ink-faint)] mt-1.5 mb-0">Naskah santri menunggu persetujuan</p>
+            </div>
+
+            <!-- Terpublikasi -->
+            <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs">
+              <span class="mono text-[0.68rem] text-emerald-800 uppercase tracking-wider font-bold">Karya Tayang</span>
+              <div class="flex items-baseline justify-between mt-2">
+                <span id="kpi-published" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
+                <span class="mono text-[0.68rem] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">Publik</span>
+              </div>
+              <p class="mono text-[0.65rem] text-[var(--ink-faint)] mt-1.5 mb-0">Dapat dibaca oleh umum di Pojok Baca</p>
+            </div>
+
+            <!-- Draf Redaksi -->
+            <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs">
+              <span class="mono text-[0.68rem] text-[var(--gold)] uppercase tracking-wider font-bold">Draf Redaksi</span>
+              <div class="flex items-baseline justify-between mt-2">
+                <span id="kpi-drafts" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
+                <span class="mono text-[0.68rem] text-amber-800 font-semibold bg-amber-50 px-2 py-0.5 rounded-full">Proses</span>
+              </div>
+              <p class="mono text-[0.65rem] text-[var(--ink-faint)] mt-1.5 mb-0">Naskah dalam penyuntingan redaksi</p>
+            </div>
+
+            <!-- Catatan Pembaca -->
+            <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs">
+              <span class="mono text-[0.68rem] text-blue-800 uppercase tracking-wider font-bold">Catatan Pembaca</span>
+              <div class="flex items-baseline justify-between mt-2">
+                <span id="kpi-comments" class="font-['Fraunces',serif] font-bold text-3xl text-[var(--ink)]">0</span>
+                <span class="mono text-[0.68rem] text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded-full">Komentar</span>
+              </div>
+              <p class="mono text-[0.65rem] text-[var(--ink-faint)] mt-1.5 mb-0">Respon dan catatan dari pembaca</p>
+            </div>
+
+          </div>
+
+          <!-- Quick Submission Queue (Antrean Cepat Kurasi) -->
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-[var(--rule)] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+                  Antrean Naskah Santri Menunggu Kurasi
+                </h3>
+                <span id="overview-badge-queue" class="mono text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">0</span>
+              </div>
+              <button onclick="switchAdminSection('kurasi')" class="mono text-xs text-[var(--crimson)] hover:underline font-semibold cursor-pointer">
+                Buka Seluruh Antrean →
+              </button>
+            </div>
+            
+            <div id="overview-queue-container" class="divide-y divide-[var(--rule)]">
+              <p class="p-6 text-center mono text-xs text-[var(--ink-faint)] italic">Memuat antrean naskah...</p>
+            </div>
+          </div>
+
+          <!-- Recently Published Works -->
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-[var(--rule)] flex items-center justify-between">
+              <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+                Karya Sastra Terpublikasi Terbaru
+              </h3>
+              <button onclick="switchAdminSection('karya')" class="mono text-xs text-[var(--crimson)] hover:underline font-semibold cursor-pointer">
+                Kelola Semua Karya →
+              </button>
+            </div>
+            <div id="overview-published-container" class="divide-y divide-[var(--rule)]">
+              <p class="p-6 text-center mono text-xs text-[var(--ink-faint)] italic">Memuat karya terpublikasi...</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SECTION 2: ANTREAN KURASI (CURATION HUB) -->
+        <div id="section-kurasi" class="admin-section hidden space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
+                Kurasi Naskah Masuk dari Siswa
+              </h2>
+              <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Setujui kiriman santri agar langsung terbit di website, sunting naskah bila perlu, atau simpan sebagai draf.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input 
+                type="search" 
+                id="search-kurasi" 
+                placeholder="Cari naskah / penulis..." 
+                oninput="renderKurasiList()"
+                class="px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+              />
+            </div>
+          </div>
+
+          <div id="kurasi-list-container" class="space-y-3">
+            <p class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Memuat daftar kurasi...</p>
+          </div>
+        </div>
+
+        <!-- SECTION 3: KARYA SASTRA (CATALOG) -->
+        <div id="section-karya" class="admin-section hidden space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-2 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
+                Katalog Karya Sastra Lengkap
+              </h2>
+              <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Kelola 6 format literatur: Karya Tulis Ilmiah, Puisi &amp; Prosa, Cerpen, Drama, Antologi, dan Quotes.
+              </p>
+            </div>
+
+            <!-- Filters & Search -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <input 
+                type="search" 
+                id="search-karya" 
+                placeholder="Cari judul / penulis..." 
+                oninput="renderKaryaCatalog()"
+                class="px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+              />
+              <select 
+                id="filter-karya-kategori" 
+                onchange="renderKaryaCatalog()"
+                class="px-2.5 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs mono text-[var(--ink)] outline-none"
+              >
+                <option value="all">Semua Kategori</option>
+                <option value="ilmiah">Karya Tulis Ilmiah</option>
+                <option value="puisi">Puisi &amp; Prosa</option>
+                <option value="cerpen">Cerpen</option>
+                <option value="drama">Naskah Drama</option>
+                <option value="antologi">Antologi</option>
+              </select>
+              <select 
+                id="filter-karya-status" 
+                onchange="renderKaryaCatalog()"
+                class="px-2.5 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-lg text-xs mono text-[var(--ink)] outline-none"
+              >
+                <option value="all">Semua Status</option>
+                <option value="published">Tayang (Publik)</option>
+                <option value="menunggu_kurasi">Menunggu Kurasi</option>
+                <option value="draft">Draf Redaksi</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-[var(--paper-deep)] border-b border-[var(--rule)] text-[0.68rem] mono uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+                  <tr>
+                    <th class="px-4 py-3">Sampul</th>
+                    <th class="px-4 py-3">Judul Karya</th>
+                    <th class="px-4 py-3">Penulis &amp; Kelas</th>
+                    <th class="px-4 py-3">Kategori</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="karya-table-body" class="divide-y divide-[var(--rule)]">
+                  <tr>
+                    <td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+                      Memuat katalog karya...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: KOMENTAR & CATATAN PEMBACA -->
+        <div id="section-komentar" class="admin-section hidden space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
+                Moderasi Catatan &amp; Komentar Pembaca
+              </h2>
+              <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Pantau apresiasi dan hapus komentar yang tidak pantas dari pembaca.
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-[var(--paper-deep)] border-b border-[var(--rule)] text-[0.68rem] mono uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+                  <tr>
+                    <th class="px-4 py-3">Komentator</th>
+                    <th class="px-4 py-3">Peran</th>
+                    <th class="px-4 py-3">Karya yang Dikomentari</th>
+                    <th class="px-4 py-3">Isi Catatan</th>
+                    <th class="px-4 py-3">Waktu</th>
+                    <th class="px-4 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="komentar-table-body" class="divide-y divide-[var(--rule)]">
+                  <tr>
+                    <td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+                      Memuat data komentar...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: QUOTES & MUTIARA SASTRA -->
+        <div id="section-quotes" class="admin-section hidden space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
+                Koleksi Quotes &amp; Mutiara Sastra
+              </h2>
+              <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Kutipan sastra santri, masyayikh, dan dewan redaksi SMPI YQ.
+              </p>
+            </div>
+            <button 
+              type="button" 
+              onclick="openQuoteModal()" 
+              class="btn-literary btn-literary-solid !py-2 !px-3.5 !text-xs cursor-pointer"
+            >
+              + Tambah Kutipan Baru
+            </button>
+          </div>
+
+          <div id="quotes-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <p class="col-span-full p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+              Memuat kutipan sastra...
             </p>
           </div>
         </div>
 
-        <div id="submissions-list-container" class="space-y-4">
-          <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat antrean kiriman santri...</p>
-        </div>
-      </section>
-
-      <!-- ========================================================== -->
-      <!-- VIEW 2: KARYA TERPUBLIKASI -->
-      <!-- ========================================================== -->
-      <section id="view-published" class="tab-view hidden space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
-          <div>
-            <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
-              Karya Sastra Terpublikasi
-            </h2>
-            <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
-              Daftar seluruh karya yang sedang tayang di portal Ruang Sastra dan dapat dibaca oleh umum.
-            </p>
+        <!-- SECTION 6: PENULIS SANTRI -->
+        <div id="section-penulis" class="admin-section hidden space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+            <div>
+              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
+                Direktori Akun Penulis Santri
+              </h2>
+              <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Data santri terdaftar yang aktif mengirimkan naskah literatur.
+              </p>
+            </div>
           </div>
 
-          <!-- Search & Filter Controls -->
-          <div class="flex items-center gap-2">
+          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-[var(--paper-deep)] border-b border-[var(--rule)] text-[0.68rem] mono uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+                  <tr>
+                    <th class="px-4 py-3">Nama Santri</th>
+                    <th class="px-4 py-3">Kelas / Angkatan</th>
+                    <th class="px-4 py-3">Alamat Email</th>
+                    <th class="px-4 py-3">Kontak WhatsApp</th>
+                    <th class="px-4 py-3">Peran</th>
+                  </tr>
+                </thead>
+                <tbody id="penulis-table-body" class="divide-y divide-[var(--rule)]">
+                  <tr>
+                    <td colspan="5" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+                      Memuat daftar penulis...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: STUDIO EDITOR KARYA (MIRRORS smpalmubarokweb) -->
+  <!-- ============================================================ -->
+  <div id="modal-editor-karya" class="fixed inset-0 bg-black/60 z-[9995] hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="w-full max-w-4xl bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-[var(--crimson)] text-[var(--paper)] flex items-center justify-between flex-shrink-0">
+        <div>
+          <h3 id="modal-editor-title" class="font-['Fraunces',serif] font-bold text-base text-[var(--paper)] m-0">
+            Tulis Naskah Sastra Baru
+          </h3>
+          <p class="mono text-[0.62rem] text-[var(--paper)]/80 uppercase tracking-wider m-0">
+            Studio Redaksi SMPI Yambu'ul Qur'an
+          </p>
+        </div>
+        <button 
+          type="button" 
+          onclick="closeEditorModal()" 
+          class="text-2xl text-[var(--paper)]/70 hover:text-[var(--paper)] leading-none cursor-pointer"
+          aria-label="Tutup Editor"
+        >
+          &times;
+        </button>
+      </div>
+
+      <!-- Modal Form Body -->
+      <form id="admin-karya-form" class="p-6 overflow-y-auto space-y-4 flex-1">
+        <input type="hidden" id="form-karya-id" />
+        <input type="hidden" id="form-karya-slug" />
+
+        <!-- Alert in Modal -->
+        <div id="modal-form-alert" class="hidden p-3 rounded-lg text-xs mono text-center"></div>
+
+        <!-- Judul & Kategori -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label for="form-title" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-semibold">
+              Judul Karya *
+            </label>
             <input 
-              type="search" 
-              id="search-published-input" 
-              placeholder="Cari judul / penulis..." 
-              class="px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
+              type="text" 
+              id="form-title" 
+              required 
+              placeholder="Misal: Gemuruh Bait di Pelataran Pesantren" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-sm font-['Fraunces',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
             />
-            <select id="filter-published-category" class="px-2.5 py-1.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none">
-              <option value="all">Semua Kategori</option>
-              <option value="ilmiah">Karya Ilmiah</option>
+          </div>
+          <div>
+            <label for="form-category" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-semibold">
+              Format / Kategori *
+            </label>
+            <select 
+              id="form-category" 
+              onchange="onCategoryChange(this.value)"
+              class="w-full px-3 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+            >
               <option value="puisi">Puisi &amp; Prosa</option>
               <option value="cerpen">Cerpen</option>
-              <option value="drama">Naskah Drama</option>
+              <option value="ilmiah">Karya Tulis Ilmiah</option>
               <option value="antologi">Antologi</option>
+              <option value="drama">Naskah Drama</option>
             </select>
           </div>
         </div>
 
-        <div id="published-list-container" class="space-y-3">
-          <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat karya terpublikasi...</p>
-        </div>
-      </section>
-
-      <!-- ========================================================== -->
-      <!-- VIEW 3: DRAF REDAKSI -->
-      <!-- ========================================================== -->
-      <section id="view-drafts" class="tab-view hidden space-y-4">
-        <div>
-          <h2 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
-            Draf Naskah Redaksi
-          </h2>
-          <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
-            Naskah yang masih dalam tahap perancangan atau disembunyikan sementara dari penayangan publik.
-          </p>
-        </div>
-
-        <div id="drafts-list-container" class="space-y-3">
-          <p class="mono text-xs text-[var(--ink-faint)] italic text-center py-8">Memuat draf...</p>
-        </div>
-      </section>
-
-      <!-- ========================================================== -->
-      <!-- VIEW 4: STUDIO EDITOR & LIVE PREVIEW -->
-      <!-- ========================================================== -->
-      <section id="view-editor" class="tab-view hidden grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        
-        <!-- Left: Form Editor -->
-        <div class="p-6 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm space-y-4">
-          <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)]">
-            <div>
-              <h2 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0" id="editor-form-title">
-                Tulis Naskah Baru
-              </h2>
-              <span id="editor-mode-badge" class="mono text-[0.65rem] text-[var(--crimson)] uppercase">Karya Baru</span>
-            </div>
-            <button id="btn-reset-form" class="mono text-xs text-[var(--ink-faint)] hover:text-[var(--crimson)] underline cursor-pointer">
-              Kosongkan Form
-            </button>
-          </div>
-
-          <input type="hidden" id="edit-id" />
-          <input type="hidden" id="edit-slug" />
-
-          <!-- Judul -->
+        <!-- Penulis, Kelas, Status -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label for="editor-title" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Judul Karya *</label>
+            <label for="form-author" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-semibold">
+              Nama Penulis *
+            </label>
             <input 
               type="text" 
-              id="editor-title" 
-              placeholder="Misal: Senja di Pelataran Pesantren" 
-              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Fraunces',serif]"
+              id="form-author" 
+              required 
+              placeholder="Nama santri atau nama pena" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
             />
           </div>
-
-          <!-- Penulis & Kelas -->
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label for="editor-author" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Nama Penulis *</label>
-              <input 
-                type="text" 
-                id="editor-author" 
-                placeholder="Misal: Ahmad Santoso" 
-                class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
-              />
-            </div>
-            <div>
-              <label for="editor-grade" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kelas / Jabatan</label>
-              <input 
-                type="text" 
-                id="editor-grade" 
-                placeholder="Misal: Kelas XI-B / Guru Bahasa" 
-                class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif]"
-              />
-            </div>
-          </div>
-
-          <!-- Kategori & Status -->
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label for="editor-category" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Kategori *</label>
-              <select id="editor-category" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
-                <option value="puisi">Puisi &amp; Prosa</option>
-                <option value="cerpen">Cerpen</option>
-                <option value="ilmiah">Karya Tulis Ilmiah</option>
-                <option value="drama">Naskah Drama</option>
-                <option value="antologi">Antologi</option>
-              </select>
-            </div>
-            <div>
-              <label for="editor-status" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Status Publikasi</label>
-              <select id="editor-status" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]">
-                <option value="published">Tayang (Published)</option>
-                <option value="menunggu_kurasi">Menunggu Kurasi</option>
-                <option value="draft">Draf (Draft)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Sinopsis / Ringkasan -->
           <div>
-            <label for="editor-desc" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">Sinopsis / Pengantar *</label>
-            <textarea 
-              id="editor-desc" 
-              rows="2" 
-              placeholder="Petikan atau ringkasan 1-2 kalimat..." 
-              class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] italic"
-            ></textarea>
-          </div>
-
-          <!-- Upload Foto ke Google Drive Storage -->
-          <div class="p-3.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded">
-            <label class="block mono text-xs uppercase text-[var(--crimson)] mb-1.5 font-semibold">
-              Unggah Foto Sampul ke Google Drive Storage
+            <label for="form-grade" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-semibold">
+              Kelas / Angkatan
             </label>
-            <div class="flex items-center gap-3">
+            <input 
+              type="text" 
+              id="form-grade" 
+              placeholder="Misal: Kelas IX-B" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+            />
+          </div>
+          <div>
+            <label for="form-status" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-semibold">
+              Status Penayangan *
+            </label>
+            <select 
+              id="form-status" 
+              class="w-full px-3 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+            >
+              <option value="published">Terpublikasi (Tayang Publik)</option>
+              <option value="menunggu_kurasi">Menunggu Kurasi</option>
+              <option value="draft">Draf Redaksi (Tertutup)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Ringkasan / Sinopsis Singkat -->
+        <div>
+          <label for="form-desc" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] mb-1 font-semibold">
+            Ringkasan / Sinopsis Singkat *
+          </label>
+          <input 
+            type="text" 
+            id="form-desc" 
+            required 
+            placeholder="Petikan atau pengantar singkat mengenai karya..." 
+            class="w-full px-3.5 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] italic text-[var(--ink)] outline-none focus:border-[var(--crimson)]"
+          />
+        </div>
+
+        <!-- Cover Photo Upload (Direct to Google Drive) -->
+        <div class="p-3.5 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-xl space-y-2">
+          <label class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] font-semibold">
+            Foto Sampul / Gambar Karya (Google Drive Storage)
+          </label>
+          <div class="flex items-center gap-3">
+            <div id="cover-preview-box" class="w-16 h-16 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] overflow-hidden flex items-center justify-center flex-shrink-0">
+              <span class="mono text-[0.6rem] text-[var(--ink-faint)]">Foto</span>
+            </div>
+            <div class="flex-1 space-y-1.5">
               <input 
                 type="file" 
-                id="editor-photo-file" 
-                accept="image/*"
-                class="block w-full text-xs mono text-[var(--ink-soft)] file:mr-3 file:py-1.5 file:px-3 file:rounded file:border file:border-[var(--crimson)] file:text-xs file:mono file:bg-transparent file:text-[var(--crimson)] hover:file:bg-[var(--crimson)] hover:file:text-[var(--paper)] cursor-pointer"
+                id="form-cover-file" 
+                accept="image/*" 
+                class="text-xs file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[var(--crimson)] file:text-[var(--paper)] cursor-pointer"
+              />
+              <input 
+                type="text" 
+                id="form-cover-url" 
+                placeholder="Atau tautkan URL gambar langsung: https://..." 
+                class="w-full px-2.5 py-1 bg-[var(--paper)] border border-[var(--rule)] rounded text-[0.7rem] mono text-[var(--ink)] outline-none"
               />
             </div>
-            <input 
-              type="url" 
-              id="editor-photo-url" 
-              placeholder="Atau tempel URL gambar sampul di sini..." 
-              class="w-full mt-2 px-3 py-1.5 bg-[var(--paper-card)] border border-[var(--rule)] rounded text-xs mono text-[var(--ink-soft)] outline-none"
-            />
-            <span id="photo-upload-status" class="mono text-[0.68rem] text-[var(--ink-faint)] block mt-1"></span>
           </div>
+          <span id="cover-upload-status" class="mono text-[0.65rem] text-[var(--ink-faint)] block"></span>
+        </div>
 
-          <!-- Isi Naskah -->
-          <div>
-            <label for="editor-content" class="block mono text-xs uppercase text-[var(--ink-soft)] mb-1">
-              Isi Naskah Karya * (Mendukung Markdown)
-            </label>
-            <textarea 
-              id="editor-content" 
-              rows="12" 
-              placeholder="Tulis bait puisi, alur cerpen, bab makalah, atau dialog drama..." 
-              class="w-full px-3.5 py-3 bg-[var(--paper)] border border-[var(--rule-strong)] rounded text-sm text-[var(--ink)] outline-none focus:border-[var(--crimson)] font-['Source_Serif_4',serif] leading-relaxed"
-            ></textarea>
-          </div>
-
-          <!-- Alert Box -->
-          <div id="editor-alert" class="hidden mono text-xs p-3 rounded border"></div>
-
-          <!-- Actions -->
-          <div class="pt-2 flex items-center justify-between gap-3 flex-wrap">
-            <div class="flex items-center gap-2">
-              <button 
-                id="btn-save-supabase" 
-                class="btn-literary btn-literary-solid !py-2.5 !px-5 text-sm cursor-pointer"
-              >
-                Simpan ke Cloud DB (Google Sheets) ⚡
-              </button>
+        <!-- FORMAT SPECIFIC FIELDS (Accordion) -->
+        <!-- Fields for KTI (Karya Ilmiah) -->
+        <div id="fields-ilmiah" class="hidden p-3.5 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-xl space-y-3">
+          <p class="mono text-[0.68rem] text-[var(--crimson)] uppercase font-bold m-0">Metadata Khusus Karya Tulis Ilmiah</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="form-supervisor" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Guru Pembimbing</label>
+              <input type="text" id="form-supervisor" placeholder="Misal: Ust. Ahmad Fauzi, M.Pd." class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs" />
             </div>
+            <div>
+              <label for="form-pdf-url" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Tautan Berkas PDF Lengkap</label>
+              <input type="url" id="form-pdf-url" placeholder="https://drive.google.com/..." class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs" />
+            </div>
+          </div>
+          <div>
+            <label for="form-abstract" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Abstrak Bahasa Indonesia</label>
+            <textarea id="form-abstract" rows="2" placeholder="Abstrak ringkas karya ilmiah..." class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs font-['Source_Serif_4',serif]"></textarea>
+          </div>
+        </div>
+
+        <!-- Fields for Puisi -->
+        <div id="fields-puisi" class="p-3.5 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-xl space-y-2">
+          <p class="mono text-[0.68rem] text-[var(--crimson)] uppercase font-bold m-0">Media Musikalisasi &amp; Audio Puisi</p>
+          <div>
+            <label for="form-audio-url" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Tautan Audio Resitasi / Musikalisasi (.mp3 atau Drive)</label>
+            <input type="url" id="form-audio-url" placeholder="https://.../audio.mp3" class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs mono" />
+          </div>
+        </div>
+
+        <!-- Fields for Cerpen -->
+        <div id="fields-cerpen" class="hidden p-3.5 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-xl space-y-2">
+          <p class="mono text-[0.68rem] text-[var(--crimson)] uppercase font-bold m-0">Pengaturan Waktu Baca Cerpen</p>
+          <div class="w-48">
+            <label for="form-reading-time" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Estimasi Waktu Baca (Menit)</label>
+            <input type="number" id="form-reading-time" placeholder="5" min="1" class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs mono" />
+          </div>
+        </div>
+
+        <!-- Fields for Drama -->
+        <div id="fields-drama" class="hidden p-3.5 bg-[var(--paper-deep)] border border-[var(--rule)] rounded-xl space-y-3">
+          <p class="mono text-[0.68rem] text-[var(--crimson)] uppercase font-bold m-0">Tata Panggung &amp; Pementasan Drama</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="form-characters" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Daftar Tokoh (Karakter)</label>
+              <input type="text" id="form-characters" placeholder="Umar, Zaid, Narator, dll" class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs" />
+            </div>
+            <div>
+              <label for="form-stage" class="block mono text-[0.65rem] uppercase text-[var(--ink-soft)] mb-1">Setting / Tata Panggung</label>
+              <input type="text" id="form-stage" placeholder="Pelataran masjid, senja hari" class="w-full px-3 py-1.5 bg-[var(--paper)] border border-[var(--rule)] rounded text-xs" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Isi Naskah Lengkap -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="form-content" class="block mono text-[0.7rem] uppercase tracking-wider text-[var(--ink-soft)] font-semibold">
+              Isi Naskah Karya Sastra Lengkap *
+            </label>
+            <span id="form-word-count" class="mono text-[0.65rem] text-[var(--ink-faint)]">0 kata</span>
+          </div>
+          <textarea 
+            id="form-content" 
+            required 
+            rows="10" 
+            placeholder="Tuliskan naskah karya secara lengkap di sini. Mendukung pemisahan bait dan paragraf sastra..." 
+            class="w-full p-4 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-sm font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)] leading-relaxed"
+          ></textarea>
+        </div>
+
+        <!-- Submit Footer -->
+        <div class="pt-3 border-t border-[var(--rule)] flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2">
             <button 
+              type="button" 
               id="btn-download-md" 
-              class="btn-literary !py-2.5 !px-4 text-xs cursor-pointer"
-              title="Unduh berkas .md untuk dimasukkan ke Git repositori"
+              class="px-3 py-2 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] hover:bg-[var(--paper-deep)] text-xs mono text-[var(--ink)] cursor-pointer"
             >
-              Unduh .md ↓
+              Unduh .MD
+            </button>
+            <button 
+              type="button" 
+              onclick="closeEditorModal()" 
+              class="px-3 py-2 rounded-lg border border-transparent text-xs mono text-[var(--ink-faint)] hover:text-[var(--ink)] cursor-pointer"
+            >
+              Batal
             </button>
           </div>
+
+          <button 
+            type="submit" 
+            id="btn-save-karya-submit" 
+            class="px-5 py-2.5 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-['Fraunces',serif] font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-2"
+          >
+            <span>Simpan ke Cloud Database ⚡</span>
+          </button>
         </div>
 
-        <!-- Right: Live Editorial Preview -->
-        <div class="sticky top-20 p-6 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-sm space-y-4 shadow-sm">
-          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
-            <span class="mono text-[0.68rem] uppercase tracking-wider text-[var(--gold)] font-semibold">Pratinjau Langsung (Live Preview)</span>
-            <span id="prev-category-badge" class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase">
-              Sastra
-            </span>
-          </div>
-
-          <div id="prev-photo-container" class="hidden rounded overflow-hidden max-h-48 border border-[var(--rule)]">
-            <img id="prev-photo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23efeae0'/%3E%3C/svg%3E" alt="Sampul Karya" width="400" height="200" class="w-full h-44 object-cover" />
-          </div>
-
-          <h3 id="prev-title" class="font-['Fraunces',serif] font-semibold text-2xl text-[var(--ink)] leading-tight m-0">
-            Judul Karya Anda
-          </h3>
-
-          <p id="prev-desc" class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] m-0 leading-relaxed">
-            "Petikan atau sinopsis karya akan tampil di sini..."
-          </p>
-
-          <div class="flex items-center gap-2 pt-1 border-t border-[var(--rule)] mono text-xs text-[var(--ink-faint)]">
-            <span id="prev-author" class="font-semibold text-[var(--ink)] font-['Fraunces',serif]">Nama Penulis</span>
-            <span id="prev-grade">· Kelas</span>
-          </div>
-
-          <div class="border-t border-[var(--rule-strong)] pt-3">
-            <div id="prev-body" class="font-['Source_Serif_4',serif] text-sm text-[var(--ink)] leading-relaxed whitespace-pre-line max-h-72 overflow-y-auto pr-2">
-              Isi naskah karya akan tampil di sini secara langsung saat Anda mengetik...
-            </div>
-          </div>
-        </div>
-
-      </section>
+      </form>
 
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- MODAL: FORM QUOTES SASTRA -->
+  <!-- ============================================================ -->
+  <div id="modal-quote-form" class="fixed inset-0 bg-black/60 z-[9996] hidden items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-[var(--crimson)] text-[var(--paper)] flex items-center justify-between">
+        <h3 class="font-['Fraunces',serif] font-bold text-sm text-[var(--paper)] m-0">Tambah Kutipan Sastra Baru</h3>
+        <button type="button" onclick="closeQuoteModal()" class="text-xl text-[var(--paper)] leading-none">&times;</button>
+      </div>
+      <form id="quote-form" class="p-5 space-y-3">
+        <div>
+          <label for="quote-text" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] mb-1">Isi Kutipan *</label>
+          <textarea id="quote-text" required rows="3" placeholder="Kata-kata mutiara sastra..." class="w-full p-3 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Fraunces',serif]"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="quote-author" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] mb-1">Nama Tokoh *</label>
+            <input type="text" id="quote-author" required placeholder="Nama penulis / ustadz" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs" />
+          </div>
+          <div>
+            <label for="quote-title" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] mb-1">Jabatan / Peran</label>
+            <input type="text" id="quote-title" placeholder="Pengasuh / Santri" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs" />
+          </div>
+        </div>
+        <div>
+          <label for="quote-cat" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] mb-1">Kategori</label>
+          <select id="quote-cat" class="w-full px-3 py-2 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono">
+            <option value="Manifesto">Manifesto Sastra</option>
+            <option value="Spiritual">Spiritual &amp; Qur'ani</option>
+            <option value="Edukasi">Edukasi &amp; Literasi</option>
+            <option value="Puitik">Puitik &amp; Renungan</option>
+          </select>
+        </div>
+        <button type="submit" id="btn-save-quote" class="w-full py-2.5 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-bold text-xs mono shadow transition-all cursor-pointer">
+          Simpan Kutipan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC FOR ADMIN DASHBOARD -->
   <script>
     import { 
-      fetchAllKaryaSupabase, 
+      getAdminUser, 
+      logoutAdmin, 
+      getFullData, 
       simpanKarya, 
       hapusKarya, 
       updateStatusKarya, 
       uploadFotoKarya, 
-      getAdminUser, 
-      logoutAdmin,
-      type KaryaInput 
+      simpanQuote, 
+      hapusQuote, 
+      hapusKomentar,
+      type KaryaInput,
+      type FullDatabaseDump 
     } from '../../lib/supabase';
     import confetti from 'canvas-confetti';
 
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-    // Elements
+    // State Variables
+    let currentAdminUser: any = null;
+    let fullDb: FullDatabaseDump = {
+      karya: [],
+      quotes: [],
+      komentar: [],
+      apresiasi: [],
+      penulis: []
+    };
+
+    // DOM Elements
     const authBarrier = document.getElementById('auth-guard-barrier');
-    const adminDashboard = document.getElementById('admin-dashboard');
-    const adminUserEmail = document.getElementById('admin-user-email');
-    const logoutBtn = document.getElementById('btn-logout') as HTMLButtonElement | null;
+    const adminPanel = document.getElementById('admin-panel');
+    const adminEmailDisplay = document.getElementById('admin-user-display-email');
+    const adminRoleDisplay = document.getElementById('admin-user-display-role');
+    const btnLogout = document.getElementById('btn-admin-logout');
 
-    // Stats
-    const statSubmissions = document.getElementById('stat-submissions');
-    const statPublished = document.getElementById('stat-published');
-    const statDrafts = document.getElementById('stat-drafts');
-    const statTotal = document.getElementById('stat-total');
+    // KPI Elements
+    const kpiSubmissions = document.getElementById('kpi-submissions');
+    const kpiPublished = document.getElementById('kpi-published');
+    const kpiDrafts = document.getElementById('kpi-drafts');
+    const kpiComments = document.getElementById('kpi-comments');
 
-    const badgeSubmissions = document.getElementById('badge-submissions');
-    const badgePublished = document.getElementById('badge-published');
-    const badgeDrafts = document.getElementById('badge-drafts');
+    // Sidebar Badges
+    const badgeKurasi = document.getElementById('sidebar-badge-kurasi');
+    const badgeKarya = document.getElementById('sidebar-badge-karya');
+    const badgeKomentar = document.getElementById('sidebar-badge-komentar');
+    const badgeQuotes = document.getElementById('sidebar-badge-quotes');
+    const badgePenulis = document.getElementById('sidebar-badge-penulis');
+    const overviewBadgeQueue = document.getElementById('overview-badge-queue');
 
-    // Tabs
-    const tabBtnSubmissions = document.getElementById('tab-btn-submissions');
-    const tabBtnPublished = document.getElementById('tab-btn-published');
-    const tabBtnDrafts = document.getElementById('tab-btn-drafts');
-    const tabBtnEditor = document.getElementById('tab-btn-editor');
-
-    const viewSubmissions = document.getElementById('view-submissions');
-    const viewPublished = document.getElementById('view-published');
-    const viewDrafts = document.getElementById('view-drafts');
-    const viewEditor = document.getElementById('view-editor');
-
-    // List Containers
-    const submissionsContainer = document.getElementById('submissions-list-container');
-    const publishedContainer = document.getElementById('published-list-container');
-    const draftsContainer = document.getElementById('drafts-list-container');
-
-    // Editor Form Inputs
-    const editIdInput = document.getElementById('edit-id') as HTMLInputElement;
-    const editSlugInput = document.getElementById('edit-slug') as HTMLInputElement;
-    const titleInput = document.getElementById('editor-title') as HTMLInputElement;
-    const authorInput = document.getElementById('editor-author') as HTMLInputElement;
-    const gradeInput = document.getElementById('editor-grade') as HTMLInputElement;
-    const categorySelect = document.getElementById('editor-category') as HTMLSelectElement;
-    const statusSelect = document.getElementById('editor-status') as HTMLSelectElement;
-    const descInput = document.getElementById('editor-desc') as HTMLTextAreaElement;
-    const contentInput = document.getElementById('editor-content') as HTMLTextAreaElement;
-    const photoFileInput = document.getElementById('editor-photo-file') as HTMLInputElement;
-    const photoUrlInput = document.getElementById('editor-photo-url') as HTMLInputElement;
-    const uploadStatus = document.getElementById('photo-upload-status');
-    const saveBtn = document.getElementById('btn-save-supabase') as HTMLButtonElement | null;
-    const alertBox = document.getElementById('editor-alert');
-    const editorFormTitle = document.getElementById('editor-form-title');
-    const editorModeBadge = document.getElementById('editor-mode-badge');
-
-    // Preview
-    const prevTitle = document.getElementById('prev-title');
-    const prevDesc = document.getElementById('prev-desc');
-    const prevAuthor = document.getElementById('prev-author');
-    const prevGrade = document.getElementById('prev-grade');
-    const prevBody = document.getElementById('prev-body');
-    const prevCatBadge = document.getElementById('prev-category-badge');
-    const prevPhotoBox = document.getElementById('prev-photo-container');
-    const prevPhotoImg = document.getElementById('prev-photo-img') as HTMLImageElement;
-
-    // Filter & Search
-    const searchPublishedInput = document.getElementById('search-published-input') as HTMLInputElement;
-    const filterPublishedCat = document.getElementById('filter-published-category') as HTMLSelectElement;
-
-    let allWorks: KaryaInput[] = [];
-
-    // 1. Auth Guard Check
-    getAdminUser().then(user => {
-      if (!user) {
+    // 1. Initial Authentication Guard
+    async function initAdmin() {
+      currentAdminUser = await getAdminUser();
+      if (!currentAdminUser) {
         authBarrier?.classList.remove('hidden');
-        adminDashboard?.classList.add('hidden');
-      } else {
-        authBarrier?.classList.add('hidden');
-        adminDashboard?.classList.remove('hidden');
-        if (adminUserEmail) adminUserEmail.textContent = user.email;
-        loadAllWorks();
+        adminPanel?.classList.add('hidden');
+        return;
       }
-    });
 
-    logoutBtn?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      if (logoutBtn) {
-        logoutBtn.disabled = true;
-        logoutBtn.innerHTML = '<span>Keluar...</span>';
-      }
-      try {
+      authBarrier?.classList.add('hidden');
+      adminPanel?.classList.remove('hidden');
+
+      if (adminEmailDisplay) adminEmailDisplay.textContent = currentAdminUser.email;
+      if (adminRoleDisplay) adminRoleDisplay.textContent = currentAdminUser.role || 'Redaktur Pelaksana';
+
+      // Load all database items
+      await loadAllAdminData();
+    }
+    initAdmin();
+
+    // Logout Handler
+    btnLogout?.addEventListener('click', async () => {
+      if (confirm('Keluar dari sesi Studio Redaksi?')) {
         await logoutAdmin();
-      } catch (err) {
-        console.warn('Gagal logout:', err);
+        window.location.href = `${basePath}/admin/login?logout=1`;
       }
-      window.location.replace(`${basePath}/admin/login?logout=1`);
     });
 
-    // 2. Tab Navigation
-    function switchTab(target: 'submissions' | 'published' | 'drafts' | 'editor') {
-      [tabBtnSubmissions, tabBtnPublished, tabBtnDrafts, tabBtnEditor].forEach(btn => {
-        if (!btn) return;
-        btn.className = 'tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:text-[var(--ink)] cursor-pointer transition-colors flex items-center gap-1.5';
-      });
+    // 2. Fetch Data from Google Sheets & Drive Cloud Backend
+    async function loadAllAdminData() {
+      const syncIcon = document.getElementById('sync-icon');
+      const syncText = document.getElementById('sync-text');
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+      if (syncText) syncText.textContent = 'Memuat Cloud...';
 
-      [viewSubmissions, viewPublished, viewDrafts, viewEditor].forEach(view => {
-        view?.classList.add('hidden');
-      });
-
-      const activeClass = 'tab-btn mono text-xs md:text-sm px-4 py-2 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-medium cursor-pointer transition-colors flex items-center gap-1.5';
-
-      if (target === 'submissions') {
-        if (tabBtnSubmissions) tabBtnSubmissions.className = activeClass;
-        viewSubmissions?.classList.remove('hidden');
-      } else if (target === 'published') {
-        if (tabBtnPublished) tabBtnPublished.className = activeClass;
-        viewPublished?.classList.remove('hidden');
-      } else if (target === 'drafts') {
-        if (tabBtnDrafts) tabBtnDrafts.className = activeClass;
-        viewDrafts?.classList.remove('hidden');
-      } else if (target === 'editor') {
-        if (tabBtnEditor) tabBtnEditor.className = activeClass;
-        viewEditor?.classList.remove('hidden');
+      try {
+        fullDb = await getFullData();
+        updateKpiMetrics();
+        renderOverviewQueue();
+        renderOverviewPublished();
+        renderKurasiList();
+        renderKaryaCatalog();
+        renderKomentarList();
+        renderQuotesGrid();
+        renderPenulisList();
+      } catch (err) {
+        console.warn('Gagal memuat database cloud:', err);
+      } finally {
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+        if (syncText) syncText.textContent = 'Segarkan Data';
       }
     }
+    (window as any).loadAllAdminData = loadAllAdminData;
 
-    tabBtnSubmissions?.addEventListener('click', () => switchTab('submissions'));
-    tabBtnPublished?.addEventListener('click', () => switchTab('published'));
-    tabBtnDrafts?.addEventListener('click', () => switchTab('drafts'));
-    tabBtnEditor?.addEventListener('click', () => switchTab('editor'));
+    // 3. Update KPI Metrics
+    function updateKpiMetrics() {
+      const submissions = fullDb.karya.filter(k => k.status === 'menunggu_kurasi').length;
+      const published = fullDb.karya.filter(k => k.status === 'published').length;
+      const drafts = fullDb.karya.filter(k => k.status === 'draft').length;
+      const comments = fullDb.komentar.length;
+      const quotes = fullDb.quotes.length;
+      const penulis = fullDb.penulis.length;
 
-    // 3. Load All Works & Render Views
-    async function loadAllWorks() {
-      allWorks = await fetchAllKaryaSupabase();
-      renderStats();
-      renderSubmissions();
-      renderPublished();
-      renderDrafts();
+      if (kpiSubmissions) kpiSubmissions.textContent = submissions.toString();
+      if (kpiPublished) kpiPublished.textContent = published.toString();
+      if (kpiDrafts) kpiDrafts.textContent = drafts.toString();
+      if (kpiComments) kpiComments.textContent = comments.toString();
+
+      if (badgeKurasi) badgeKurasi.textContent = submissions.toString();
+      if (badgeKarya) badgeKarya.textContent = fullDb.karya.length.toString();
+      if (badgeKomentar) badgeKomentar.textContent = comments.toString();
+      if (badgeQuotes) badgeQuotes.textContent = quotes.toString();
+      if (badgePenulis) badgePenulis.textContent = penulis.toString();
+      if (overviewBadgeQueue) overviewBadgeQueue.textContent = submissions.toString();
     }
 
-    function renderStats() {
-      const submissions = allWorks.filter(w => w.status === 'menunggu_kurasi');
-      const published = allWorks.filter(w => !w.status || w.status === 'published');
-      const drafts = allWorks.filter(w => w.status === 'draft');
+    // 4. Section Switcher (like smpalmubarokweb)
+    function switchAdminSection(sectionKey: string) {
+      const sections = ['ringkasan', 'kurasi', 'karya', 'komentar', 'quotes', 'penulis'];
+      const titles: Record<string, string> = {
+        ringkasan: 'Ringkasan & Statistik',
+        kurasi: 'Antrean Kurasi Naskah Masuk',
+        karya: 'Katalog Karya Sastra Lengkap',
+        komentar: 'Moderasi Catatan & Komentar',
+        quotes: 'Quotes & Mutiara Sastra',
+        penulis: 'Direktori Penulis Santri',
+      };
 
-      if (statSubmissions) statSubmissions.textContent = submissions.length.toString();
-      if (statPublished) statPublished.textContent = published.length.toString();
-      if (statDrafts) statDrafts.textContent = drafts.length.toString();
-      if (statTotal) statTotal.textContent = allWorks.length.toString();
+      sections.forEach(k => {
+        const secEl = document.getElementById(`section-${k}`);
+        const navBtn = document.getElementById(`nav-btn-${k}`);
+        if (k === sectionKey) {
+          secEl?.classList.remove('hidden');
+          navBtn?.classList.add('bg-[var(--paper-deep)]', 'text-[var(--crimson)]', 'font-bold', 'border-l-4', 'border-[var(--crimson)]');
+          navBtn?.classList.remove('text-[var(--ink-soft)]');
+        } else {
+          secEl?.classList.add('hidden');
+          navBtn?.classList.remove('bg-[var(--paper-deep)]', 'text-[var(--crimson)]', 'font-bold', 'border-l-4', 'border-[var(--crimson)]');
+          navBtn?.classList.add('text-[var(--ink-soft)]');
+        }
+      });
 
-      if (badgeSubmissions) badgeSubmissions.textContent = submissions.length.toString();
-      if (badgePublished) badgePublished.textContent = published.length.toString();
-      if (badgeDrafts) badgeDrafts.textContent = drafts.length.toString();
+      const topTitle = document.getElementById('topbar-section-title');
+      if (topTitle) topTitle.textContent = titles[sectionKey] || 'Studio Redaksi';
+
+      const mobileSelect = document.getElementById('admin-mobile-nav') as HTMLSelectElement;
+      if (mobileSelect) mobileSelect.value = sectionKey;
     }
+    (window as any).switchAdminSection = switchAdminSection;
 
-    // 3A. Render Submissions (Antrean Kiriman Santri)
-    function renderSubmissions() {
-      if (!submissionsContainer) return;
-      const submissions = allWorks.filter(w => w.status === 'menunggu_kurasi');
+    // 5. Render Overview Submissions Queue
+    function renderOverviewQueue() {
+      const container = document.getElementById('overview-queue-container');
+      if (!container) return;
+      const submissions = fullDb.karya.filter(k => k.status === 'menunggu_kurasi');
 
       if (submissions.length === 0) {
-        submissionsContainer.innerHTML = `
-          <div class="p-8 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <div class="text-2xl text-[var(--gold)] mb-2 font-serif">❧</div>
-            <h4 class="font-['Fraunces',serif] font-semibold text-lg text-[var(--ink)] m-0">
-              Alhamdulillah, Antrean Bersih!
-            </h4>
-            <p class="font-['Source_Serif_4',serif] italic text-xs text-[var(--ink-soft)] mt-1">
-              Belum ada kiriman naskah santri baru yang menunggu kurasi. Semua karya telah tertangani.
-            </p>
+        container.innerHTML = `
+          <div class="p-6 text-center text-xs mono text-[var(--ink-faint)] italic">
+            Alhamdulillah! Tidak ada naskah santri yang tertunda kurasi saat ini.
           </div>
         `;
         return;
       }
 
-      submissionsContainer.innerHTML = submissions.map((k, idx) => {
-        const contactTag = k.tags?.find(t => t.startsWith('Kontak:')) || '';
-        return `
-          <div class="p-5 bg-[var(--paper-card)] border-2 border-[var(--crimson-subtle)] hover:border-[var(--crimson)] rounded-sm transition-all shadow-sm space-y-3">
-            <div class="flex items-center justify-between gap-3 flex-wrap">
-              <div class="flex items-center gap-2">
-                <span class="mono text-[0.68rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] font-medium uppercase">
-                  ${k.category_label || k.category}
-                </span>
-                <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-semibold">
-                  Menunggu Kurasi
-                </span>
-                ${contactTag ? `<span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] text-[var(--ink-soft)]">${contactTag}</span>` : ''}
-              </div>
-              <span class="mono text-xs text-[var(--ink-faint)]">Submisi #${idx + 1}</span>
-            </div>
-
-            <div>
-              <h3 class="font-['Fraunces',serif] font-semibold text-xl text-[var(--ink)] m-0">
-                ${k.title}
-              </h3>
-              <p class="mono text-xs text-[var(--ink-faint)] mt-1 mb-0">
-                Oleh <strong class="text-[var(--ink)] font-semibold">${k.author}</strong> ${k.author_grade ? `(${k.author_grade})` : ''}
-              </p>
-            </div>
-
-            <p class="font-['Source_Serif_4',serif] italic text-sm text-[var(--ink-soft)] bg-[var(--paper)] p-3 rounded border border-[var(--rule)] m-0">
-              "${k.description || 'Tidak ada abstrak/pengantar terlampir.'}"
-            </p>
-
-            <!-- Collapsible Full Content Preview -->
-            <details class="text-xs font-['Source_Serif_4',serif] text-[var(--ink-soft)]">
-              <summary class="mono text-xs text-[var(--crimson)] cursor-pointer hover:underline select-none">
-                Lihat Naskah Penuh ▼
-              </summary>
-              <div class="mt-2 p-3 bg-[var(--paper)] rounded border border-[var(--rule)] whitespace-pre-line leading-relaxed max-h-60 overflow-y-auto">
-                ${k.content}
-              </div>
-            </details>
-
-            <!-- Action Toolbar -->
-            <div class="pt-3 border-t border-[var(--rule)] flex items-center justify-between gap-3 flex-wrap">
-              <div class="flex items-center gap-2">
-                <button 
-                  class="btn-approve-submission btn-literary btn-literary-solid !py-1.5 !px-4 !text-xs cursor-pointer flex items-center gap-1.5"
-                  data-slug="${k.slug}"
-                  data-id="${k.id || ''}"
-                >
-                  <span>✓ Setujui &amp; Publikasikan</span>
-                </button>
-                <button 
-                  class="btn-edit-submission btn-literary !py-1.5 !px-3 !text-xs cursor-pointer"
-                  data-slug="${k.slug}"
-                >
-                  <span>✎ Sunting di Editor</span>
-                </button>
-              </div>
-
-              <button 
-                class="btn-delete-submission mono text-xs text-rose-700 hover:text-rose-900 underline cursor-pointer p-1"
-                data-slug="${k.slug}"
-                data-id="${k.id || ''}"
-                data-title="${k.title}"
-              >
-                ✕ Tolak / Hapus Naskah
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Attach Submissions Listeners
-      document.querySelectorAll('.btn-approve-submission').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug || '';
-          b.disabled = true;
-          b.textContent = 'Menerbitkan...';
-
-          const res = await updateStatusKarya(slug, 'published');
-          if (res.success) {
-            confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
-            await loadAllWorks();
-            switchTab('published');
-          } else {
-            alert(res.message);
-            b.disabled = false;
-            b.textContent = '✓ Setujui & Publikasikan';
-          }
-        });
-      });
-
-      document.querySelectorAll('.btn-edit-submission').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug;
-          loadIntoEditor(slug);
-        });
-      });
-
-      document.querySelectorAll('.btn-delete-submission').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug || '';
-          const id = b.dataset.id || slug;
-          const title = b.dataset.title || 'karya ini';
-
-          if (confirm(`Apakah Anda yakin ingin menolak dan menghapus naskah "${title}"?`)) {
-            await hapusKarya(id);
-            await loadAllWorks();
-          }
-        });
-      });
-    }
-
-    // 3B. Render Published Works (Karya Terpublikasi)
-    function renderPublished() {
-      if (!publishedContainer) return;
-      const q = (searchPublishedInput?.value || '').trim().toLowerCase();
-      const cat = filterPublishedCat?.value || 'all';
-
-      let published = allWorks.filter(w => !w.status || w.status === 'published');
-
-      if (cat !== 'all') {
-        published = published.filter(w => w.category === cat);
-      }
-      if (q) {
-        published = published.filter(w => 
-          w.title.toLowerCase().includes(q) || 
-          w.author.toLowerCase().includes(q)
-        );
-      }
-
-      if (published.length === 0) {
-        publishedContainer.innerHTML = `
-          <div class="p-8 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <p class="mono text-xs text-[var(--ink-faint)] italic m-0">Tidak ada karya terpublikasi yang cocok dengan pencarian / filter.</p>
-          </div>
-        `;
-        return;
-      }
-
-      publishedContainer.innerHTML = published.map(k => `
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm flex items-center justify-between gap-4 flex-wrap hover:border-[var(--gold)] transition-colors">
-          <div class="flex items-start gap-3.5">
-            ${k.cover_image_url ? `
-              <img src="${k.cover_image_url}" alt="${k.title}" class="w-14 h-14 object-cover rounded border border-[var(--rule)] flex-shrink-0" />
-            ` : `
-              <div class="w-14 h-14 bg-[var(--paper-deep)] border border-[var(--rule)] rounded flex items-center justify-center font-['Fraunces',serif] text-base text-[var(--crimson)] flex-shrink-0">
-                ${k.title.charAt(0)}
-              </div>
-            `}
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--ink-soft)] uppercase">
-                  ${k.category_label || k.category}
-                </span>
-                <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  Tayang
-                </span>
-              </div>
-              <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] m-0">
-                ${k.title}
-              </h3>
-              <p class="mono text-[0.72rem] text-[var(--ink-faint)] m-0 mt-0.5">
-                Oleh ${k.author} ${k.author_grade ? `(${k.author_grade})` : ''}
-              </p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2 flex-wrap">
-            <a 
-              href="${basePath}/karya/${k.slug}" 
-              target="_blank" 
-              class="mono text-xs px-2.5 py-1.5 rounded border border-[var(--rule-strong)] text-[var(--ink)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] no-underline transition-colors"
-            >
-              Buka di Web ↗
-            </a>
-            <button 
-              class="btn-edit-published btn-literary !py-1.5 !px-3 !text-xs cursor-pointer"
-              data-slug="${k.slug}"
-            >
-              Sunting ✎
-            </button>
-            <button 
-              class="btn-unpublish mono text-xs px-2.5 py-1.5 rounded border border-[var(--rule)] text-[var(--gold)] hover:underline cursor-pointer"
-              data-slug="${k.slug}"
-              title="Kembalikan status menjadi draf naskah"
-            >
-              Ubah ke Draf ↷
-            </button>
-            <button 
-              class="btn-delete-published mono text-xs p-1.5 text-rose-700 hover:text-rose-900 cursor-pointer"
-              data-slug="${k.slug}"
-              data-id="${k.id || ''}"
-              data-title="${k.title}"
-              title="Hapus permanen karya ini"
-            >
-              🗑
-            </button>
-          </div>
-        </div>
-      `).join('');
-
-      // Listeners
-      document.querySelectorAll('.btn-edit-published').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          loadIntoEditor(b.dataset.slug);
-        });
-      });
-
-      document.querySelectorAll('.btn-unpublish').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug || '';
-          if (confirm('Ubah status karya ini kembali menjadi Draf? (Karya tidak akan tampil di publik)')) {
-            await updateStatusKarya(slug, 'draft');
-            await loadAllWorks();
-          }
-        });
-      });
-
-      document.querySelectorAll('.btn-delete-published').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug || '';
-          const id = b.dataset.id || slug;
-          const title = b.dataset.title || 'karya ini';
-
-          if (confirm(`Hapus permanen karya "${title}" dari database cloud?`)) {
-            await hapusKarya(id);
-            await loadAllWorks();
-          }
-        });
-      });
-    }
-
-    searchPublishedInput?.addEventListener('input', renderPublished);
-    filterPublishedCat?.addEventListener('change', renderPublished);
-
-    // 3C. Render Drafts (Draf Redaksi)
-    function renderDrafts() {
-      if (!draftsContainer) return;
-      const drafts = allWorks.filter(w => w.status === 'draft');
-
-      if (drafts.length === 0) {
-        draftsContainer.innerHTML = `
-          <div class="p-8 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm">
-            <p class="mono text-xs text-[var(--ink-faint)] italic m-0">Tidak ada draf yang tersimpan saat ini.</p>
-          </div>
-        `;
-        return;
-      }
-
-      draftsContainer.innerHTML = drafts.map(k => `
-        <div class="p-4 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-sm flex items-center justify-between gap-4 flex-wrap">
-          <div>
+      container.innerHTML = submissions.slice(0, 5).map(k => `
+        <div class="p-4 flex items-center justify-between gap-3 flex-wrap hover:bg-[var(--paper-deep)]/50 transition-colors">
+          <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 mb-1">
-              <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase">
+              <span class="mono text-[0.62rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-semibold">
                 ${k.category_label || k.category}
               </span>
-              <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
-                Draf
+              <span class="mono text-[0.62rem] text-[var(--ink-faint)]">
+                ${k.created_at ? new Date(k.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : 'Baru'}
               </span>
             </div>
-            <h3 class="font-['Fraunces',serif] font-semibold text-base text-[var(--ink)] m-0">
+            <h4 class="font-['Fraunces',serif] font-bold text-sm text-[var(--ink)] m-0 truncate">
               ${k.title}
-            </h3>
-            <p class="mono text-[0.72rem] text-[var(--ink-faint)] m-0 mt-0.5">
-              Oleh ${k.author}
+            </h4>
+            <p class="mono text-[0.7rem] text-[var(--ink-soft)] m-0 mt-0.5">
+              Oleh <span class="font-semibold text-[var(--ink)]">${k.author}</span> ${k.author_grade ? `(${k.author_grade})` : ''}
             </p>
           </div>
 
           <div class="flex items-center gap-2">
             <button 
-              class="btn-publish-draft btn-literary btn-literary-solid !py-1.5 !px-3 !text-xs cursor-pointer"
-              data-slug="${k.slug}"
+              type="button" 
+              onclick="quickPublish('${k.slug || k.id}')" 
+              class="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white mono text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1"
+              title="Setujui dan langsung terbitkan ke publik"
             >
-              Tayangkan Sekarang ⚡
+              <span>✓ Terbitkan</span>
             </button>
             <button 
-              class="btn-edit-draft btn-literary !py-1.5 !px-3 !text-xs cursor-pointer"
-              data-slug="${k.slug}"
+              type="button" 
+              onclick="editKaryaBySlug('${k.slug}')" 
+              class="px-2.5 py-1.5 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] hover:bg-[var(--paper-deep)] text-[var(--ink)] mono text-xs font-medium cursor-pointer"
             >
-              Lanjutkan Sunting ✎
+              <span>Sunting ✎</span>
             </button>
-            <button 
-              class="btn-delete-draft mono text-xs p-1.5 text-rose-700 hover:text-rose-900 cursor-pointer"
-              data-slug="${k.slug}"
-              data-id="${k.id || ''}"
-              data-title="${k.title}"
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 6. Render Overview Recently Published
+    function renderOverviewPublished() {
+      const container = document.getElementById('overview-published-container');
+      if (!container) return;
+      const published = fullDb.karya.filter(k => k.status === 'published');
+
+      if (published.length === 0) {
+        container.innerHTML = '<div class="p-6 text-center text-xs mono text-[var(--ink-faint)] italic">Belum ada karya yang terpublikasi.</div>';
+        return;
+      }
+
+      container.innerHTML = published.slice(0, 5).map(k => `
+        <div class="p-4 flex items-center justify-between gap-3 hover:bg-[var(--paper-deep)]/50 transition-colors">
+          <div class="min-w-0">
+            <span class="mono text-[0.62rem] text-[var(--gold)] uppercase font-semibold">
+              ${k.category_label || k.category}
+            </span>
+            <h4 class="font-['Fraunces',serif] font-bold text-sm text-[var(--ink)] m-0 truncate">
+              ${k.title}
+            </h4>
+            <p class="mono text-[0.7rem] text-[var(--ink-faint)] m-0">
+              Oleh ${k.author}
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a 
+              href="${basePath}/karya/${k.slug}" 
+              target="_blank" 
+              class="px-2.5 py-1 rounded-md border border-[var(--rule)] text-[var(--ink-soft)] hover:text-[var(--crimson)] text-xs mono no-underline flex items-center gap-1"
             >
+              <span>Buka</span>
+              <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+            <button 
+              type="button" 
+              onclick="editKaryaBySlug('${k.slug}')" 
+              class="px-2.5 py-1 rounded-md border border-[var(--rule-strong)] bg-[var(--paper)] text-xs mono text-[var(--ink)] hover:bg-[var(--paper-deep)] cursor-pointer"
+            >
+              Sunting
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 7. Render Antrean Kurasi (Curator Hub)
+    function renderKurasiList() {
+      const container = document.getElementById('kurasi-list-container');
+      if (!container) return;
+      const searchVal = ((document.getElementById('search-kurasi') as HTMLInputElement)?.value || '').toLowerCase();
+      
+      let list = fullDb.karya.filter(k => k.status === 'menunggu_kurasi');
+      if (searchVal) {
+        list = list.filter(k => k.title.toLowerCase().includes(searchVal) || k.author.toLowerCase().includes(searchVal));
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl">
+            <p class="font-['Fraunces',serif] text-base text-[var(--ink)] m-0">Semua kiriman santri telah selesai dikurasi.</p>
+            <p class="mono text-xs text-[var(--ink-faint)] mt-1 mb-0">Naskah baru yang dikirim siswa melalui formulir akan muncul di sini.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(k => `
+        <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs space-y-3">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-bold">
+                  ${k.category_label || k.category}
+                </span>
+                <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+                  Menunggu Persetujuan
+                </span>
+              </div>
+              <h3 class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0">
+                ${k.title}
+              </h3>
+              <p class="mono text-xs text-[var(--ink-soft)] m-0 mt-0.5">
+                Pengirim: <strong class="text-[var(--ink)]">${k.author}</strong> ${k.author_grade ? `· ${k.author_grade}` : ''}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button 
+                type="button" 
+                onclick="quickPublish('${k.slug || k.id}')" 
+                class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-['Fraunces',serif] font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1.5"
+              >
+                <span>✓ Setujui &amp; Terbitkan</span>
+              </button>
+              <button 
+                type="button" 
+                onclick="editKaryaBySlug('${k.slug}')" 
+                class="px-3 py-2 rounded-xl border border-[var(--rule-strong)] bg-[var(--paper)] hover:bg-[var(--paper-deep)] text-xs mono text-[var(--ink)] cursor-pointer"
+              >
+                <span>Sunting ✎</span>
+              </button>
+              <button 
+                type="button" 
+                onclick="quickDraft('${k.slug || k.id}')" 
+                class="px-3 py-2 rounded-xl border border-[var(--rule-strong)] bg-[var(--paper)] text-xs mono text-[var(--gold)] cursor-pointer"
+                title="Pindahkan ke draf untuk ditinjau nanti"
+              >
+                <span>Jadikan Draf</span>
+              </button>
+              <button 
+                type="button" 
+                onclick="quickDelete('${k.slug || k.id}', '${k.title}')" 
+                class="p-2 rounded-xl text-rose-700 hover:bg-rose-50 cursor-pointer" 
+                title="Hapus naskah ini"
+              >
+                🗑
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-[var(--paper-deep)] rounded-lg text-xs font-['Source_Serif_4',serif] italic text-[var(--ink-soft)] leading-relaxed">
+            "${k.description || (k.content ? k.content.slice(0, 160) + '...' : 'Tidak ada sinopsis singkat.')}"
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 8. Render Karya Catalog Table
+    function renderKaryaCatalog() {
+      const tbody = document.getElementById('karya-table-body');
+      if (!tbody) return;
+
+      const searchVal = ((document.getElementById('search-karya') as HTMLInputElement)?.value || '').toLowerCase();
+      const filterCat = (document.getElementById('filter-karya-kategori') as HTMLSelectElement)?.value || 'all';
+      const filterStat = (document.getElementById('filter-karya-status') as HTMLSelectElement)?.value || 'all';
+
+      let list = [...fullDb.karya];
+      if (searchVal) {
+        list = list.filter(k => k.title.toLowerCase().includes(searchVal) || k.author.toLowerCase().includes(searchVal));
+      }
+      if (filterCat !== 'all') {
+        list = list.filter(k => k.category === filterCat);
+      }
+      if (filterStat !== 'all') {
+        list = list.filter(k => k.status === filterStat);
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Tidak ada karya yang sesuai dengan filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(k => {
+        let statusBadge = '';
+        if (k.status === 'published') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-emerald-100 text-emerald-800">Tayang</span>';
+        } else if (k.status === 'menunggu_kurasi') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-rose-100 text-rose-800">Kurasi</span>';
+        } else {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-amber-100 text-amber-800">Draf</span>';
+        }
+
+        const coverImg = k.cover_image_url 
+          ? `<img src="${k.cover_image_url}" class="w-9 h-9 rounded object-cover border border-[var(--rule)]" alt="Sampul" />`
+          : `<div class="w-9 h-9 rounded bg-[var(--paper-deep)] border border-[var(--rule)] flex items-center justify-center mono text-[0.55rem] text-[var(--ink-faint)]">N/A</div>`;
+
+        return `
+          <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors">
+            <td class="px-4 py-3">${coverImg}</td>
+            <td class="px-4 py-3">
+              <a href="${basePath}/karya/${k.slug}" target="_blank" class="font-['Fraunces',serif] font-bold text-xs text-[var(--ink)] hover:text-[var(--crimson)] no-underline block max-w-xs truncate">
+                ${k.title}
+              </a>
+              <span class="mono text-[0.62rem] text-[var(--ink-faint)] truncate block">${k.slug}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="font-semibold text-xs text-[var(--ink)] block">${k.author}</span>
+              <span class="mono text-[0.62rem] text-[var(--ink-faint)]">${k.author_grade || '-'}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="mono text-[0.65rem] px-2 py-0.5 rounded border border-[var(--rule)] text-[var(--ink-soft)] uppercase">
+                ${k.category_label || k.category}
+              </span>
+            </td>
+            <td class="px-4 py-3">${statusBadge}</td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">
+              <div class="inline-flex items-center gap-1.5">
+                <a href="${basePath}/karya/${k.slug}" target="_blank" title="Lihat di Web" class="p-1 text-[var(--ink-soft)] hover:text-[var(--crimson)]">
+                  👁️
+                </a>
+                <button type="button" onclick="editKaryaBySlug('${k.slug}')" title="Sunting Naskah" class="p-1 text-[var(--ink-soft)] hover:text-[var(--crimson)] cursor-pointer">
+                  ✎
+                </button>
+                <button type="button" onclick="quickToggleStatus('${k.slug || k.id}', '${k.status}')" title="Ubah Status" class="p-1 text-[var(--gold)] hover:underline cursor-pointer">
+                  ⇄
+                </button>
+                <button type="button" onclick="quickDelete('${k.slug || k.id}', '${k.title}')" title="Hapus Permanen" class="p-1 text-rose-700 hover:text-rose-900 cursor-pointer">
+                  🗑
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 9. Render Komentar List
+    function renderKomentarList() {
+      const tbody = document.getElementById('komentar-table-body');
+      if (!tbody) return;
+
+      if (fullDb.komentar.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Belum ada catatan pembaca.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = fullDb.komentar.map(c => `
+        <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors">
+          <td class="px-4 py-3 font-semibold text-xs text-[var(--ink)]">${c.nama}</td>
+          <td class="px-4 py-3">
+            <span class="mono text-[0.65rem] px-2 py-0.5 rounded bg-[var(--paper-deep)] border border-[var(--rule)]">${c.peran || 'Pembaca'}</span>
+          </td>
+          <td class="px-4 py-3 mono text-xs text-[var(--crimson)]">${c.karya_id}</td>
+          <td class="px-4 py-3 font-['Source_Serif_4',serif] italic text-xs max-w-sm">${c.pesan}</td>
+          <td class="px-4 py-3 mono text-[0.65rem] text-[var(--ink-faint)] whitespace-nowrap">
+            ${c.created_at ? new Date(c.created_at).toLocaleDateString('id-ID') : '-'}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <button type="button" onclick="hapusKomentarItem('${c.id}')" class="p-1 text-rose-700 hover:underline cursor-pointer mono text-xs font-bold" title="Hapus Komentar">
+              Hapus
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 10. Render Quotes Grid
+    function renderQuotesGrid() {
+      const container = document.getElementById('quotes-grid-container');
+      if (!container) return;
+
+      if (fullDb.quotes.length === 0) {
+        container.innerHTML = '<p class="col-span-full p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Belum ada quotes sastra.</p>';
+        return;
+      }
+
+      container.innerHTML = fullDb.quotes.map(q => `
+        <div class="p-5 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="mono text-[0.62rem] px-2 py-0.5 rounded-full border border-[var(--gold)] text-[var(--gold)] uppercase font-semibold">
+              ${q.category || 'Quotes'}
+            </span>
+            <p class="font-['Fraunces',serif] italic text-sm text-[var(--ink)] m-0 leading-relaxed">
+              "${q.quote}"
+            </p>
+          </div>
+          <div class="pt-2 border-t border-[var(--rule)] flex items-center justify-between text-xs">
+            <div>
+              <p class="font-bold text-[var(--ink)] m-0 text-xs">${q.author}</p>
+              <p class="mono text-[0.65rem] text-[var(--ink-faint)] m-0">${q.author_title || q.source || ''}</p>
+            </div>
+            <button type="button" onclick="hapusQuoteItem('${q.id}')" class="p-1 text-rose-700 hover:underline text-xs mono cursor-pointer" title="Hapus Quote">
               🗑
             </button>
           </div>
         </div>
       `).join('');
-
-      document.querySelectorAll('.btn-publish-draft').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug || '';
-          await updateStatusKarya(slug, 'published');
-          confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
-          await loadAllWorks();
-          switchTab('published');
-        });
-      });
-
-      document.querySelectorAll('.btn-edit-draft').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          loadIntoEditor(b.dataset.slug);
-        });
-      });
-
-      document.querySelectorAll('.btn-delete-draft').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const b = e.currentTarget as HTMLButtonElement;
-          const slug = b.dataset.slug || '';
-          const id = b.dataset.id || slug;
-          const title = b.dataset.title || 'karya ini';
-
-          if (confirm(`Hapus draf "${title}"?`)) {
-            await hapusKarya(id);
-            await loadAllWorks();
-          }
-        });
-      });
     }
 
-    // 4. Load Work into Editor Form
-    function loadIntoEditor(slug?: string) {
-      if (!slug) return;
-      const found = allWorks.find(w => w.slug === slug);
-      if (!found) return;
+    // 11. Render Penulis Santri List
+    function renderPenulisList() {
+      const tbody = document.getElementById('penulis-table-body');
+      if (!tbody) return;
 
-      editIdInput.value = found.id || '';
-      editSlugInput.value = found.slug || '';
-      titleInput.value = found.title || '';
-      authorInput.value = found.author || '';
-      gradeInput.value = found.author_grade || '';
-      categorySelect.value = found.category || 'puisi';
-      statusSelect.value = found.status || 'published';
-      descInput.value = found.description || '';
-      contentInput.value = found.content || '';
-      photoUrlInput.value = found.cover_image_url || '';
-
-      if (editorFormTitle) editorFormTitle.textContent = `Sunting: "${found.title}"`;
-      if (editorModeBadge) editorModeBadge.textContent = 'Mode Penyuntingan Naskah';
-
-      updateLivePreview();
-      switchTab('editor');
-    }
-
-    // 5. Live Preview
-    function updateLivePreview() {
-      if (prevTitle) prevTitle.textContent = titleInput.value.trim() || 'Judul Karya Anda';
-      if (prevDesc) prevDesc.textContent = `"${descInput.value.trim() || 'Petikan atau sinopsis karya akan tampil di sini...'}"`;
-      if (prevAuthor) prevAuthor.textContent = authorInput.value.trim() || 'Nama Penulis';
-      if (prevGrade) prevGrade.textContent = gradeInput.value.trim() ? `· ${gradeInput.value.trim()}` : '';
-      if (prevBody) prevBody.textContent = contentInput.value.trim() || 'Isi naskah karya akan tampil di sini secara langsung saat Anda mengetik...';
-      
-      if (prevCatBadge) {
-        prevCatBadge.textContent = categorySelect.options[categorySelect.selectedIndex]?.text || 'Sastra';
-      }
-
-      const imgUrl = photoUrlInput.value.trim();
-      if (imgUrl && prevPhotoBox && prevPhotoImg) {
-        prevPhotoImg.src = imgUrl;
-        prevPhotoBox.classList.remove('hidden');
-      } else if (prevPhotoBox) {
-        prevPhotoBox.classList.add('hidden');
-      }
-    }
-
-    [titleInput, authorInput, gradeInput, categorySelect, descInput, contentInput, photoUrlInput].forEach(el => {
-      el?.addEventListener('input', updateLivePreview);
-    });
-
-    // 6. Photo File Upload to Cloud Storage (Google Drive)
-    photoFileInput?.addEventListener('change', async () => {
-      if (!photoFileInput.files || !photoFileInput.files[0]) return;
-      const file = photoFileInput.files[0];
-      if (uploadStatus) uploadStatus.textContent = 'Mengunggah ke Google Drive Storage...';
-
-      try {
-        const publicUrl = await uploadFotoKarya(file);
-        photoUrlInput.value = publicUrl;
-        updateLivePreview();
-        if (uploadStatus) {
-          uploadStatus.textContent = 'Foto berhasil diunggah ke Google Drive!';
-          uploadStatus.className = 'mono text-[0.68rem] text-emerald-600 block mt-1';
-        }
-      } catch (err: any) {
-        if (uploadStatus) {
-          uploadStatus.textContent = 'Gagal unggah foto: ' + (err.message || 'Error');
-          uploadStatus.className = 'mono text-[0.68rem] text-rose-600 block mt-1';
-        }
-      }
-    });
-
-    // 7. Save to Cloud DB
-    saveBtn?.addEventListener('click', async () => {
-      if (!titleInput.value || !authorInput.value || !contentInput.value) {
-        alert('Harap lengkapi Judul, Penulis, dan Isi Naskah terlebih dahulu.');
+      if (fullDb.penulis.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Belum ada akun santri terdaftar.</td></tr>';
         return;
       }
 
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Menyimpan ke Cloud DB...';
+      tbody.innerHTML = fullDb.penulis.map(p => `
+        <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors">
+          <td class="px-4 py-3 font-semibold text-xs text-[var(--ink)]">${p.nama}</td>
+          <td class="px-4 py-3 mono text-xs">${p.kelas || '-'}</td>
+          <td class="px-4 py-3 mono text-xs text-[var(--crimson)]">${p.email}</td>
+          <td class="px-4 py-3 mono text-xs">
+            ${p.kontak ? `<a href="https://wa.me/${p.kontak.replace(/[^0-9]/g, '')}" target="_blank" class="text-emerald-700 hover:underline">WA: ${p.kontak}</a>` : '-'}
+          </td>
+          <td class="px-4 py-3">
+            <span class="mono text-[0.65rem] px-2 py-0.5 rounded bg-[var(--paper-deep)] border border-[var(--rule)] uppercase">Santri</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 12. Quick Actions
+    async function quickPublish(idOrSlug: string) {
+      if (confirm('Terbitkan karya ini langsung ke publik?')) {
+        await updateStatusKarya(idOrSlug, 'published');
+        confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+        await loadAllAdminData();
+      }
+    }
+    (window as any).quickPublish = quickPublish;
+
+    async function quickDraft(idOrSlug: string) {
+      await updateStatusKarya(idOrSlug, 'draft');
+      await loadAllAdminData();
+    }
+    (window as any).quickDraft = quickDraft;
+
+    async function quickToggleStatus(idOrSlug: string, currentStatus: string) {
+      const nextStatus = currentStatus === 'published' ? 'draft' : 'published';
+      const promptMsg = `Ubah status karya menjadi: "${nextStatus}"?`;
+      if (confirm(promptMsg)) {
+        await updateStatusKarya(idOrSlug, nextStatus as any);
+        await loadAllAdminData();
+      }
+    }
+    (window as any).quickToggleStatus = quickToggleStatus;
+
+    async function quickDelete(idOrSlug: string, title: string) {
+      if (confirm(`Hapus permanen karya "${title}" dari database cloud?`)) {
+        await hapusKarya(idOrSlug);
+        await loadAllAdminData();
+      }
+    }
+    (window as any).quickDelete = quickDelete;
+
+    async function hapusKomentarItem(id: string) {
+      if (confirm('Hapus komentar ini?')) {
+        await hapusKomentar(id);
+        await loadAllAdminData();
+      }
+    }
+    (window as any).hapusKomentarItem = hapusKomentarItem;
+
+    async function hapusQuoteItem(id: string) {
+      if (confirm('Hapus quote ini?')) {
+        await hapusQuote(id);
+        await loadAllAdminData();
+      }
+    }
+    (window as any).hapusQuoteItem = hapusQuoteItem;
+
+    // 13. Studio Editor Modal Handlers
+    const modalEditor = document.getElementById('modal-editor-karya');
+    const formKaryaId = document.getElementById('form-karya-id') as HTMLInputElement;
+    const formKaryaSlug = document.getElementById('form-karya-slug') as HTMLInputElement;
+    const formTitle = document.getElementById('form-title') as HTMLInputElement;
+    const formCategory = document.getElementById('form-category') as HTMLSelectElement;
+    const formAuthor = document.getElementById('form-author') as HTMLInputElement;
+    const formGrade = document.getElementById('form-grade') as HTMLInputElement;
+    const formStatus = document.getElementById('form-status') as HTMLSelectElement;
+    const formDesc = document.getElementById('form-desc') as HTMLInputElement;
+    const formCoverUrl = document.getElementById('form-cover-url') as HTMLInputElement;
+    const formCoverFile = document.getElementById('form-cover-file') as HTMLInputElement;
+    const coverPreviewBox = document.getElementById('cover-preview-box');
+    const coverUploadStatus = document.getElementById('cover-upload-status');
+    const formContent = document.getElementById('form-content') as HTMLTextAreaElement;
+    const formWordCount = document.getElementById('form-word-count');
+    const modalEditorTitle = document.getElementById('modal-editor-title');
+    const btnSaveKarya = document.getElementById('btn-save-karya-submit') as HTMLButtonElement;
+
+    // Category specific fields
+    const fieldsIlmiah = document.getElementById('fields-ilmiah');
+    const fieldsPuisi = document.getElementById('fields-puisi');
+    const fieldsCerpen = document.getElementById('fields-cerpen');
+    const fieldsDrama = document.getElementById('fields-drama');
+    const formSupervisor = document.getElementById('form-supervisor') as HTMLInputElement;
+    const formPdfUrl = document.getElementById('form-pdf-url') as HTMLInputElement;
+    const formAbstract = document.getElementById('form-abstract') as HTMLTextAreaElement;
+    const formAudioUrl = document.getElementById('form-audio-url') as HTMLInputElement;
+    const formReadingTime = document.getElementById('form-reading-time') as HTMLInputElement;
+    const formCharacters = document.getElementById('form-characters') as HTMLInputElement;
+    const formStage = document.getElementById('form-stage') as HTMLInputElement;
+
+    function onCategoryChange(cat: string) {
+      [fieldsIlmiah, fieldsPuisi, fieldsCerpen, fieldsDrama].forEach(el => el?.classList.add('hidden'));
+      if (cat === 'ilmiah') fieldsIlmiah?.classList.remove('hidden');
+      else if (cat === 'puisi') fieldsPuisi?.classList.remove('hidden');
+      else if (cat === 'cerpen') fieldsCerpen?.classList.remove('hidden');
+      else if (cat === 'drama') fieldsDrama?.classList.remove('hidden');
+    }
+    (window as any).onCategoryChange = onCategoryChange;
+
+    function openEditorModal(karya: KaryaInput | null) {
+      if (!modalEditor) return;
+
+      if (karya) {
+        if (modalEditorTitle) modalEditorTitle.textContent = `Sunting Naskah: "${karya.title}"`;
+        formKaryaId.value = karya.id || '';
+        formKaryaSlug.value = karya.slug || '';
+        formTitle.value = karya.title || '';
+        formCategory.value = karya.category || 'puisi';
+        formAuthor.value = karya.author || '';
+        formGrade.value = karya.author_grade || '';
+        formStatus.value = karya.status || 'published';
+        formDesc.value = karya.description || '';
+        formCoverUrl.value = karya.cover_image_url || '';
+        formContent.value = karya.content || '';
+
+        // Category specific
+        if (formSupervisor) formSupervisor.value = karya.supervisor || '';
+        if (formPdfUrl) formPdfUrl.value = karya.pdf_url || '';
+        if (formAbstract) formAbstract.value = karya.abstract || '';
+        if (formAudioUrl) formAudioUrl.value = karya.audio_url || '';
+        if (formReadingTime) formReadingTime.value = (karya.reading_time || '').toString();
+        if (formCharacters) formCharacters.value = Array.isArray(karya.characters) ? karya.characters.join(', ') : (karya.characters || '');
+        if (formStage) formStage.value = karya.stage_setting || '';
+
+        onCategoryChange(karya.category || 'puisi');
+        updateCoverPreview(karya.cover_image_url);
+      } else {
+        if (modalEditorTitle) modalEditorTitle.textContent = 'Tulis Naskah Sastra Baru';
+        formKaryaId.value = '';
+        formKaryaSlug.value = '';
+        formTitle.value = '';
+        formCategory.value = 'puisi';
+        formAuthor.value = currentAdminUser?.email === 'redaksi@yq.sch.id' ? 'Dewan Redaksi SMPI YQ' : (currentAdminUser?.email || '');
+        formGrade.value = 'Dewan Redaksi';
+        formStatus.value = 'published';
+        formDesc.value = '';
+        formCoverUrl.value = '';
+        formContent.value = '';
+
+        if (formSupervisor) formSupervisor.value = '';
+        if (formPdfUrl) formPdfUrl.value = '';
+        if (formAbstract) formAbstract.value = '';
+        if (formAudioUrl) formAudioUrl.value = '';
+        if (formReadingTime) formReadingTime.value = '';
+        if (formCharacters) formCharacters.value = '';
+        if (formStage) formStage.value = '';
+
+        onCategoryChange('puisi');
+        updateCoverPreview('');
+      }
+
+      updateWordCount();
+      modalEditor.classList.remove('hidden');
+      modalEditor.classList.add('flex');
+    }
+    (window as any).openEditorModal = openEditorModal;
+
+    function closeEditorModal() {
+      if (!modalEditor) return;
+      modalEditor.classList.add('hidden');
+      modalEditor.classList.remove('flex');
+    }
+    (window as any).closeEditorModal = closeEditorModal;
+
+    function editKaryaBySlug(slug: string) {
+      const found = fullDb.karya.find(k => k.slug === slug);
+      if (found) {
+        openEditorModal(found);
+      }
+    }
+    (window as any).editKaryaBySlug = editKaryaBySlug;
+
+    // Word count update
+    function updateWordCount() {
+      if (!formContent || !formWordCount) return;
+      const words = formContent.value.trim().split(/\s+/).filter(Boolean).length;
+      formWordCount.textContent = `${words} kata`;
+    }
+    formContent?.addEventListener('input', updateWordCount);
+
+    // Cover image preview update
+    function updateCoverPreview(url?: string) {
+      if (!coverPreviewBox) return;
+      if (url) {
+        coverPreviewBox.innerHTML = `<img src="${url}" class="w-full h-full object-cover" alt="Sampul" />`;
+      } else {
+        coverPreviewBox.innerHTML = '<span class="mono text-[0.6rem] text-[var(--ink-faint)]">Foto</span>';
+      }
+    }
+    formCoverUrl?.addEventListener('input', () => updateCoverPreview(formCoverUrl.value));
+
+    // Upload Cover Photo to Google Drive Storage
+    formCoverFile?.addEventListener('change', async () => {
+      if (!formCoverFile.files || !formCoverFile.files[0]) return;
+      const file = formCoverFile.files[0];
+      if (coverUploadStatus) {
+        coverUploadStatus.textContent = 'Mengunggah ke Google Drive Storage...';
+        coverUploadStatus.className = 'mono text-[0.65rem] text-[var(--gold)] block';
+      }
+
+      try {
+        const publicUrl = await uploadFotoKarya(file);
+        formCoverUrl.value = publicUrl;
+        updateCoverPreview(publicUrl);
+        if (coverUploadStatus) {
+          coverUploadStatus.textContent = '✓ Foto berhasil diunggah ke Google Drive!';
+          coverUploadStatus.className = 'mono text-[0.65rem] text-emerald-700 block';
+        }
+      } catch (err: any) {
+        if (coverUploadStatus) {
+          coverUploadStatus.textContent = 'Gagal upload: ' + (err.message || 'Error');
+          coverUploadStatus.className = 'mono text-[0.65rem] text-rose-700 block';
+        }
+      }
+    });
+
+    // Save Karya Submit
+    document.getElementById('admin-karya-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!formTitle.value || !formAuthor.value || !formContent.value) {
+        alert('Harap lengkapi Judul, Penulis, dan Isi Naskah.');
+        return;
+      }
+
+      btnSaveKarya.disabled = true;
+      btnSaveKarya.innerHTML = '<span>Menyimpan ke Cloud DB...</span>';
 
       const payload: KaryaInput = {
-        id: editIdInput.value || undefined,
-        slug: editSlugInput.value || undefined,
-        title: titleInput.value.trim(),
-        description: descInput.value.trim(),
-        author: authorInput.value.trim(),
-        author_grade: gradeInput.value.trim(),
-        category: categorySelect.value,
-        content: contentInput.value.trim(),
-        cover_image_url: photoUrlInput.value.trim() || undefined,
-        status: statusSelect.value as any,
+        id: formKaryaId.value || undefined,
+        slug: formKaryaSlug.value || undefined,
+        title: formTitle.value.trim(),
+        category: formCategory.value,
+        category_label: formCategory.options[formCategory.selectedIndex]?.text || 'Sastra',
+        author: formAuthor.value.trim(),
+        author_grade: formGrade.value.trim(),
+        status: formStatus.value as any,
+        description: formDesc.value.trim(),
+        cover_image_url: formCoverUrl.value.trim() || undefined,
+        content: formContent.value.trim(),
+        supervisor: formSupervisor?.value.trim() || undefined,
+        pdf_url: formPdfUrl?.value.trim() || undefined,
+        abstract: formAbstract?.value.trim() || undefined,
+        audio_url: formAudioUrl?.value.trim() || undefined,
+        reading_time: formReadingTime?.value ? parseInt(formReadingTime.value, 10) : undefined,
+        characters: formCharacters?.value.trim() ? formCharacters.value.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        stage_setting: formStage?.value.trim() || undefined,
       };
 
       try {
         const res = await simpanKarya(payload);
         if (res.success) {
-          confetti({ particleCount: 30, spread: 60, origin: { y: 0.7 } });
-          if (alertBox) {
-            alertBox.textContent = res.message;
-            alertBox.className = 'mono text-xs p-3 rounded border border-emerald-600 bg-emerald-50 text-emerald-900 block';
-            setTimeout(() => alertBox.classList.add('hidden'), 4000);
-          }
-          await loadAllWorks();
-          if (statusSelect.value === 'published') {
-            switchTab('published');
-          } else if (statusSelect.value === 'draft') {
-            switchTab('drafts');
+          confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
+          closeEditorModal();
+          await loadAllAdminData();
+          if (formStatus.value === 'published') {
+            switchAdminSection('karya');
+          } else if (formStatus.value === 'menunggu_kurasi') {
+            switchAdminSection('kurasi');
           }
         }
-      } catch (e: any) {
-        if (alertBox) {
-          alertBox.textContent = 'Gagal menyimpan: ' + e.message;
-          alertBox.className = 'mono text-xs p-3 rounded border border-rose-600 bg-rose-50 text-rose-900 block';
-        }
+      } catch (err: any) {
+        alert('Gagal menyimpan: ' + (err.message || 'Terjadi kesalahan sistem'));
       } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Simpan ke Cloud DB (Google Sheets) ⚡';
+        btnSaveKarya.disabled = false;
+        btnSaveKarya.innerHTML = '<span>Simpan ke Cloud Database ⚡</span>';
       }
     });
 
-    // 8. Download as Markdown
+    // Download as Markdown
     document.getElementById('btn-download-md')?.addEventListener('click', () => {
-      const slug = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'naskah';
-      const mdContent = `---
-title: "${titleInput.value.replace(/"/g, '\\"')}"
-description: "${descInput.value.replace(/"/g, '\\"')}"
-author: "${authorInput.value.replace(/"/g, '\\"')}"
-authorGrade: "${gradeInput.value.replace(/"/g, '\\"')}"
-category: "${categorySelect.value}"
-categoryLabel: "${categorySelect.options[categorySelect.selectedIndex]?.text || 'Sastra'}"
+      const slug = formTitle.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'naskah';
+      const md = `---
+title: "${formTitle.value.replace(/"/g, '\\"')}"
+description: "${formDesc.value.replace(/"/g, '\\"')}"
+author: "${formAuthor.value.replace(/"/g, '\\"')}"
+authorGrade: "${formGrade.value.replace(/"/g, '\\"')}"
+category: "${formCategory.value}"
+categoryLabel: "${formCategory.options[formCategory.selectedIndex]?.text || 'Sastra'}"
 publishDate: ${new Date().toISOString().split('T')[0]}
-featured: false
-tags: ["${categorySelect.options[categorySelect.selectedIndex]?.text || 'Sastra'}"]
-${photoUrlInput.value ? `coverImage: "${photoUrlInput.value}"\n` : ''}---
+${formCoverUrl.value ? `coverImage: "${formCoverUrl.value}"\n` : ''}---
 
-${contentInput.value}
+${formContent.value}
 `;
-
-      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `${slug}.md`;
       a.click();
     });
 
-    // 9. Reset Form
-    document.getElementById('btn-reset-form')?.addEventListener('click', () => {
-      editIdInput.value = '';
-      editSlugInput.value = '';
-      titleInput.value = '';
-      authorInput.value = '';
-      gradeInput.value = '';
-      descInput.value = '';
-      contentInput.value = '';
-      photoUrlInput.value = '';
-      statusSelect.value = 'published';
-      if (editorFormTitle) editorFormTitle.textContent = 'Tulis Naskah Baru';
-      if (editorModeBadge) editorModeBadge.textContent = 'Karya Baru';
-      updateLivePreview();
-    });
+    // 14. Quotes Modal
+    const modalQuote = document.getElementById('modal-quote-form');
+    function openQuoteModal() {
+      modalQuote?.classList.remove('hidden');
+      modalQuote?.classList.add('flex');
+    }
+    (window as any).openQuoteModal = openQuoteModal;
 
-    // Refresh All Button
-    document.getElementById('btn-refresh-all')?.addEventListener('click', loadAllWorks);
+    function closeQuoteModal() {
+      modalQuote?.classList.add('hidden');
+      modalQuote?.classList.remove('flex');
+    }
+    (window as any).closeQuoteModal = closeQuoteModal;
+
+    document.getElementById('quote-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const quoteText = (document.getElementById('quote-text') as HTMLTextAreaElement).value.trim();
+      const quoteAuthor = (document.getElementById('quote-author') as HTMLInputElement).value.trim();
+      const quoteTitle = (document.getElementById('quote-title') as HTMLInputElement).value.trim();
+      const quoteCat = (document.getElementById('quote-cat') as HTMLSelectElement).value;
+
+      if (!quoteText || !quoteAuthor) return;
+
+      await simpanQuote({
+        quote: quoteText,
+        author: quoteAuthor,
+        author_title: quoteTitle,
+        category: quoteCat
+      });
+
+      closeQuoteModal();
+      await loadAllAdminData();
+    });
   </script>
 </Layout>

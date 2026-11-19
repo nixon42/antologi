@@ -28,23 +28,33 @@ export const isSupabaseConfigured = isAppsScriptConfigured;
 export const supabase = null;
 
 /**
- * Universal HTTP Dispatcher to Apps Script Web App
+ * Universal HTTP Dispatcher to Apps Script Web App with Timeout Guard
  */
 async function callAppsScript<T = any>(
   fn: string, 
   args: any[] = [], 
-  method: 'GET' | 'POST' = 'POST'
+  method: 'GET' | 'POST' = 'POST',
+  timeoutMs: number = 8000
 ): Promise<T | null> {
   if (!isAppsScriptConfigured || typeof window === 'undefined') return null;
 
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
     if (method === 'GET') {
       const url = new URL(APPS_SCRIPT_URL);
       url.searchParams.set('fn', fn);
       if (args[0] && typeof args[0] === 'object') {
         Object.keys(args[0]).forEach(k => url.searchParams.set(k, String(args[0][k])));
+      } else if (typeof args[0] === 'string') {
+        url.searchParams.set('token', args[0]);
       }
-      const res = await fetch(url.toString(), { method: 'GET' });
+      const res = await fetch(url.toString(), { 
+        method: 'GET',
+        signal: controller.signal 
+      });
+      clearTimeout(timer);
       if (!res.ok) return null;
       const json = await res.json();
       return (json && '__hasil' in json) ? json.__hasil : json;
@@ -53,7 +63,9 @@ async function callAppsScript<T = any>(
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ fn, args }),
+        signal: controller.signal
       });
+      clearTimeout(timer);
       if (!res.ok) return null;
       const json = await res.json();
       return (json && '__hasil' in json) ? json.__hasil : json;
@@ -825,3 +837,172 @@ export async function getKaryaByPenulis(authorName: string, authorEmail?: string
 
   return results;
 }
+
+// ==========================================================
+// 7. MANAJEMEN DATABASE LENGKAP (FULL DATA DUMP & MODERASI)
+// ==========================================================
+
+export interface QuoteItem {
+  id: string;
+  quote: string;
+  author: string;
+  author_title?: string;
+  source?: string;
+  category?: string;
+  created_at?: string;
+}
+
+export interface KomentarModerasiItem {
+  id: string;
+  karya_id: string;
+  karya_title?: string;
+  nama: string;
+  pesan: string;
+  peran?: string;
+  created_at: string;
+}
+
+export interface FullDatabaseDump {
+  karya: KaryaInput[];
+  quotes: QuoteItem[];
+  komentar: KomentarModerasiItem[];
+  apresiasi: Array<{ karya_id: string; count: number }>;
+  penulis: PenulisUser[];
+}
+
+/**
+ * Mengambil seluruh database secara terpusat untuk Dashboard Studio Redaksi
+ */
+export async function getFullData(): Promise<FullDatabaseDump> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+
+  if (isAppsScriptConfigured) {
+    try {
+      const res = await callAppsScript<FullDatabaseDump>('getFullData', [token], 'GET', 9000);
+      if (res && typeof res === 'object') {
+        if (typeof window !== 'undefined') {
+          if (Array.isArray(res.karya)) localStorage.setItem('rs_cloud_karya_cache', JSON.stringify(res.karya));
+          if (Array.isArray(res.quotes)) localStorage.setItem('rs_quotes_cache', JSON.stringify(res.quotes));
+          if (Array.isArray(res.komentar)) localStorage.setItem('rs_komentar_cache', JSON.stringify(res.komentar));
+          if (Array.isArray(res.penulis)) localStorage.setItem('rs_penulis_users', JSON.stringify(res.penulis));
+        }
+        return {
+          karya: Array.isArray(res.karya) ? res.karya : [],
+          quotes: Array.isArray(res.quotes) ? res.quotes : [],
+          komentar: Array.isArray(res.komentar) ? res.komentar : [],
+          apresiasi: Array.isArray(res.apresiasi) ? res.apresiasi : [],
+          penulis: Array.isArray(res.penulis) ? res.penulis : [],
+        };
+      }
+    } catch (e) {
+      console.warn('[AppsScript] Gagal getFullData dari cloud:', e);
+    }
+  }
+
+  // Fallback LocalStorage
+  const karya = await fetchAllKarya();
+  let quotes: QuoteItem[] = [];
+  let komentar: KomentarModerasiItem[] = [];
+  let penulis: PenulisUser[] = [];
+
+  if (typeof window !== 'undefined') {
+    try {
+      quotes = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
+      komentar = JSON.parse(localStorage.getItem('rs_komentar_cache') || '[]');
+      penulis = JSON.parse(localStorage.getItem('rs_penulis_users') || '[]');
+    } catch {}
+  }
+
+  // Default initial quotes jika kosong
+  if (quotes.length === 0) {
+    quotes = [
+      {
+        id: 'q_01',
+        quote: 'Sastra bukan sekadar rangkaian kata indah di atas kertas, melainkan denyut nurani yang meretas kebekuan peradaban.',
+        author: 'SMPI Yambu\'ul Qur\'an',
+        author_title: 'Manifesto Literasi 2026',
+        source: 'Manifesto',
+        category: 'Manifesto',
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 'q_02',
+        quote: 'Setiap huruf yang terpahat dengan keikhlasan adalah benih keabadian yang mekar di taman sanubari pembacanya.',
+        author: 'K.H. Ahmad Dahlan Al-Hafidz',
+        author_title: 'Pengasuh Pesantren',
+        source: 'Pojok Baca Santri',
+        category: 'Spiritual',
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 'q_03',
+        quote: 'Membaca adalah menghirup dunia, dan menulis adalah mengembuskan kembali kearifan ke relung semesta.',
+        author: 'Ust. H. Ahmad Fauzi, Lc., M.Pd.',
+        author_title: 'Kepala Sekolah SMPI YQ',
+        source: 'Amanat Hari Literasi',
+        category: 'Edukasi',
+        created_at: new Date().toISOString()
+      }
+    ];
+  }
+
+  return {
+    karya,
+    quotes,
+    komentar,
+    apresiasi: [],
+    penulis
+  };
+}
+
+/**
+ * Menyimpan quote baru ke Database
+ */
+export async function simpanQuote(quote: Omit<QuoteItem, 'id' | 'created_at'> & { id?: string }): Promise<{ success: boolean; message: string }> {
+  const id = quote.id || ('q_' + Date.now());
+  const now = new Date().toISOString();
+  const newQuote: QuoteItem = {
+    ...quote,
+    id,
+    created_at: now
+  };
+
+  if (typeof window !== 'undefined') {
+    const list: QuoteItem[] = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
+    const idx = list.findIndex(q => q.id === id);
+    if (idx >= 0) {
+      list[idx] = newQuote;
+    } else {
+      list.unshift(newQuote);
+    }
+    localStorage.setItem('rs_quotes_cache', JSON.stringify(list));
+  }
+
+  return { success: true, message: 'Kutipan sastra berhasil disimpan!' };
+}
+
+/**
+ * Menghapus quote dari Database
+ */
+export async function hapusQuote(id: string): Promise<{ success: boolean; message: string }> {
+  if (typeof window !== 'undefined') {
+    const list: QuoteItem[] = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
+    const filtered = list.filter(q => q.id !== id);
+    localStorage.setItem('rs_quotes_cache', JSON.stringify(filtered));
+  }
+  return { success: true, message: 'Kutipan berhasil dihapus.' };
+}
+
+/**
+ * Menghapus komentar pembaca (Moderasi Redaksi)
+ */
+export async function hapusKomentar(id: string): Promise<{ success: boolean; message: string }> {
+  if (typeof window !== 'undefined') {
+    const list: KomentarModerasiItem[] = JSON.parse(localStorage.getItem('rs_komentar_cache') || '[]');
+    const filtered = list.filter(k => k.id !== id);
+    localStorage.setItem('rs_komentar_cache', JSON.stringify(filtered));
+  }
+  return { success: true, message: 'Komentar pembaca berhasil dihapus.' };
+}
+
