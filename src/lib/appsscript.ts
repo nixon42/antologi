@@ -1548,13 +1548,26 @@ function sanitizeVisitorAnalytics(data: VisitorAnalyticsData | null): VisitorAna
   return data;
 }
 
+// In-memory cache untuk percepatan interaksi filter dashboard analitik
+const vLogMemoryCache = new Map<string, { data: VisitorAnalyticsData; timestamp: number }>();
+
 /**
  * Fetch Full Visitor Analytics for Admin Dashboard
  */
 export async function getVisitorAnalytics(
   period: 'today' | '7d' | '30d' | 'all' = '30d',
-  category: string = 'all'
+  category: string = 'all',
+  forceFresh: boolean = false
 ): Promise<VisitorAnalyticsData | null> {
+  const cacheKey = `${period}_${category}`;
+
+  if (!forceFresh && vLogMemoryCache.has(cacheKey)) {
+    const cachedEntry = vLogMemoryCache.get(cacheKey)!;
+    if (Date.now() - cachedEntry.timestamp < 90000) {
+      return cachedEntry.data;
+    }
+  }
+
   const admin = await getAdminUser();
   const token = admin?.token || '';
 
@@ -1563,7 +1576,10 @@ export async function getVisitorAnalytics(
       const res = await callAppsScript<VisitorAnalyticsData>('getVisitorAnalytics', [period, category, token], 'POST', 15000);
       if (res && res.summary) {
         const cleaned = sanitizeVisitorAnalytics(res);
-        localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(cleaned));
+        if (cleaned) {
+          vLogMemoryCache.set(cacheKey, { data: cleaned, timestamp: Date.now() });
+          localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(cleaned));
+        }
         return cleaned;
       }
     } catch (e) {
@@ -1586,6 +1602,7 @@ export async function getVisitorAnalytics(
  * Membersihkan data analitik dummy dari Google Spreadsheet dan cache lokal
  */
 export async function bersihkanDataDummy(): Promise<{ success: boolean; message: string; deletedVisitors?: number }> {
+  vLogMemoryCache.clear();
   if (typeof window !== 'undefined') {
     localStorage.removeItem('rs_visitor_analytics_cache');
   }
