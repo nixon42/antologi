@@ -2313,6 +2313,53 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
     (window as any).switchAdminSection = switchAdminSection;
 
+    // Helper: Thumbnail sampul karya sastra untuk daftar ringkasan
+    function getKaryaCoverThumbnail(k: any): string {
+      const rawImg = k.cover_image_url || k.coverImage || k.cover_image || '';
+      const formattedImgUrl = rawImg ? formatDriveImageUrl(rawImg) : '';
+
+      let categoryAbbr = 'YQ';
+      const catLower = (k.category || '').toLowerCase();
+      if (catLower.includes('ilmiah')) categoryAbbr = 'KTI';
+      else if (catLower.includes('puisi')) categoryAbbr = 'PUI';
+      else if (catLower.includes('cerpen')) categoryAbbr = 'CRP';
+      else if (catLower.includes('drama')) categoryAbbr = 'NSK';
+      else if (catLower.includes('antologi')) categoryAbbr = 'ANT';
+      else if (catLower.includes('quotes')) categoryAbbr = 'QTS';
+
+      const titleEsc = escapeHtml(k.title || 'Karya Sastra');
+      const slugEsc = escapeHtml(k.slug || '');
+
+      if (formattedImgUrl) {
+        return `
+          <a href="${basePath}/karya/${slugEsc}" target="_blank" class="block w-12 h-14 sm:w-13 sm:h-16 rounded-md overflow-hidden border border-[var(--rule-strong)] bg-[var(--paper-deep)] shrink-0 shadow-2xs relative group" title="Lihat sampul: ${titleEsc}">
+            <img 
+              src="${formattedImgUrl}" 
+              alt="${titleEsc}" 
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+              loading="lazy" 
+              onerror="this.classList.add('hidden'); if(this.nextElementSibling) this.nextElementSibling.classList.remove('hidden');" 
+            />
+            <div class="hidden w-full h-full flex flex-col items-center justify-center text-[var(--ink-faint)] p-1 bg-[var(--paper-deep)]">
+              <svg class="w-5 h-5 text-[var(--ink-faint)] mb-0.5" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <span class="mono text-[0.55rem] uppercase text-[var(--gold)] font-bold tracking-wider">${categoryAbbr}</span>
+            </div>
+          </a>
+        `;
+      }
+
+      return `
+        <div class="w-12 h-14 sm:w-13 sm:h-16 rounded-md overflow-hidden border border-[var(--rule-strong)] bg-[var(--paper-deep)] shrink-0 shadow-2xs flex flex-col items-center justify-center text-[var(--ink-faint)] p-1">
+          <svg class="w-5 h-5 text-[var(--ink-faint)] mb-0.5" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          <span class="mono text-[0.55rem] uppercase text-[var(--gold)] font-bold tracking-wider">${categoryAbbr}</span>
+        </div>
+      `;
+    }
+
     // 5. Render Overview Submissions Queue
     function renderOverviewQueue() {
       const container = document.getElementById('overview-queue-container');
@@ -2328,44 +2375,56 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         return;
       }
 
-      container.innerHTML = submissions.slice(0, 5).map(k => `
-        <div class="p-4 flex items-center justify-between gap-3 flex-wrap hover:bg-[var(--paper-deep)]/50 transition-colors">
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-semibold">
-                ${k.category_label || k.category}
-              </span>
-              <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
-                ${k.created_at ? new Date(k.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : 'Baru'}
-              </span>
-            </div>
-            <h4 class="font-['Fraunces',serif] font-bold text-sm text-[var(--ink)] m-0 truncate">
-              ${k.title}
-            </h4>
-            <p class="mono text-[0.7rem] text-[var(--ink-soft)] m-0 mt-0.5">
-              Oleh <span class="font-semibold text-[var(--ink)]">${k.author}</span> ${k.author_grade ? `(${k.author_grade})` : ''}
-            </p>
-          </div>
+      container.innerHTML = submissions.slice(0, 5).map(k => {
+        const thumbHtml = getKaryaCoverThumbnail(k);
+        const titleEsc = escapeHtml(k.title || 'Tanpa Judul');
+        const authorEsc = escapeHtml(k.author || 'Anonim');
+        const catEsc = escapeHtml(k.category_label || k.category || 'Karya');
+        const slugEsc = escapeHtml(k.slug || k.id || '');
+        const dateStr = k.created_at ? new Date(k.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : 'Baru';
 
-          <div class="flex items-center gap-2">
-            <button 
-              type="button" 
-              onclick="quickPublish('${k.slug || k.id}')" 
-              class="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white mono text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1"
-              title="Setujui dan langsung terbitkan ke publik"
-            >
-              <span>✓ Terbitkan</span>
-            </button>
-            <button 
-              type="button" 
-              onclick="editKaryaBySlug('${k.slug}')" 
-              class="px-2.5 py-1.5 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] hover:bg-[var(--paper-deep)] text-[var(--ink)] mono text-xs font-medium cursor-pointer"
-            >
-              <span>Sunting ✎</span>
-            </button>
+        return `
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3 sm:gap-4 flex-wrap hover:bg-[var(--paper-deep)]/50 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+              ${thumbHtml}
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full border border-[var(--crimson)] text-[var(--crimson)] uppercase font-semibold">
+                    ${catEsc}
+                  </span>
+                  <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
+                    ${dateStr}
+                  </span>
+                </div>
+                <h4 class="font-['Fraunces',serif] font-bold text-sm sm:text-base text-[var(--ink)] m-0 truncate">
+                  ${titleEsc}
+                </h4>
+                <p class="mono text-[0.7rem] text-[var(--ink-soft)] m-0 mt-0.5 truncate">
+                  Oleh <span class="font-semibold text-[var(--ink)]">${authorEsc}</span> ${k.author_grade ? `(${escapeHtml(k.author_grade)})` : ''}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <button 
+                type="button" 
+                onclick="quickPublish('${slugEsc}')" 
+                class="px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white mono text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1 transition-colors"
+                title="Setujui dan langsung terbitkan ke publik"
+              >
+                <span>✓ Terbitkan</span>
+              </button>
+              <button 
+                type="button" 
+                onclick="editKaryaBySlug('${slugEsc}')" 
+                class="px-2.5 py-1.5 rounded-lg border border-[var(--rule-strong)] bg-[var(--paper)] hover:bg-[var(--paper-deep)] text-[var(--ink)] mono text-xs font-medium cursor-pointer transition-colors"
+              >
+                <span>Sunting ✎</span>
+              </button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // Helper: Build Pagination Range with Ellipsis
@@ -2429,40 +2488,62 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       const endIndex = Math.min(startIndex + perPage, totalItems);
       const pageItems = published.slice(startIndex, endIndex);
 
-      container.innerHTML = pageItems.map(k => `
-        <div class="p-4 flex items-center justify-between gap-3 hover:bg-[var(--paper-deep)]/50 transition-colors">
-          <div class="min-w-0">
-            <span class="mono text-[0.68rem] text-[var(--gold)] uppercase font-semibold">
-              ${k.category_label || k.category}
-            </span>
-            <h4 class="font-['Fraunces',serif] font-bold text-sm text-[var(--ink)] m-0 truncate">
-              ${k.title}
-            </h4>
-            <p class="mono text-[0.7rem] text-[var(--ink-faint)] m-0">
-              Oleh ${k.author}
-            </p>
+      container.innerHTML = pageItems.map(k => {
+        const thumbHtml = getKaryaCoverThumbnail(k);
+        const titleEsc = escapeHtml(k.title || 'Tanpa Judul');
+        const authorEsc = escapeHtml(k.author || 'Anonim');
+        const catEsc = escapeHtml(k.category_label || k.category || 'Karya');
+        const slugEsc = escapeHtml(k.slug || '');
+        const viewsCount = Number(k.views || 0).toLocaleString('id-ID');
+
+        return `
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3 sm:gap-4 hover:bg-[var(--paper-deep)]/50 transition-colors">
+            <div class="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+              ${thumbHtml}
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                  <span class="mono text-[0.68rem] text-[var(--gold)] uppercase font-semibold">
+                    ${catEsc}
+                  </span>
+                  <span class="mono text-[0.65rem] text-[var(--ink-faint)] flex items-center gap-0.5">
+                    <span>•</span>
+                    <span>👁️ ${viewsCount}</span>
+                  </span>
+                </div>
+                <h4 class="font-['Fraunces',serif] font-bold text-sm sm:text-base text-[var(--ink)] m-0 truncate">
+                  <a href="${basePath}/karya/${slugEsc}" target="_blank" class="hover:text-[var(--crimson)] text-inherit no-underline">
+                    ${titleEsc}
+                  </a>
+                </h4>
+                <p class="mono text-[0.7rem] text-[var(--ink-faint)] m-0 mt-0.5 truncate">
+                  Oleh <span class="text-[var(--ink-soft)] font-medium">${authorEsc}</span> ${k.author_grade ? `· ${escapeHtml(k.author_grade)}` : ''}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              <a 
+                href="${basePath}/karya/${slugEsc}" 
+                target="_blank" 
+                class="px-2.5 py-1.5 rounded-md border border-[var(--rule)] text-[var(--ink-soft)] hover:text-[var(--crimson)] hover:border-[var(--crimson)] text-xs mono no-underline flex items-center gap-1 transition-colors"
+                title="Buka karya di tab baru"
+              >
+                <span>Buka</span>
+                <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </a>
+              <button 
+                type="button" 
+                onclick="editKaryaBySlug('${slugEsc}')" 
+                class="px-2.5 py-1.5 rounded-md border border-[var(--rule-strong)] bg-[var(--paper)] text-xs mono text-[var(--ink)] hover:bg-[var(--paper-deep)] hover:text-[var(--crimson)] cursor-pointer transition-colors"
+                title="Sunting karya ini"
+              >
+                Sunting
+              </button>
+            </div>
           </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <a 
-              href="${basePath}/karya/${k.slug}" 
-              target="_blank" 
-              class="px-2.5 py-1 rounded-md border border-[var(--rule)] text-[var(--ink-soft)] hover:text-[var(--crimson)] text-xs mono no-underline flex items-center gap-1"
-            >
-              <span>Buka</span>
-              <svg class="w-3 h-3" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-            </a>
-            <button 
-              type="button" 
-              onclick="editKaryaBySlug('${k.slug}')" 
-              class="px-2.5 py-1 rounded-md border border-[var(--rule-strong)] bg-[var(--paper)] text-xs mono text-[var(--ink)] hover:bg-[var(--paper-deep)] cursor-pointer"
-            >
-              Sunting
-            </button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       // Update Page Info
       if (pageInfo) {
