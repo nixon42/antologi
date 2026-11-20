@@ -2173,6 +2173,14 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     // 1. Initial Authentication Guard
     async function initAdmin() {
+      // Bersihkan residu cache lama yang menyimpan views dummy (344, 519, dst)
+      if (typeof window !== 'undefined') {
+        const cachedKaryaStr = localStorage.getItem('rs_cloud_karya_cache');
+        if (cachedKaryaStr && (cachedKaryaStr.includes('"views":344') || cachedKaryaStr.includes('"views":519') || cachedKaryaStr.includes('"views":342') || cachedKaryaStr.includes('"views":518'))) {
+          localStorage.removeItem('rs_cloud_karya_cache');
+        }
+      }
+
       currentAdminUser = await getAdminUser();
       if (!currentAdminUser) {
         authBarrier?.classList.remove('hidden');

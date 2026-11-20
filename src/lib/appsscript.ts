@@ -995,6 +995,7 @@ export interface FullDatabaseDump {
   apresiasi: Array<{ karya_id: string; count: number }>;
   penulis: PenulisUser[];
   admin: AdminProfileItem[];
+  pengunjung?: any[];
 }
 
 /**
@@ -1019,7 +1020,14 @@ export async function getFullData(): Promise<FullDatabaseDump> {
         }
 
         if (typeof window !== 'undefined') {
-          if (Array.isArray(res.karya)) localStorage.setItem('rs_cloud_karya_cache', JSON.stringify(res.karya));
+          if (Array.isArray(res.karya)) {
+            localStorage.setItem('rs_cloud_karya_cache', JSON.stringify(res.karya));
+            res.karya.forEach((k: any) => {
+              if (k && k.slug) {
+                localStorage.setItem(`rs_views_${k.slug}`, String(k.views || 0));
+              }
+            });
+          }
           if (Array.isArray(res.quotes)) localStorage.setItem('rs_quotes_cache', JSON.stringify(res.quotes));
           if (Array.isArray(res.komentar)) localStorage.setItem('rs_komentar_cache', JSON.stringify(res.komentar));
           if (Array.isArray(res.penulis)) localStorage.setItem('rs_penulis_users', JSON.stringify(res.penulis));
@@ -1044,7 +1052,8 @@ export async function getFullData(): Promise<FullDatabaseDump> {
           komentar: Array.isArray(res.komentar) ? res.komentar : [],
           apresiasi: Array.isArray(res.apresiasi) ? res.apresiasi : [],
           penulis: Array.isArray(res.penulis) ? res.penulis : [],
-          admin: adminList
+          admin: adminList,
+          pengunjung: Array.isArray(res.pengunjung) ? res.pengunjung : []
         };
       }
     } catch (e) {

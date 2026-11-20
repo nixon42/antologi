@@ -240,7 +240,7 @@ function isiDemoData(forceReset) {
         'Karya sastra, khususnya puisi, bukanlah cermin datar yang sekadar memantulkan kenyataan empiris, melainkan sebuah transformasi simbolik atas pengalaman batin pengarangnya...',
         'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80',
         9,
-        342,
+        0,
         true,
         'published',
         'Penelitian ini mengkaji struktur semiotika puisi karya siswa SMPI Yambu\'ul Qur\'an dengan menerapkan teori Semiotika Michael Riffaterre...',
@@ -272,7 +272,7 @@ function isiDemoData(forceReset) {
         'Di antara riak kata yang sunyi,\nada bait yang menolak berhenti.\nUjung penaku mencatat dentang jam tiga pagi,\nketika dingin merayap dari lantai marmer serambi,\ndan gemerisik dedaunan sawo kecik\nmengiringi napas para pencari cahaya.\n\nAku bukanlah perangkai kalimat ulung,\nhanya seorang musafir yang mengeja takdir\npada lembar-lembar kertas buram bergaris.\nSetiap tetes dawat adalah doa yang dipanjangkan,\nsetiap spasi adalah jeda bagi air mata\nyang enggan tumpah di hadapan fana.',
         'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&q=80',
         3,
-        518,
+        0,
         true,
         'published',
         '',
@@ -304,7 +304,7 @@ function isiDemoData(forceReset) {
         'Malam itu hujan gerimis membasahi pelataran masjid. Lampu neon temaram berkedip-kedip di ujung gang sempit...',
         'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&q=80',
         6,
-        289,
+        0,
         true,
         'published',
         '',
@@ -336,7 +336,7 @@ function isiDemoData(forceReset) {
         'BABAK I\n[Latar panggung temaram. Suara gemercik air wudhu mengalun lembut di kejauhan.]\n\nUSTADZ MANSYUR:\n(Berdiri menatap cakrawala malam)\nIlmu itu bagai bahtera di samudra raya, anakku. Tanpa keteguhan nakhoda, ia karam dihempas badai fitnah.',
         'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=1200&q=80',
         8,
-        175,
+        0,
         true,
         'published',
         '',
@@ -368,7 +368,7 @@ function isiDemoData(forceReset) {
         'Kompilasi karya puisi, prosa, dan renungan terpilih dari para santri penghafal Al-Qur\'an...',
         'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80',
         12,
-        420,
+        0,
         true,
         'published',
         '',
@@ -1404,6 +1404,39 @@ function bersihkanPengunjungDummy() {
       if (!isReal) {
         sheetPengunjung.deleteRow(i + 1);
         deletedVisitors++;
+      }
+    }
+  }
+
+  // Sinkronkan views lembar 'Karya' murni dari kunjungan nyata di lembar 'Pengunjung'
+  const sheetKarya = ss.getSheetByName('Karya');
+  if (sheetKarya && sheetKarya.getLastRow() > 1) {
+    const kData = sheetKarya.getDataRange().getValues();
+    const kHeaders = kData[0];
+    const viewCol = kHeaders.indexOf('views') + 1;
+    const slugCol = kHeaders.indexOf('slug');
+
+    const realViews = {};
+    if (sheetPengunjung && sheetPengunjung.getLastRow() > 1) {
+      const pData = sheetPengunjung.getDataRange().getValues();
+      const pHeaders = pData[0];
+      const pKaryaIdCol = pHeaders.indexOf('karya_id');
+      const pPathCol = pHeaders.indexOf('path');
+      for (let j = 1; j < pData.length; j++) {
+        let s = (pData[j][pKaryaIdCol] || '').toString().trim();
+        if (!s && pData[j][pPathCol]) {
+          const parts = pData[j][pPathCol].toString().split('/').filter(Boolean);
+          if (parts.length >= 2 && parts[0] === 'karya') s = parts[1];
+        }
+        if (s) realViews[s] = (realViews[s] || 0) + 1;
+      }
+    }
+
+    if (viewCol > 0 && slugCol >= 0) {
+      for (let i = 1; i < kData.length; i++) {
+        const slug = (kData[i][slugCol] || '').toString().trim();
+        const actualCount = realViews[slug] || 0;
+        sheetKarya.getRange(i + 1, viewCol).setValue(actualCount);
       }
     }
   }
