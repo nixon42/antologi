@@ -981,12 +981,20 @@ export interface KomentarModerasiItem {
   created_at: string;
 }
 
+export interface AdminProfileItem {
+  username: string;
+  nama: string;
+  role: string;
+  created_at?: string;
+}
+
 export interface FullDatabaseDump {
   karya: KaryaInput[];
   quotes: QuoteItem[];
   komentar: KomentarModerasiItem[];
   apresiasi: Array<{ karya_id: string; count: number }>;
   penulis: PenulisUser[];
+  admin: AdminProfileItem[];
 }
 
 /**
@@ -998,20 +1006,45 @@ export async function getFullData(): Promise<FullDatabaseDump> {
 
   if (isAppsScriptConfigured) {
     try {
-      const res = await callAppsScript<FullDatabaseDump>('getFullData', [token], 'GET', 9000);
+      const res = await callAppsScript<any>('getFullData', [token], 'GET', 9000);
       if (res && typeof res === 'object') {
+        let adminList: AdminProfileItem[] = [];
+        if (Array.isArray(res.admin)) {
+          adminList = res.admin.map((a: any) => ({
+            username: (a.username || a.email || '').toString().toLowerCase().trim(),
+            nama: (a.nama || a.username || 'Redaktur Redaksi').toString(),
+            role: (a.role || 'Redaktur Pelaksana').toString(),
+            created_at: a.created_at || new Date().toISOString()
+          }));
+        }
+
         if (typeof window !== 'undefined') {
           if (Array.isArray(res.karya)) localStorage.setItem('rs_cloud_karya_cache', JSON.stringify(res.karya));
           if (Array.isArray(res.quotes)) localStorage.setItem('rs_quotes_cache', JSON.stringify(res.quotes));
           if (Array.isArray(res.komentar)) localStorage.setItem('rs_komentar_cache', JSON.stringify(res.komentar));
           if (Array.isArray(res.penulis)) localStorage.setItem('rs_penulis_users', JSON.stringify(res.penulis));
+          if (adminList.length > 0) localStorage.setItem('rs_admin_users', JSON.stringify(adminList));
         }
+
+        if (adminList.length === 0 && typeof window !== 'undefined') {
+          try {
+            adminList = JSON.parse(localStorage.getItem('rs_admin_users') || '[]');
+          } catch {}
+        }
+
+        if (adminList.length === 0) {
+          adminList = [
+            { username: 'admin', nama: 'Redaksi Utama SMPI YQ', role: 'Redaktur Utama', created_at: '2026-08-15T00:00:00.000Z' }
+          ];
+        }
+
         return {
           karya: Array.isArray(res.karya) ? res.karya : [],
           quotes: Array.isArray(res.quotes) ? res.quotes : [],
           komentar: Array.isArray(res.komentar) ? res.komentar : [],
           apresiasi: Array.isArray(res.apresiasi) ? res.apresiasi : [],
           penulis: Array.isArray(res.penulis) ? res.penulis : [],
+          admin: adminList
         };
       }
     } catch (e) {
@@ -1024,13 +1057,21 @@ export async function getFullData(): Promise<FullDatabaseDump> {
   let quotes: QuoteItem[] = [];
   let komentar: KomentarModerasiItem[] = [];
   let penulis: PenulisUser[] = [];
+  let adminList: AdminProfileItem[] = [];
 
   if (typeof window !== 'undefined') {
     try {
       quotes = JSON.parse(localStorage.getItem('rs_quotes_cache') || '[]');
       komentar = JSON.parse(localStorage.getItem('rs_komentar_cache') || '[]');
       penulis = JSON.parse(localStorage.getItem('rs_penulis_users') || '[]');
+      adminList = JSON.parse(localStorage.getItem('rs_admin_users') || '[]');
     } catch {}
+  }
+
+  if (adminList.length === 0) {
+    adminList = [
+      { username: 'admin', nama: 'Redaksi Utama SMPI YQ', role: 'Redaktur Utama', created_at: '2026-08-15T00:00:00.000Z' }
+    ];
   }
 
   // Default initial quotes jika kosong
@@ -1071,8 +1112,203 @@ export async function getFullData(): Promise<FullDatabaseDump> {
     quotes,
     komentar,
     apresiasi: [],
-    penulis
+    penulis,
+    admin: adminList
   };
+}
+
+export interface SimpanAdminInput {
+  username: string;
+  nama: string;
+  role: string;
+  password?: string;
+  isNew?: boolean;
+}
+
+export interface SimpanPenulisInput {
+  id?: string;
+  nama: string;
+  email: string;
+  kelas: string;
+  kontak?: string;
+  role?: string;
+  password?: string;
+  isNew?: boolean;
+}
+
+/**
+ * Menyimpan profil atau kata sandi akun Dewan Redaksi / Admin
+ */
+export async function simpanAdminUser(input: SimpanAdminInput): Promise<{ success: boolean; message: string }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  const normalizedUser = input.username.trim().toLowerCase();
+  const payload: SimpanAdminInput = { ...input, username: normalizedUser };
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string }>('simpanAdminUser', [payload, token], 'POST');
+      if (res && res.success) {
+        updateLocalAdminUser(payload);
+        return res;
+      }
+    } catch (e) {
+      console.warn('[AppsScript] simpanAdminUser fallback local:', e);
+    }
+  }
+
+  // Fallback Local
+  updateLocalAdminUser(payload);
+  return { success: true, message: `Akun redaksi "${input.nama}" berhasil disimpan!` };
+}
+
+function updateLocalAdminUser(input: SimpanAdminInput) {
+  if (typeof window === 'undefined') return;
+  try {
+    const list: AdminProfileItem[] = JSON.parse(localStorage.getItem('rs_admin_users') || '[]');
+    const idx = list.findIndex(a => a.username.toLowerCase() === input.username.trim().toLowerCase());
+    if (idx >= 0) {
+      list[idx].nama = input.nama.trim();
+      list[idx].role = input.role.trim();
+    } else {
+      list.push({
+        username: input.username.trim().toLowerCase(),
+        nama: input.nama.trim(),
+        role: input.role.trim(),
+        created_at: new Date().toISOString()
+      });
+    }
+    localStorage.setItem('rs_admin_users', JSON.stringify(list));
+
+    // Update active admin session if current user edited themselves
+    const currentSession = JSON.parse(localStorage.getItem('rs_admin_session') || '{}');
+    if (currentSession && (currentSession.email === input.username.trim().toLowerCase() || currentSession.username === input.username.trim().toLowerCase())) {
+      currentSession.nama = input.nama.trim();
+      currentSession.role = input.role.trim();
+      localStorage.setItem('rs_admin_session', JSON.stringify(currentSession));
+    }
+  } catch {}
+}
+
+/**
+ * Menghapus akun Dewan Redaksi / Admin
+ */
+export async function hapusAdminUser(username: string): Promise<{ success: boolean; message: string }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  const normalized = username.trim().toLowerCase();
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string }>('hapusAdminUser', [normalized, token], 'POST');
+      if (res && res.success) {
+        removeLocalAdminUser(normalized);
+        return res;
+      }
+    } catch (e) {
+      console.warn('[AppsScript] hapusAdminUser fallback local:', e);
+    }
+  }
+
+  // Fallback Local
+  removeLocalAdminUser(normalized);
+  return { success: true, message: `Akun admin "${username}" berhasil dihapus.` };
+}
+
+function removeLocalAdminUser(username: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    let list: AdminProfileItem[] = JSON.parse(localStorage.getItem('rs_admin_users') || '[]');
+    list = list.filter(a => a.username.toLowerCase() !== username.toLowerCase());
+    localStorage.setItem('rs_admin_users', JSON.stringify(list));
+  } catch {}
+}
+
+/**
+ * Menyimpan profil atau kata sandi akun Penulis Santri
+ */
+export async function simpanPenulisUser(input: SimpanPenulisInput): Promise<{ success: boolean; message: string; user?: PenulisUser }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const payload: SimpanPenulisInput = { ...input, email: normalizedEmail };
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string; user?: any }>('simpanPenulisUser', [payload, token], 'POST');
+      if (res && res.success) {
+        updateLocalPenulisUser(payload);
+        return res;
+      }
+    } catch (e) {
+      console.warn('[AppsScript] simpanPenulisUser fallback local:', e);
+    }
+  }
+
+  // Fallback Local
+  const saved = updateLocalPenulisUser(payload);
+  return { success: true, message: `Data santri "${input.nama}" berhasil disimpan!`, user: saved };
+}
+
+function updateLocalPenulisUser(input: SimpanPenulisInput): PenulisUser {
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const user: PenulisUser = {
+    id: input.id || ('penulis_' + Date.now()),
+    nama: input.nama.trim(),
+    email: normalizedEmail,
+    kelas: input.kelas.trim(),
+    kontak: input.kontak?.trim() || '',
+    role: (input.role as any) || 'penulis',
+    source: 'local'
+  };
+
+  if (typeof window !== 'undefined') {
+    try {
+      const list: PenulisUser[] = JSON.parse(localStorage.getItem('rs_penulis_users') || '[]');
+      const idx = list.findIndex(p => p.id === user.id || p.email.toLowerCase() === normalizedEmail);
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...user };
+      } else {
+        list.push(user);
+      }
+      localStorage.setItem('rs_penulis_users', JSON.stringify(list));
+    } catch {}
+  }
+  return user;
+}
+
+/**
+ * Menghapus akun Penulis Santri
+ */
+export async function hapusPenulisUser(idOrEmail: string): Promise<{ success: boolean; message: string }> {
+  const admin = await getAdminUser();
+  const token = admin?.token || '';
+  const target = idOrEmail.trim().toLowerCase();
+
+  if (isAppsScriptConfigured && token) {
+    try {
+      const res = await callAppsScript<{ success: boolean; message: string }>('hapusPenulisUser', [target, token], 'POST');
+      if (res && res.success) {
+        removeLocalPenulisUser(target);
+        return res;
+      }
+    } catch (e) {
+      console.warn('[AppsScript] hapusPenulisUser fallback local:', e);
+    }
+  }
+
+  // Fallback Local
+  removeLocalPenulisUser(target);
+  return { success: true, message: 'Akun santri berhasil dihapus dari direktori!' };
+}
+
+function removeLocalPenulisUser(idOrEmail: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    let list: PenulisUser[] = JSON.parse(localStorage.getItem('rs_penulis_users') || '[]');
+    list = list.filter(p => p.id !== idOrEmail && p.email.toLowerCase() !== idOrEmail.toLowerCase());
+    localStorage.setItem('rs_penulis_users', JSON.stringify(list));
+  } catch {}
 }
 
 /**

@@ -167,9 +167,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           >
             <div class="flex items-center gap-2.5">
               <svg class="w-4 h-4 text-blue-700" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
               </svg>
-              <span>Penulis Santri</span>
+              <span>Manajemen Pengguna</span>
             </div>
             <span id="sidebar-badge-penulis" class="px-2 py-0.5 rounded-full text-[0.68rem] mono font-bold bg-[var(--paper-deep)] text-[var(--ink)]">0</span>
           </button>
@@ -256,7 +256,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             <option value="karya">📚 Seluruh Karya Sastra</option>
             <option value="komentar">💬 Catatan &amp; Komentar</option>
             <option value="quotes">📜 Quotes &amp; Mutiara</option>
-            <option value="penulis">👥 Penulis Santri</option>
+            <option value="penulis">👥 Manajemen Pengguna (Santri &amp; Admin)</option>
             <option value="pengaturan">⚙️ Pengaturan Portal</option>
             <option value="editor">✍️ Studio Editor Naskah</option>
           </select>
@@ -987,39 +987,229 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
           </div>
         </div>
 
-        <!-- SECTION 6: PENULIS SANTRI -->
-        <div id="section-penulis" class="admin-section hidden space-y-4">
-          <div class="flex items-center justify-between pb-2 border-b border-[var(--rule)]">
+        <!-- SECTION 6: MANAJEMEN PENGGUNA (SANTRI & DEWAN REDAKSI) -->
+        <div id="section-penulis" class="admin-section hidden space-y-6">
+          <!-- Section Header with Sub-tab Switcher -->
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--rule)] flex-wrap gap-4">
             <div>
-              <h2 class="font-['Fraunces',serif] font-bold text-xl text-[var(--ink)] m-0">
-                Direktori Akun Penulis Santri
+              <div class="flex items-center gap-2 mb-1">
+                <span class="mono text-[0.68rem] font-bold text-[var(--crimson)] uppercase tracking-wider bg-[var(--paper-deep)] px-2 py-0.5 rounded border border-[var(--rule-strong)]">
+                  Hak Akses &amp; Direktori
+                </span>
+                <span class="text-xs text-[var(--ink-faint)]">·</span>
+                <span id="user-mgmt-stats" class="mono text-xs text-[var(--ink-soft)]">Memuat data pengguna...</span>
+              </div>
+              <h2 class="font-['Fraunces',serif] font-bold text-2xl text-[var(--ink)] m-0">
+                Manajemen Pengguna &amp; Redaksi
               </h2>
               <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0 mt-0.5">
-                Data santri terdaftar yang aktif mengirimkan naskah literatur.
+                Kelola hak akses dewan redaksi, akun admin portal, serta direktori penulis santri SMPI YQ.
               </p>
+            </div>
+
+            <!-- Sub-tab Switcher Pills -->
+            <div class="flex items-center bg-[var(--paper-deep)] p-1 rounded-xl border border-[var(--rule-strong)]">
+              <button 
+                type="button" 
+                id="subtab-btn-santri"
+                onclick="switchUserSubTab('santri')"
+                class="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer bg-[var(--paper-card)] text-[var(--crimson)] shadow-xs font-bold"
+              >
+                <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <span>Penulis Santri</span>
+                <span id="subtab-badge-santri" class="ml-1 px-1.5 py-0.2 rounded-full text-[0.65rem] mono bg-rose-100 text-rose-800">0</span>
+              </button>
+
+              <button 
+                type="button" 
+                id="subtab-btn-admin"
+                onclick="switchUserSubTab('admin')"
+                class="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer text-[var(--ink-soft)] hover:text-[var(--ink)]"
+              >
+                <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <span>Dewan Redaksi &amp; Admin</span>
+                <span id="subtab-badge-admin" class="ml-1 px-1.5 py-0.2 rounded-full text-[0.65rem] mono bg-[var(--paper)] text-[var(--ink-soft)]">0</span>
+              </button>
             </div>
           </div>
 
-          <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs text-left">
-                <thead class="bg-[var(--paper-deep)] border-b border-[var(--rule)] text-[0.68rem] mono uppercase tracking-wider text-[var(--ink-soft)] font-bold">
-                  <tr>
-                    <th class="px-4 py-3">Nama Santri</th>
-                    <th class="px-4 py-3">Kelas / Angkatan</th>
-                    <th class="px-4 py-3">Alamat Email</th>
-                    <th class="px-4 py-3">Kontak WhatsApp</th>
-                    <th class="px-4 py-3">Peran</th>
-                  </tr>
-                </thead>
-                <tbody id="penulis-table-body" class="divide-y divide-[var(--rule)]">
-                  <tr>
-                    <td colspan="5" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
-                      Memuat daftar penulis...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <!-- ============================================== -->
+          <!-- SUBPANEL 1: PENULIS SANTRI                      -->
+          <!-- ============================================== -->
+          <div id="subpanel-santri" class="space-y-4">
+            <!-- Toolbar: Search & Action Bar -->
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2.5 flex-1 min-w-[280px]">
+                <div class="relative flex-1 max-w-sm">
+                  <input 
+                    type="text" 
+                    id="santri-search-input"
+                    oninput="onSantriSearch(this.value)"
+                    placeholder="Cari santri berdasarkan nama / email..." 
+                    class="w-full pl-9 pr-3 py-2 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)] transition-colors"
+                  />
+                  <svg class="w-4 h-4 text-[var(--ink-faint)] absolute left-3 top-2.5" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+
+                <select 
+                  id="santri-kelas-filter"
+                  onchange="onSantriKelasChange(this.value)"
+                  class="px-3 py-2 bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)] cursor-pointer"
+                >
+                  <option value="all">Semua Kelas</option>
+                  <option value="VII">Kelas VII</option>
+                  <option value="VIII">Kelas VIII</option>
+                  <option value="IX">Kelas IX</option>
+                  <option value="Alumni">Alumni / Lainnya</option>
+                </select>
+              </div>
+
+              <button 
+                type="button" 
+                onclick="openSantriModal(null)" 
+                class="btn-literary btn-literary-solid !py-2 !px-3.5 !text-xs cursor-pointer flex items-center gap-1.5"
+              >
+                <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>+ Tambah Akun Santri</span>
+              </button>
+            </div>
+
+            <!-- Santri Table Card -->
+            <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                  <thead class="bg-[var(--paper-deep)] border-b border-[var(--rule)] text-[0.68rem] mono uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+                    <tr>
+                      <th class="px-4 py-3">Nama Santri</th>
+                      <th class="px-4 py-3">Kelas / Angkatan</th>
+                      <th class="px-4 py-3">Email Pengguna</th>
+                      <th class="px-4 py-3">Kontak WhatsApp</th>
+                      <th class="px-4 py-3 text-center">Naskah Karya</th>
+                      <th class="px-4 py-3 text-right">Aksi Akun</th>
+                    </tr>
+                  </thead>
+                  <tbody id="penulis-table-body" class="divide-y divide-[var(--rule)]">
+                    <tr>
+                      <td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+                        Memuat direktori penulis santri...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- SUBPANEL 2: DEWAN REDAKSI & ADMIN              -->
+          <!-- ============================================== -->
+          <div id="subpanel-admin" class="hidden space-y-6">
+            <!-- Active Session Card ("Sesi Redaksi Saya") -->
+            <div class="bg-[var(--paper-card)] border-2 border-[var(--crimson)]/30 rounded-2xl p-5 shadow-xs relative overflow-hidden">
+              <div class="absolute right-0 top-0 translate-x-4 -translate-y-4 w-32 h-32 bg-[var(--crimson)]/5 rounded-full pointer-events-none"></div>
+              
+              <div class="flex items-center justify-between gap-4 flex-wrap relative z-10">
+                <div class="flex items-center gap-3.5">
+                  <div id="my-profile-avatar" class="w-12 h-12 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-['Fraunces',serif] font-bold text-base flex items-center justify-center shadow-xs border border-[var(--crimson)]">
+                    RD
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[0.65rem] mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                        Sesi Redaksi Aktif Anda
+                      </span>
+                      <span id="my-profile-source-badge" class="mono text-[0.65rem] text-[var(--ink-faint)]"></span>
+                    </div>
+                    <h3 id="my-profile-nama" class="font-['Fraunces',serif] font-bold text-lg text-[var(--ink)] m-0 mt-0.5">
+                      Redaktur Utama
+                    </h3>
+                    <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0">
+                      Username: <span id="my-profile-username" class="mono font-bold text-[var(--crimson)]">admin</span> · Peran: <span id="my-profile-role" class="italic">Dewan Redaksi</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                  <button 
+                    type="button" 
+                    onclick="openGantiPasswordSayaModal()" 
+                    class="px-3.5 py-2 rounded-xl border border-[var(--crimson)] bg-[var(--paper)] hover:bg-[var(--crimson)] hover:!text-[var(--paper)] text-[var(--crimson)] text-xs mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                  >
+                    <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    <span>Ganti Kata Sandi Saya</span>
+                  </button>
+
+                  <button 
+                    type="button" 
+                    onclick="editMyProfile()" 
+                    class="px-3.5 py-2 rounded-xl border border-[var(--rule-strong)] bg-[var(--paper-deep)] hover:bg-[var(--paper-card)] text-[var(--ink)] text-xs mono font-semibold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                  >
+                    <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    <span>Edit Profil</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin Table Card -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between pb-1 flex-wrap gap-2">
+                <div>
+                  <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--ink)] m-0">
+                    Daftar Seluruh Pengelola &amp; Dewan Redaksi
+                  </h3>
+                  <p class="font-['Source_Serif_4',serif] text-xs text-[var(--ink-soft)] m-0">
+                    Akun yang memiliki hak akses ke Studio Redaksi, kurasi naskah, moderasi komentar, dan pengaturan portal.
+                  </p>
+                </div>
+
+                <button 
+                  type="button" 
+                  onclick="openAdminModal(null)" 
+                  class="btn-literary btn-literary-solid !py-2 !px-3.5 !text-xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                  </svg>
+                  <span>+ Tambah Admin Redaksi</span>
+                </button>
+              </div>
+
+              <div class="bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-xl shadow-xs overflow-hidden">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs text-left">
+                    <thead class="bg-[var(--paper-deep)] border-b border-[var(--rule)] text-[0.68rem] mono uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+                      <tr>
+                        <th class="px-4 py-3">Nama Redaktur</th>
+                        <th class="px-4 py-3">Username / ID</th>
+                        <th class="px-4 py-3">Peran / Jabatan</th>
+                        <th class="px-4 py-3">Status Sesi</th>
+                        <th class="px-4 py-3 text-right">Aksi Akun</th>
+                      </tr>
+                    </thead>
+                    <tbody id="admin-table-body" class="divide-y divide-[var(--rule)]">
+                      <tr>
+                        <td colspan="5" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+                          Memuat daftar dewan redaksi...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1580,6 +1770,340 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- MODAL: FORM KELOLA SANTRI (TAMBAH / EDIT)                    -->
+  <!-- ============================================================ -->
+  <div id="modal-santri-form" class="fixed inset-0 bg-black/60 z-[9996] hidden items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-5 py-4 bg-[var(--crimson)] text-[var(--paper)] flex items-center justify-between">
+        <div>
+          <span class="mono text-[0.65rem] uppercase text-[var(--paper)]/80 tracking-widest block">Direktori Santri</span>
+          <h3 id="modal-santri-title" class="font-['Fraunces',serif] font-bold text-base text-[var(--paper)] m-0">Tambah Akun Santri Baru</h3>
+        </div>
+        <button type="button" onclick="closeSantriModal()" class="text-2xl text-[var(--paper)] leading-none hover:opacity-75 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="form-kelola-santri" class="p-5 space-y-4">
+        <input type="hidden" id="santri-form-id" />
+        <input type="hidden" id="santri-form-is-new" value="true" />
+
+        <div>
+          <label for="santri-form-nama" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Nama Lengkap Santri *
+          </label>
+          <input 
+            type="text" 
+            id="santri-form-nama" 
+            required 
+            placeholder="misal: Zulfa Naura / Ahmad Fatihul Ihsan" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label for="santri-form-kelas" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+              Kelas / Jenjang *
+            </label>
+            <input 
+              type="text" 
+              id="santri-form-kelas" 
+              required 
+              placeholder="misal: IX-A / VII Tahfidz / Alumni" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+            />
+          </div>
+
+          <div>
+            <label for="santri-form-kontak" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+              No. WhatsApp (Opsional)
+            </label>
+            <input 
+              type="text" 
+              id="santri-form-kontak" 
+              placeholder="misal: 0812-3456-7890" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="santri-form-email" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Alamat Email (Digunakan untuk Masuk) *
+          </label>
+          <input 
+            type="email" 
+            id="santri-form-email" 
+            required 
+            placeholder="santri@yq.sch.id" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+        </div>
+
+        <div id="santri-password-container">
+          <label for="santri-form-password" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            <span id="santri-pass-label">Kata Sandi Awal *</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="santri-form-password" 
+              placeholder="Minimal 6 karakter" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)] pr-24" 
+            />
+            <button 
+              type="button" 
+              onclick="generateSantriRandomPassword()" 
+              class="absolute right-2 top-2 px-2 py-1 bg-[var(--paper-deep)] hover:bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded text-[0.65rem] mono text-[var(--crimson)] font-bold cursor-pointer"
+            >
+              Acak Sandi
+            </button>
+          </div>
+          <p id="santri-pass-hint" class="text-[0.68rem] font-['Source_Serif_4',serif] text-[var(--ink-faint)] italic mt-1">
+            Sandi ini akan digunakan santri saat login di portal kirim naskah.
+          </p>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button 
+            type="button" 
+            onclick="closeSantriModal()" 
+            class="px-4 py-2 rounded-xl border border-[var(--rule-strong)] text-xs mono text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] cursor-pointer"
+          >
+            Batal
+          </button>
+          <button 
+            type="submit" 
+            id="btn-save-santri" 
+            class="px-5 py-2 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-bold text-xs mono shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <span>Simpan Santri</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: RESET KATA SANDI SANTRI                               -->
+  <!-- ============================================================ -->
+  <div id="modal-reset-santri-password" class="fixed inset-0 bg-black/60 z-[9996] hidden items-center justify-center p-4">
+    <div class="w-full max-w-md bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-5 py-4 bg-[var(--ink)] text-[var(--paper)] flex items-center justify-between">
+        <div>
+          <span class="mono text-[0.65rem] uppercase text-[var(--paper)]/80 tracking-widest block">Keamanan Santri</span>
+          <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--paper)] m-0">Reset Kata Sandi Santri</h3>
+        </div>
+        <button type="button" onclick="closeResetSantriPasswordModal()" class="text-2xl text-[var(--paper)] leading-none hover:opacity-75 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="form-reset-santri-password" class="p-5 space-y-4">
+        <input type="hidden" id="reset-santri-id" />
+        <input type="hidden" id="reset-santri-email" />
+
+        <div class="bg-[var(--paper-deep)] border border-[var(--rule-strong)] p-3 rounded-xl">
+          <p class="mono text-[0.68rem] text-[var(--ink-faint)] uppercase m-0">Santri yang direset:</p>
+          <p id="reset-santri-nama-display" class="font-['Fraunces',serif] font-bold text-sm text-[var(--ink)] m-0 mt-0.5">Nama Santri</p>
+          <p id="reset-santri-email-display" class="mono text-xs text-[var(--crimson)] m-0">santri@yq.sch.id</p>
+        </div>
+
+        <div>
+          <label for="reset-santri-new-pass" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Kata Sandi Baru *
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="reset-santri-new-pass" 
+              required
+              placeholder="Masukkan sandi baru" 
+              class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)] pr-24" 
+            />
+            <button 
+              type="button" 
+              onclick="generateResetRandomPassword()" 
+              class="absolute right-2 top-2 px-2 py-1 bg-[var(--paper-deep)] hover:bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded text-[0.65rem] mono text-[var(--crimson)] font-bold cursor-pointer"
+            >
+              Acak Sandi
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button 
+            type="button" 
+            onclick="closeResetSantriPasswordModal()" 
+            class="px-4 py-2 rounded-xl border border-[var(--rule-strong)] text-xs mono text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] cursor-pointer"
+          >
+            Batal
+          </button>
+          <button 
+            type="submit" 
+            id="btn-confirm-reset-santri" 
+            class="px-5 py-2 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-bold text-xs mono shadow-xs transition-all cursor-pointer"
+          >
+            Simpan Sandi Baru
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: FORM ADMIN REDAKSI (TAMBAH / EDIT / RESET SANDI)       -->
+  <!-- ============================================================ -->
+  <div id="modal-admin-form" class="fixed inset-0 bg-black/60 z-[9996] hidden items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-5 py-4 bg-[var(--crimson)] text-[var(--paper)] flex items-center justify-between">
+        <div>
+          <span class="mono text-[0.65rem] uppercase text-[var(--paper)]/80 tracking-widest block">Dewan Redaksi</span>
+          <h3 id="modal-admin-title" class="font-['Fraunces',serif] font-bold text-base text-[var(--paper)] m-0">Kelola Akun Redaksi</h3>
+        </div>
+        <button type="button" onclick="closeAdminModal()" class="text-2xl text-[var(--paper)] leading-none hover:opacity-75 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="form-kelola-admin" class="p-5 space-y-4">
+        <input type="hidden" id="admin-form-is-new" value="true" />
+
+        <div>
+          <label for="admin-form-username" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Username / ID Redaktur *
+          </label>
+          <input 
+            type="text" 
+            id="admin-form-username" 
+            required 
+            placeholder="misal: admin / redaksi_fauzi / ust_ali" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+          <p id="admin-username-hint" class="text-[0.68rem] font-['Source_Serif_4',serif] text-[var(--ink-faint)] italic mt-1">
+            Gunakan huruf kecil tanpa spasi. Digunakan untuk login ke Studio Redaksi.
+          </p>
+        </div>
+
+        <div>
+          <label for="admin-form-nama" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Nama Lengkap Redaktur / Pembina *
+          </label>
+          <input 
+            type="text" 
+            id="admin-form-nama" 
+            required 
+            placeholder="misal: Ust. H. Ahmad Fauzi, Lc., M.Pd." 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs font-['Source_Serif_4',serif] text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+        </div>
+
+        <div>
+          <label for="admin-form-role" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Peran / Jabatan Redaksi *
+          </label>
+          <select 
+            id="admin-form-role" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)] cursor-pointer"
+          >
+            <option value="Redaktur Utama">Redaktur Utama (Akses Penuh)</option>
+            <option value="Dewan Guru &amp; Pembina">Dewan Guru &amp; Pembina Literasi</option>
+            <option value="Tim Kurasi Redaksi">Tim Kurasi Redaksi Santri</option>
+            <option value="Redaktur Pelaksana">Redaktur Pelaksana</option>
+          </select>
+        </div>
+
+        <div id="admin-password-container">
+          <label for="admin-form-password" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            <span id="admin-pass-label">Kata Sandi Baru *</span>
+          </label>
+          <input 
+            type="text" 
+            id="admin-form-password" 
+            placeholder="Minimal 6 karakter" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+          <p id="admin-pass-hint" class="text-[0.68rem] font-['Source_Serif_4',serif] text-[var(--ink-faint)] italic mt-1">
+            Kosongkan jika hanya ingin memperbarui nama atau jabatan tanpa mengubah sandi.
+          </p>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button 
+            type="button" 
+            onclick="closeAdminModal()" 
+            class="px-4 py-2 rounded-xl border border-[var(--rule-strong)] text-xs mono text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] cursor-pointer"
+          >
+            Batal
+          </button>
+          <button 
+            type="submit" 
+            id="btn-save-admin-user" 
+            class="px-5 py-2 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-bold text-xs mono shadow-xs transition-all cursor-pointer"
+          >
+            Simpan Akun Redaksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: GANTI KATA SANDI SAYA (SESI ADMIN AKTIF)              -->
+  <!-- ============================================================ -->
+  <div id="modal-ganti-password-saya" class="fixed inset-0 bg-black/60 z-[9996] hidden items-center justify-center p-4">
+    <div class="w-full max-w-md bg-[var(--paper-card)] border border-[var(--rule-strong)] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-5 py-4 bg-[var(--crimson)] text-[var(--paper)] flex items-center justify-between">
+        <div>
+          <span class="mono text-[0.65rem] uppercase text-[var(--paper)]/80 tracking-widest block">Keamanan Redaksi</span>
+          <h3 class="font-['Fraunces',serif] font-bold text-base text-[var(--paper)] m-0">Ganti Kata Sandi Saya</h3>
+        </div>
+        <button type="button" onclick="closeGantiPasswordSayaModal()" class="text-2xl text-[var(--paper)] leading-none hover:opacity-75 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="form-ganti-password-saya" class="p-5 space-y-4">
+        <div>
+          <label for="my-new-pass" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Kata Sandi Baru *
+          </label>
+          <input 
+            type="password" 
+            id="my-new-pass" 
+            required 
+            placeholder="Minimal 6 karakter" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+        </div>
+
+        <div>
+          <label for="my-confirm-pass" class="block mono text-[0.7rem] uppercase text-[var(--ink-soft)] font-bold mb-1">
+            Ulangi Kata Sandi Baru *
+          </label>
+          <input 
+            type="password" 
+            id="my-confirm-pass" 
+            required 
+            placeholder="Ketik ulang sandi baru" 
+            class="w-full px-3.5 py-2.5 bg-[var(--paper)] border border-[var(--rule-strong)] rounded-xl text-xs mono text-[var(--ink)] outline-none focus:border-[var(--crimson)]" 
+          />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button 
+            type="button" 
+            onclick="closeGantiPasswordSayaModal()" 
+            class="px-4 py-2 rounded-xl border border-[var(--rule-strong)] text-xs mono text-[var(--ink-soft)] hover:bg-[var(--paper-deep)] cursor-pointer"
+          >
+            Batal
+          </button>
+          <button 
+            type="submit" 
+            id="btn-confirm-ganti-password-saya" 
+            class="px-5 py-2 rounded-xl bg-[var(--crimson)] hover:bg-[#63241e] text-[var(--paper)] font-bold text-xs mono shadow-xs transition-all cursor-pointer"
+          >
+            Perbarui Sandi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- SCRIPT LOGIC FOR ADMIN DASHBOARD -->
   <script>
     import { 
@@ -1597,12 +2121,16 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       simpanPengaturan,
       formatDriveImageUrl,
       getVisitorAnalytics,
+      simpanAdminUser,
+      hapusAdminUser,
+      simpanPenulisUser,
+      hapusPenulisUser,
       type KaryaInput,
       type FullDatabaseDump,
       type VisitorAnalyticsData,
       type TopKaryaItem,
       type TopReferrerItem,
-      type RecentVisitorLog 
+      type RecentVisitorLog
     } from '../../lib/supabase';
     import confetti from 'canvas-confetti';
 
@@ -1615,8 +2143,12 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       quotes: [],
       komentar: [],
       apresiasi: [],
-      penulis: []
+      penulis: [],
+      admin: []
     };
+    let currentUserSubTab: 'santri' | 'admin' = 'santri';
+    let currentSantriSearch: string = '';
+    let currentSantriKelasFilter: string = 'all';
 
     // DOM Elements
     const authBarrier = document.getElementById('auth-guard-barrier');
@@ -1684,6 +2216,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         renderKomentarList();
         renderQuotesGrid();
         renderPenulisList();
+        renderAdminList();
+        updateUserStatsCounter();
+        (window as any).currentUserSubTab = currentUserSubTab;
         await loadPengaturanData();
       } catch (err) {
         console.warn('Gagal memuat database cloud:', err);
@@ -1701,7 +2236,8 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       const drafts = fullDb.karya.filter(k => k.status === 'draft').length;
       const comments = fullDb.komentar.length;
       const quotes = fullDb.quotes.length;
-      const penulis = fullDb.penulis.length;
+      const santriCount = fullDb.penulis?.length || 0;
+      const adminCount = fullDb.admin?.length || 0;
       const totalViews = fullDb.karya.reduce((acc, k) => acc + (parseInt((k as any).views || 0, 10)), 0);
 
       if (kpiSubmissions) kpiSubmissions.textContent = submissions.toString();
@@ -1715,7 +2251,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       if (badgeKarya) badgeKarya.textContent = fullDb.karya.length.toString();
       if (badgeKomentar) badgeKomentar.textContent = comments.toString();
       if (badgeQuotes) badgeQuotes.textContent = quotes.toString();
-      if (badgePenulis) badgePenulis.textContent = penulis.toString();
+      if (badgePenulis) badgePenulis.textContent = (santriCount + adminCount).toString();
       if (overviewBadgeQueue) overviewBadgeQueue.textContent = submissions.toString();
     }
 
@@ -1729,7 +2265,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         karya: 'Katalog Karya Sastra Lengkap',
         komentar: 'Moderasi Catatan & Komentar',
         quotes: 'Quotes & Mutiara Sastra',
-        penulis: 'Direktori Penulis Santri',
+        penulis: 'Manajemen Pengguna (Santri & Redaksi)',
         pengaturan: 'Pengaturan Redaksi & Portal',
         editor: 'Studio Editor Naskah Sastra',
       };
@@ -2325,30 +2861,660 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       `).join('');
     }
 
-    // 11. Render Penulis Santri List
+    // ==========================================================
+    // 11. MANAJEMEN PENGGUNA (PENULIS SANTRI & DEWAN REDAKSI)
+    // ==========================================================
+    function escapeHtml(str: string): string {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function generateRandomPassword(prefix = 'yq'): string {
+      const chars = '23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
+      let rand = '';
+      for (let i = 0; i < 6; i++) {
+        rand += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return `${prefix}-${rand}`;
+    }
+
+    function switchUserSubTab(tab: 'santri' | 'admin') {
+      currentUserSubTab = tab;
+      const btnSantri = document.getElementById('subtab-btn-santri');
+      const btnAdmin = document.getElementById('subtab-btn-admin');
+      const panelSantri = document.getElementById('subpanel-santri');
+      const panelAdmin = document.getElementById('subpanel-admin');
+
+      if (tab === 'santri') {
+        panelSantri?.classList.remove('hidden');
+        panelAdmin?.classList.add('hidden');
+
+        btnSantri?.classList.add('bg-[var(--paper-card)]', 'text-[var(--crimson)]', 'shadow-xs', 'font-bold');
+        btnSantri?.classList.remove('text-[var(--ink-soft)]');
+
+        btnAdmin?.classList.remove('bg-[var(--paper-card)]', 'text-[var(--crimson)]', 'shadow-xs', 'font-bold');
+        btnAdmin?.classList.add('text-[var(--ink-soft)]');
+
+        renderPenulisList();
+      } else {
+        panelSantri?.classList.add('hidden');
+        panelAdmin?.classList.remove('hidden');
+
+        btnAdmin?.classList.add('bg-[var(--paper-card)]', 'text-[var(--crimson)]', 'shadow-xs', 'font-bold');
+        btnAdmin?.classList.remove('text-[var(--ink-soft)]');
+
+        btnSantri?.classList.remove('bg-[var(--paper-card)]', 'text-[var(--crimson)]', 'shadow-xs', 'font-bold');
+        btnSantri?.classList.add('text-[var(--ink-soft)]');
+
+        renderAdminList();
+      }
+    }
+    (window as any).switchUserSubTab = switchUserSubTab;
+
+    function updateUserStatsCounter() {
+      const santriCount = fullDb.penulis?.length || 0;
+      const adminCount = fullDb.admin?.length || 0;
+
+      const badgeSantri = document.getElementById('subtab-badge-santri');
+      const badgeAdmin = document.getElementById('subtab-badge-admin');
+      const userStats = document.getElementById('user-mgmt-stats');
+      const sideBadgePenulis = document.getElementById('sidebar-badge-penulis');
+
+      if (badgeSantri) badgeSantri.textContent = santriCount.toString();
+      if (badgeAdmin) badgeAdmin.textContent = adminCount.toString();
+      if (userStats) userStats.textContent = `${santriCount} Santri Terdaftar · ${adminCount} Dewan Redaksi`;
+      if (sideBadgePenulis) sideBadgePenulis.textContent = (santriCount + adminCount).toString();
+    }
+
+    function onSantriSearch(val: string) {
+      currentSantriSearch = (val || '').toLowerCase().trim();
+      renderPenulisList();
+    }
+    (window as any).onSantriSearch = onSantriSearch;
+
+    function onSantriKelasChange(val: string) {
+      currentSantriKelasFilter = val || 'all';
+      renderPenulisList();
+    }
+    (window as any).onSantriKelasChange = onSantriKelasChange;
+
+    // Render Santri Table
     function renderPenulisList() {
       const tbody = document.getElementById('penulis-table-body');
       if (!tbody) return;
 
-      if (fullDb.penulis.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">Belum ada akun santri terdaftar.</td></tr>';
+      let list = fullDb.penulis || [];
+      if (currentSantriKelasFilter !== 'all') {
+        list = list.filter(p => (p.kelas || '').toLowerCase().includes(currentSantriKelasFilter.toLowerCase()));
+      }
+      if (currentSantriSearch) {
+        list = list.filter(p => 
+          (p.nama || '').toLowerCase().includes(currentSantriSearch) ||
+          (p.email || '').toLowerCase().includes(currentSantriSearch) ||
+          (p.kelas || '').toLowerCase().includes(currentSantriSearch)
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center mono text-xs text-[var(--ink-faint)] italic">
+              ${(currentSantriSearch || currentSantriKelasFilter !== 'all') 
+                ? 'Tidak ada santri yang cocok dengan filter pencarian.' 
+                : 'Belum ada akun santri terdaftar. Klik "+ Tambah Akun Santri" untuk menambahkan.'}
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      tbody.innerHTML = fullDb.penulis.map(p => `
-        <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors">
-          <td class="px-4 py-3 font-semibold text-xs text-[var(--ink)]">${p.nama}</td>
-          <td class="px-4 py-3 mono text-xs">${p.kelas || '-'}</td>
-          <td class="px-4 py-3 mono text-xs text-[var(--crimson)]">${p.email}</td>
-          <td class="px-4 py-3 mono text-xs">
-            ${p.kontak ? `<a href="https://wa.me/${p.kontak.replace(/[^0-9]/g, '')}" target="_blank" class="text-emerald-700 hover:underline">WA: ${p.kontak}</a>` : '-'}
-          </td>
-          <td class="px-4 py-3">
-            <span class="mono text-[0.65rem] px-2 py-0.5 rounded bg-[var(--paper-deep)] border border-[var(--rule)] uppercase">Santri</span>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = list.map(p => {
+        const pNamaEsc = escapeHtml(p.nama);
+        const pEmailEsc = escapeHtml(p.email);
+        const pIdEsc = escapeHtml(p.id || p.email);
+        const initials = (p.nama || 'S').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'S';
+        
+        const karyaCount = (fullDb.karya || []).filter(k => 
+          (k.author && k.author.toLowerCase() === p.nama.toLowerCase()) ||
+          ((k as any).author_email && (k as any).author_email.toLowerCase() === p.email.toLowerCase())
+        ).length;
+
+        const cleanWa = (p.kontak || '').replace(/[^0-9]/g, '');
+        const waDisplay = cleanWa
+          ? `<a href="https://wa.me/${cleanWa}" target="_blank" rel="noopener noreferrer" class="text-emerald-700 hover:underline flex items-center gap-1 font-semibold">
+              <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+              <span>${escapeHtml(p.kontak || '')}</span>
+            </a>`
+          : '<span class="text-[var(--ink-faint)]">-</span>';
+
+        return `
+          <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-[var(--paper-deep)] border border-[var(--rule-strong)] text-[var(--crimson)] font-['Fraunces',serif] font-bold text-xs flex items-center justify-center shrink-0">
+                  ${initials}
+                </div>
+                <div>
+                  <p class="font-bold text-xs text-[var(--ink)] m-0">${pNamaEsc}</p>
+                  <p class="mono text-[0.62rem] text-[var(--ink-faint)] m-0">ID: ${pIdEsc}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] border border-[var(--rule)] text-[var(--ink)] font-medium">
+                ${escapeHtml(p.kelas || '-')}
+              </span>
+            </td>
+            <td class="px-4 py-3 mono text-xs text-[var(--crimson)]">
+              ${pEmailEsc}
+            </td>
+            <td class="px-4 py-3 mono text-xs">
+              ${waDisplay}
+            </td>
+            <td class="px-4 py-3 text-center">
+              <span class="mono text-xs font-bold ${karyaCount > 0 ? 'text-[var(--crimson)] bg-rose-50 border border-rose-200' : 'text-[var(--ink-faint)] bg-[var(--paper-deep)]'} px-2 py-0.5 rounded-full">
+                ${karyaCount} naskah
+              </span>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <button 
+                  type="button" 
+                  onclick="openSantriModal('${pIdEsc}')" 
+                  class="px-2 py-1 rounded-lg border border-[var(--rule-strong)] hover:border-[var(--crimson)] hover:text-[var(--crimson)] text-[var(--ink-soft)] text-[0.68rem] mono transition-colors cursor-pointer"
+                  title="Edit Profil Santri"
+                >
+                  Edit
+                </button>
+                <button 
+                  type="button" 
+                  onclick="openResetSandiSantriModal('${pIdEsc}', '${pNamaEsc}', '${pEmailEsc}')" 
+                  class="px-2 py-1 rounded-lg border border-amber-300 bg-amber-50/60 hover:bg-amber-100 text-amber-900 text-[0.68rem] mono font-bold transition-colors cursor-pointer"
+                  title="Reset Kata Sandi Santri"
+                >
+                  🔑 Sandi
+                </button>
+                <button 
+                  type="button" 
+                  onclick="hapusSantriItem('${pIdEsc}', '${pNamaEsc}')" 
+                  class="px-2 py-1 rounded-lg border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-700 text-[0.68rem] mono transition-colors cursor-pointer"
+                  title="Hapus Akun Santri"
+                >
+                  🗑
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
+    (window as any).renderPenulisList = renderPenulisList;
+
+    // Render Dewan Redaksi & Admin Table
+    function renderAdminList() {
+      const myNama = currentAdminUser?.nama || 'Redaktur Utama';
+      const myUsername = currentAdminUser?.username || currentAdminUser?.email || 'admin';
+      const myRole = currentAdminUser?.role || 'Redaktur Utama (Akses Penuh)';
+      const mySource = currentAdminUser?.source === 'apps_script' ? 'Cloud Synced' : 'Akses Terverifikasi';
+      const myInitials = myNama.trim().split(/\s+/).slice(0, 2).map((w: string) => w[0]).join('').toUpperCase() || 'RD';
+
+      const avatarEl = document.getElementById('my-profile-avatar');
+      const namaEl = document.getElementById('my-profile-nama');
+      const userEl = document.getElementById('my-profile-username');
+      const roleEl = document.getElementById('my-profile-role');
+      const sourceBadgeEl = document.getElementById('my-profile-source-badge');
+
+      if (avatarEl) avatarEl.textContent = myInitials;
+      if (namaEl) namaEl.textContent = myNama;
+      if (userEl) userEl.textContent = myUsername;
+      if (roleEl) roleEl.textContent = myRole;
+      if (sourceBadgeEl) sourceBadgeEl.textContent = `· ${mySource}`;
+
+      const tbody = document.getElementById('admin-table-body');
+      if (!tbody) return;
+
+      let adminList = fullDb.admin || [];
+      if (adminList.length === 0) {
+        adminList = [
+          { username: 'admin', nama: 'Redaksi Utama SMPI YQ', role: 'Redaktur Utama', created_at: '2026-08-15T00:00:00.000Z' }
+        ];
+      }
+
+      tbody.innerHTML = adminList.map(a => {
+        const aUserEsc = escapeHtml(a.username);
+        const aNamaEsc = escapeHtml(a.nama);
+        const aRoleEsc = escapeHtml(a.role || 'Redaktur Pelaksana');
+        const initials = (a.nama || 'A').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'AD';
+        const isSelf = a.username.toLowerCase() === myUsername.toLowerCase();
+
+        return `
+          <tr class="hover:bg-[var(--paper-deep)]/40 transition-colors ${isSelf ? 'bg-amber-50/20' : ''}">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-[var(--crimson)] text-[var(--paper)] font-['Fraunces',serif] font-bold text-xs flex items-center justify-center shrink-0">
+                  ${initials}
+                </div>
+                <div>
+                  <p class="font-bold text-xs text-[var(--ink)] m-0">${aNamaEsc}</p>
+                  <p class="font-['Source_Serif_4',serif] text-[0.68rem] text-[var(--ink-faint)] m-0">
+                    ${a.created_at ? 'Terdaftar: ' + new Date(a.created_at).toLocaleDateString('id-ID') : 'Dewan Redaksi'}
+                  </p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 mono text-xs font-bold text-[var(--crimson)]">
+              ${aUserEsc}
+            </td>
+            <td class="px-4 py-3">
+              <span class="mono text-[0.68rem] px-2 py-0.5 rounded-full bg-[var(--paper-deep)] border border-[var(--rule)] text-[var(--ink)] font-semibold">
+                ${aRoleEsc}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              ${isSelf 
+                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.62rem] mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> Sesi Ini
+                   </span>`
+                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.62rem] mono bg-[var(--paper-deep)] text-[var(--ink-soft)]">
+                    Aktif
+                   </span>`
+              }
+            </td>
+            <td class="px-4 py-3 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <button 
+                  type="button" 
+                  onclick="openAdminModal('${aUserEsc}')" 
+                  class="px-2.5 py-1 rounded-lg border border-[var(--rule-strong)] hover:border-[var(--crimson)] hover:text-[var(--crimson)] text-[var(--ink-soft)] text-[0.68rem] mono transition-colors cursor-pointer"
+                  title="Edit Akun & Jabatan"
+                >
+                  Edit
+                </button>
+                ${!isSelf && adminList.length > 1
+                  ? `<button 
+                      type="button" 
+                      onclick="hapusAdminItem('${aUserEsc}', '${aNamaEsc}')" 
+                      class="px-2 py-1 rounded-lg border border-rose-200 bg-rose-50/50 hover:bg-rose-100 text-rose-700 text-[0.68rem] mono transition-colors cursor-pointer"
+                      title="Hapus Akun Redaksi"
+                    >
+                      🗑
+                    </button>`
+                  : `<span class="px-2 py-1 text-[0.65rem] mono text-[var(--ink-faint)] italic cursor-not-allowed" title="${isSelf ? 'Sesi aktif Anda' : 'Admin utama'}">Terkunci</span>`
+                }
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    (window as any).renderAdminList = renderAdminList;
+
+    // Santri Modal Handlers
+    function openSantriModal(id: string | null) {
+      const modal = document.getElementById('modal-santri-form');
+      const titleEl = document.getElementById('modal-santri-title');
+      const formId = document.getElementById('santri-form-id') as HTMLInputElement;
+      const formIsNew = document.getElementById('santri-form-is-new') as HTMLInputElement;
+      const formNama = document.getElementById('santri-form-nama') as HTMLInputElement;
+      const formKelas = document.getElementById('santri-form-kelas') as HTMLInputElement;
+      const formKontak = document.getElementById('santri-form-kontak') as HTMLInputElement;
+      const formEmail = document.getElementById('santri-form-email') as HTMLInputElement;
+      const formPass = document.getElementById('santri-form-password') as HTMLInputElement;
+      const passLabel = document.getElementById('santri-pass-label');
+      const passHint = document.getElementById('santri-pass-hint');
+
+      if (!modal) return;
+
+      if (id) {
+        const santri = (fullDb.penulis || []).find(p => p.id === id || p.email === id);
+        if (titleEl) titleEl.textContent = 'Edit Profil Santri';
+        if (formId) formId.value = santri?.id || id;
+        if (formIsNew) formIsNew.value = 'false';
+        if (formNama) formNama.value = santri?.nama || '';
+        if (formKelas) formKelas.value = santri?.kelas || '';
+        if (formKontak) formKontak.value = santri?.kontak || '';
+        if (formEmail) {
+          formEmail.value = santri?.email || '';
+          formEmail.readOnly = true;
+          formEmail.classList.add('opacity-70');
+        }
+        if (formPass) {
+          formPass.value = '';
+          formPass.required = false;
+        }
+        if (passLabel) passLabel.textContent = 'Ubah Kata Sandi (Opsional)';
+        if (passHint) passHint.textContent = 'Kosongkan jika tidak ingin mengubah kata sandi santri.';
+      } else {
+        if (titleEl) titleEl.textContent = 'Tambah Akun Santri Baru';
+        if (formId) formId.value = '';
+        if (formIsNew) formIsNew.value = 'true';
+        if (formNama) formNama.value = '';
+        if (formKelas) formKelas.value = 'VII';
+        if (formKontak) formKontak.value = '';
+        if (formEmail) {
+          formEmail.value = '';
+          formEmail.readOnly = false;
+          formEmail.classList.remove('opacity-70');
+        }
+        if (formPass) {
+          formPass.value = generateRandomPassword('yq');
+          formPass.required = true;
+        }
+        if (passLabel) passLabel.textContent = 'Kata Sandi Awal *';
+        if (passHint) passHint.textContent = 'Sandi ini akan digunakan santri saat login di portal kirim naskah.';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    (window as any).openSantriModal = openSantriModal;
+
+    function closeSantriModal() {
+      const modal = document.getElementById('modal-santri-form');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    (window as any).closeSantriModal = closeSantriModal;
+
+    function generateSantriRandomPassword() {
+      const formPass = document.getElementById('santri-form-password') as HTMLInputElement;
+      if (formPass) formPass.value = generateRandomPassword('santri');
+    }
+    (window as any).generateSantriRandomPassword = generateSantriRandomPassword;
+
+    function openResetSandiSantriModal(id: string, nama: string, email: string) {
+      const modal = document.getElementById('modal-reset-santri-password');
+      const idEl = document.getElementById('reset-santri-id') as HTMLInputElement;
+      const emailEl = document.getElementById('reset-santri-email') as HTMLInputElement;
+      const namaDisp = document.getElementById('reset-santri-nama-display');
+      const emailDisp = document.getElementById('reset-santri-email-display');
+      const newPass = document.getElementById('reset-santri-new-pass') as HTMLInputElement;
+
+      if (!modal) return;
+      if (idEl) idEl.value = id;
+      if (emailEl) emailEl.value = email;
+      if (namaDisp) namaDisp.textContent = nama;
+      if (emailDisp) emailDisp.textContent = email;
+      if (newPass) newPass.value = generateRandomPassword('yq');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    (window as any).openResetSandiSantriModal = openResetSandiSantriModal;
+
+    function closeResetSantriPasswordModal() {
+      const modal = document.getElementById('modal-reset-santri-password');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    (window as any).closeResetSantriPasswordModal = closeResetSantriPasswordModal;
+
+    function generateResetRandomPassword() {
+      const newPass = document.getElementById('reset-santri-new-pass') as HTMLInputElement;
+      if (newPass) newPass.value = generateRandomPassword('yq');
+    }
+    (window as any).generateResetRandomPassword = generateResetRandomPassword;
+
+    async function hapusSantriItem(id: string, nama: string) {
+      if (confirm(`Hapus akun santri "${nama}" dari direktori? Data karya yang sudah terbit tetap tersimpan di arsip.`)) {
+        const res = await hapusPenulisUser(id);
+        alert(res.message || 'Akun santri berhasil dihapus.');
+        await loadAllAdminData();
+      }
+    }
+    (window as any).hapusSantriItem = hapusSantriItem;
+
+    // Admin Modal Handlers
+    function openAdminModal(username: string | null) {
+      const modal = document.getElementById('modal-admin-form');
+      const titleEl = document.getElementById('modal-admin-title');
+      const formIsNew = document.getElementById('admin-form-is-new') as HTMLInputElement;
+      const formUser = document.getElementById('admin-form-username') as HTMLInputElement;
+      const formNama = document.getElementById('admin-form-nama') as HTMLInputElement;
+      const formRole = document.getElementById('admin-form-role') as HTMLSelectElement;
+      const formPass = document.getElementById('admin-form-password') as HTMLInputElement;
+      const userHint = document.getElementById('admin-username-hint');
+      const passLabel = document.getElementById('admin-pass-label');
+      const passHint = document.getElementById('admin-pass-hint');
+
+      if (!modal) return;
+
+      if (username) {
+        const adm = (fullDb.admin || []).find(a => a.username.toLowerCase() === username.toLowerCase());
+        if (titleEl) titleEl.textContent = `Edit Akun Redaksi: ${adm?.nama || username}`;
+        if (formIsNew) formIsNew.value = 'false';
+        if (formUser) {
+          formUser.value = adm?.username || username;
+          formUser.readOnly = true;
+          formUser.classList.add('opacity-70');
+        }
+        if (userHint) userHint.textContent = 'Username akun dewan redaksi tidak dapat diubah.';
+        if (formNama) formNama.value = adm?.nama || '';
+        if (formRole) formRole.value = adm?.role || 'Redaktur Pelaksana';
+        if (formPass) {
+          formPass.value = '';
+          formPass.required = false;
+        }
+        if (passLabel) passLabel.textContent = 'Kata Sandi Baru (Opsional)';
+        if (passHint) passHint.textContent = 'Kosongkan jika hanya ingin memperbarui nama atau jabatan redaksi.';
+      } else {
+        if (titleEl) titleEl.textContent = 'Tambah Akun Dewan Redaksi Baru';
+        if (formIsNew) formIsNew.value = 'true';
+        if (formUser) {
+          formUser.value = '';
+          formUser.readOnly = false;
+          formUser.classList.remove('opacity-70');
+        }
+        if (userHint) userHint.textContent = 'Gunakan huruf kecil tanpa spasi (misal: redaksi_ust_ali). Digunakan untuk login.';
+        if (formNama) formNama.value = '';
+        if (formRole) formRole.value = 'Redaktur Pelaksana';
+        if (formPass) {
+          formPass.value = generateRandomPassword('redaksi');
+          formPass.required = true;
+        }
+        if (passLabel) passLabel.textContent = 'Kata Sandi Masuk *';
+        if (passHint) passHint.textContent = 'Sandi awal untuk masuk ke Studio Redaksi.';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    (window as any).openAdminModal = openAdminModal;
+
+    function closeAdminModal() {
+      const modal = document.getElementById('modal-admin-form');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    (window as any).closeAdminModal = closeAdminModal;
+
+    function editMyProfile() {
+      const myUsername = currentAdminUser?.username || currentAdminUser?.email || 'admin';
+      openAdminModal(myUsername);
+    }
+    (window as any).editMyProfile = editMyProfile;
+
+    function openGantiPasswordSayaModal() {
+      const modal = document.getElementById('modal-ganti-password-saya');
+      const pass1 = document.getElementById('my-new-pass') as HTMLInputElement;
+      const pass2 = document.getElementById('my-confirm-pass') as HTMLInputElement;
+      if (pass1) pass1.value = '';
+      if (pass2) pass2.value = '';
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+    (window as any).openGantiPasswordSayaModal = openGantiPasswordSayaModal;
+
+    function closeGantiPasswordSayaModal() {
+      const modal = document.getElementById('modal-ganti-password-saya');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    (window as any).closeGantiPasswordSayaModal = closeGantiPasswordSayaModal;
+
+    async function hapusAdminItem(username: string, nama: string) {
+      const myUsername = currentAdminUser?.username || currentAdminUser?.email || 'admin';
+      if (username.toLowerCase() === myUsername.toLowerCase()) {
+        alert('Anda tidak dapat menghapus akun Anda sendiri saat sedang masuk!');
+        return;
+      }
+      if ((fullDb.admin || []).length <= 1) {
+        alert('Tidak dapat menghapus akun dewan redaksi terakhir!');
+        return;
+      }
+      if (confirm(`Hapus akun dewan redaksi "${nama}" (${username})? Hak akses Studio Redaksi akun ini akan dicabut permanen.`)) {
+        const res = await hapusAdminUser(username);
+        alert(res.message || 'Akun admin berhasil dihapus.');
+        await loadAllAdminData();
+      }
+    }
+    (window as any).hapusAdminItem = hapusAdminItem;
+
+    // Event Listeners for User Management Forms
+    document.getElementById('form-kelola-santri')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-santri') as HTMLButtonElement;
+      if (btn) btn.disabled = true;
+
+      const isNew = (document.getElementById('santri-form-is-new') as HTMLInputElement)?.value === 'true';
+      const id = (document.getElementById('santri-form-id') as HTMLInputElement)?.value || '';
+      const nama = (document.getElementById('santri-form-nama') as HTMLInputElement)?.value || '';
+      const kelas = (document.getElementById('santri-form-kelas') as HTMLInputElement)?.value || '';
+      const kontak = (document.getElementById('santri-form-kontak') as HTMLInputElement)?.value || '';
+      const email = (document.getElementById('santri-form-email') as HTMLInputElement)?.value || '';
+      const password = (document.getElementById('santri-form-password') as HTMLInputElement)?.value || '';
+
+      try {
+        const res = await simpanPenulisUser({
+          id: isNew ? undefined : id,
+          nama,
+          kelas,
+          kontak,
+          email,
+          password: password || undefined,
+          isNew
+        });
+        alert(res.message || 'Data santri berhasil disimpan!');
+        closeSantriModal();
+        confetti({ particleCount: 25, spread: 50, origin: { y: 0.7 } });
+        await loadAllAdminData();
+      } catch (err: any) {
+        alert('Gagal menyimpan santri: ' + (err.message || 'Terjadi kesalahan'));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+
+    document.getElementById('form-reset-santri-password')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-confirm-reset-santri') as HTMLButtonElement;
+      if (btn) btn.disabled = true;
+
+      const id = (document.getElementById('reset-santri-id') as HTMLInputElement)?.value || '';
+      const email = (document.getElementById('reset-santri-email') as HTMLInputElement)?.value || '';
+      const newPass = (document.getElementById('reset-santri-new-pass') as HTMLInputElement)?.value || '';
+
+      const santri = (fullDb.penulis || []).find(p => p.id === id || p.email.toLowerCase() === email.toLowerCase());
+
+      try {
+        await simpanPenulisUser({
+          id,
+          email,
+          nama: santri?.nama || 'Santri SMPI YQ',
+          kelas: santri?.kelas || '',
+          kontak: santri?.kontak || '',
+          password: newPass
+        });
+        alert(`✓ Kata sandi santri "${santri?.nama || email}" berhasil direset menjadi:\n${newPass}\n\nSilakan bagikan sandi baru ini kepada santri.`);
+        closeResetSantriPasswordModal();
+        await loadAllAdminData();
+      } catch (err: any) {
+        alert('Gagal mereset sandi: ' + (err.message || 'Terjadi kesalahan'));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+
+    document.getElementById('form-kelola-admin')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-admin-user') as HTMLButtonElement;
+      if (btn) btn.disabled = true;
+
+      const isNew = (document.getElementById('admin-form-is-new') as HTMLInputElement)?.value === 'true';
+      const username = (document.getElementById('admin-form-username') as HTMLInputElement)?.value || '';
+      const nama = (document.getElementById('admin-form-nama') as HTMLInputElement)?.value || '';
+      const role = (document.getElementById('admin-form-role') as HTMLSelectElement)?.value || 'Redaktur Pelaksana';
+      const password = (document.getElementById('admin-form-password') as HTMLInputElement)?.value || '';
+
+      try {
+        const res = await simpanAdminUser({
+          username,
+          nama,
+          role,
+          password: password || undefined,
+          isNew
+        });
+        alert(res.message || 'Akun redaksi berhasil disimpan!');
+        closeAdminModal();
+        confetti({ particleCount: 25, spread: 50, origin: { y: 0.7 } });
+        await loadAllAdminData();
+      } catch (err: any) {
+        alert('Gagal menyimpan akun redaksi: ' + (err.message || 'Terjadi kesalahan'));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+
+    document.getElementById('form-ganti-password-saya')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-confirm-ganti-password-saya') as HTMLButtonElement;
+      const pass1 = (document.getElementById('my-new-pass') as HTMLInputElement)?.value || '';
+      const pass2 = (document.getElementById('my-confirm-pass') as HTMLInputElement)?.value || '';
+
+      if (pass1.length < 6) {
+        alert('Kata sandi baru minimal harus 6 karakter!');
+        return;
+      }
+      if (pass1 !== pass2) {
+        alert('Konfirmasi kata sandi tidak cocok! Mohon periksa kembali.');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      const myUsername = currentAdminUser?.username || currentAdminUser?.email || 'admin';
+      const myNama = currentAdminUser?.nama || 'Redaktur Utama';
+      const myRole = currentAdminUser?.role || 'Dewan Redaksi';
+
+      try {
+        const res = await simpanAdminUser({
+          username: myUsername,
+          nama: myNama,
+          role: myRole,
+          password: pass1
+        });
+        alert(res.message || '✓ Kata sandi Anda berhasil diperbarui!');
+        closeGantiPasswordSayaModal();
+        await loadAllAdminData();
+      } catch (err: any) {
+        alert('Gagal memperbarui kata sandi: ' + (err.message || 'Terjadi kesalahan'));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
 
     // 12. Quick Actions
     async function quickPublish(idOrSlug: string) {

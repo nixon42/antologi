@@ -1421,6 +1421,154 @@ function bersihkanDataDummy() {
   return bersihkanPengunjungDummy();
 }
 
+/**
+ * 6.6. MANAJEMEN PENGGUNA (ADMIN REDAKSI & PENULIS SANTRI)
+ */
+
+function simpanAdminUser(input, token) {
+  verifikasiAdminToken_(token);
+  if (!input || !input.username || !input.nama) {
+    return { success: false, message: 'Username dan Nama Pengurus Redaksi wajib diisi.' };
+  }
+
+  const ss = getDb_();
+  let sheet = ss.getSheetByName('Admin');
+  if (!sheet) sheet = ss.insertSheet('Admin');
+
+  const normalizedUser = input.username.toString().toLowerCase().trim();
+  const role = input.role ? input.role.toString().trim() : 'Redaktur Pelaksana';
+  const data = sheet.getDataRange().getValues();
+  const now = new Date().toISOString();
+
+  for (let i = 1; i < data.length; i++) {
+    const u = (data[i][0] || '').toString().toLowerCase().trim();
+    if (u === normalizedUser) {
+      // Update data admin yang sudah ada
+      sheet.getRange(i + 1, 3).setValue(input.nama.toString().trim());
+      sheet.getRange(i + 1, 4).setValue(role);
+      if (input.password && input.password.toString().trim()) {
+        sheet.getRange(i + 1, 2).setValue(hashPassword_(input.password.toString().trim()));
+      }
+      return { 
+        success: true, 
+        message: 'Profil akun redaksi "' + input.nama + '" berhasil diperbarui!' 
+      };
+    }
+  }
+
+  // Tambah akun admin redaksi baru
+  if (!input.password || !input.password.toString().trim()) {
+    return { success: false, message: 'Kata sandi wajib diisi untuk akun redaksi baru.' };
+  }
+
+  const hash = hashPassword_(input.password.toString().trim());
+  sheet.appendRow([
+    normalizedUser,
+    hash,
+    input.nama.toString().trim(),
+    role,
+    '',
+    '',
+    now
+  ]);
+
+  return { 
+    success: true, 
+    message: 'Akun dewan redaksi baru "' + input.nama + '" (' + role + ') berhasil ditambahkan!' 
+  };
+}
+
+function hapusAdminUser(username, token) {
+  const currentAdmin = verifikasiAdminToken_(token);
+  if (!username) return { success: false, message: 'Username tidak valid.' };
+
+  const normalized = username.toString().toLowerCase().trim();
+  if (currentAdmin.email && currentAdmin.email.toLowerCase().trim() === normalized) {
+    return { success: false, message: 'Keamanan: Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.' };
+  }
+
+  const ss = getDb_();
+  const sheet = ss.getSheetByName('Admin');
+  if (!sheet) return { success: false, message: 'Sheet Admin tidak ditemukan.' };
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 2) {
+    return { success: false, message: 'Sistem harus memiliki minimal 1 akun Redaktur Utama aktif.' };
+  }
+
+  for (let i = 1; i < data.length; i++) {
+    const u = (data[i][0] || '').toString().toLowerCase().trim();
+    if (u === normalized) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: 'Akun admin redaksi "' + username + '" berhasil dihapus.' };
+    }
+  }
+
+  return { success: false, message: 'Akun admin tidak ditemukan.' };
+}
+
+function simpanPenulisUser(input, token) {
+  verifikasiAdminToken_(token);
+  if (!input || !input.nama || !input.email) {
+    return { success: false, message: 'Nama santri dan Alamat Email wajib diisi.' };
+  }
+
+  const ss = getDb_();
+  let sheet = ss.getSheetByName('Penulis');
+  if (!sheet) sheet = ss.insertSheet('Penulis');
+
+  const normalizedEmail = input.email.toString().toLowerCase().trim();
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    const id = (data[i][0] || '').toString();
+    const email = (data[i][2] || '').toString().toLowerCase().trim();
+
+    if ((input.id && id === input.id) || email === normalizedEmail) {
+      // Update santri yang ada
+      sheet.getRange(i + 1, 2).setValue(input.nama.toString().trim());
+      sheet.getRange(i + 1, 3).setValue(normalizedEmail);
+      sheet.getRange(i + 1, 5).setValue((input.kelas || '').toString().trim());
+      sheet.getRange(i + 1, 6).setValue((input.kontak || '').toString().trim());
+      if (input.role) sheet.getRange(i + 1, 7).setValue(input.role.toString().trim());
+      if (input.password && input.password.toString().trim()) {
+        sheet.getRange(i + 1, 4).setValue(hashPassword_(input.password.toString().trim()));
+      }
+      return { 
+        success: true, 
+        message: 'Data penulis santri ' + input.nama + ' berhasil diperbarui!' 
+      };
+    }
+  }
+
+  // Tambah santri baru
+  return daftarPenulis(input);
+}
+
+function hapusPenulisUser(idOrEmail, token) {
+  verifikasiAdminToken_(token);
+  if (!idOrEmail) return { success: false, message: 'ID atau Email santri tidak valid.' };
+
+  const ss = getDb_();
+  const sheet = ss.getSheetByName('Penulis');
+  if (!sheet) return { success: false, message: 'Sheet Penulis tidak ditemukan.' };
+
+  const target = idOrEmail.toString().toLowerCase().trim();
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    const id = (data[i][0] || '').toString().toLowerCase().trim();
+    const email = (data[i][2] || '').toString().toLowerCase().trim();
+
+    if (id === target || email === target) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: 'Akun santri berhasil dihapus dari direktori.' };
+    }
+  }
+
+  return { success: false, message: 'Akun santri tidak ditemukan.' };
+}
+
 // ============================================================
 // 7. AUTENTIKASI REDAKSI & PENULIS
 // ============================================================
@@ -1728,6 +1876,14 @@ function doGet(e) {
       hasil = loginAdmin(u, pass);
     } else if (fn === 'bersihkanDataDummy' || fn === 'bersihkanPengunjungDummy') {
       hasil = bersihkanPengunjungDummy();
+    } else if (fn === 'simpanAdminUser') {
+      hasil = simpanAdminUser(args[0] || body.data || body, args[1] || body.token);
+    } else if (fn === 'hapusAdminUser') {
+      hasil = hapusAdminUser(args[0] || body.username || body.id, args[1] || body.token);
+    } else if (fn === 'simpanPenulisUser') {
+      hasil = simpanPenulisUser(args[0] || body.data || body, args[1] || body.token);
+    } else if (fn === 'hapusPenulisUser') {
+      hasil = hapusPenulisUser(args[0] || body.idOrEmail || body.id || body.email, args[1] || body.token);
     } else {
       hasil = { status: 'unknown_function', fn: fn };
     }
@@ -1809,6 +1965,14 @@ function doPost(e) {
       hasil = getFullData(args[0] || body.token);
     } else if (fn === 'bersihkanDataDummy' || fn === 'bersihkanPengunjungDummy') {
       hasil = bersihkanPengunjungDummy();
+    } else if (fn === 'simpanAdminUser') {
+      hasil = simpanAdminUser(args[0] || body.data || body, args[1] || body.token);
+    } else if (fn === 'hapusAdminUser') {
+      hasil = hapusAdminUser(args[0] || body.username || body.id, args[1] || body.token);
+    } else if (fn === 'simpanPenulisUser') {
+      hasil = simpanPenulisUser(args[0] || body.data || body, args[1] || body.token);
+    } else if (fn === 'hapusPenulisUser') {
+      hasil = hapusPenulisUser(args[0] || body.idOrEmail || body.id || body.email, args[1] || body.token);
     } else {
       throw new Error('Fungsi backend "' + fn + '" tidak dikenali.');
     }
