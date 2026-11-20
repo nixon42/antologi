@@ -1475,79 +1475,6 @@ export async function recordVisit(options: {
   return { success: true };
 }
 
-/**
- * Menyaring data analitik agar hanya menampilkan data kunjungan asli (non-dummy)
- */
-function sanitizeVisitorAnalytics(data: VisitorAnalyticsData | null): VisitorAnalyticsData | null {
-  if (!data) return data;
-
-  // 1. Filter log kunjungan dummy (ID seed dummy <= 15 karakter seperti vlog_0, vlog_1000)
-  if (Array.isArray(data.recent_logs)) {
-    const hasDummy = data.recent_logs.some(l => l.id && (!l.id.startsWith('vlog_1') || l.id.length <= 15));
-    if (hasDummy) {
-      data.recent_logs = data.recent_logs.filter(l => l.id && l.id.startsWith('vlog_1') && l.id.length > 15);
-    }
-  }
-
-  // 2. Jika summary mengandung angka seed dummy (misal total_views > log nyata)
-  if (data.summary && Array.isArray(data.recent_logs)) {
-    const realLogs = data.recent_logs;
-    const isSeeded = data.summary.total_views > realLogs.length && realLogs.some(l => l.id && l.id.startsWith('vlog_1'));
-    if (isSeeded || data.summary.growth_pct > 1000) {
-      const totalReal = realLogs.length;
-      const uniqueVisitors = new Set(realLogs.map(l => l.ip_masked || l.id)).size;
-      const karyaLogs = realLogs.filter(l => l.category === 'karya');
-      const portalLogs = realLogs.filter(l => l.category === 'portal');
-      const mobileLogs = realLogs.filter(l => l.device_type === 'mobile');
-      const desktopLogs = realLogs.filter(l => l.device_type === 'desktop');
-      const tabletLogs = realLogs.filter(l => l.device_type === 'tablet');
-      const totalDevices = mobileLogs.length + desktopLogs.length + tabletLogs.length || 1;
-
-      data.summary = {
-        total_views: totalReal,
-        today_views: totalReal,
-        unique_visitors: uniqueVisitors,
-        today_unique: uniqueVisitors,
-        growth_pct: 0,
-        categories: {
-          karya: { total: karyaLogs.length, unique: new Set(karyaLogs.map(l => l.ip_masked || l.id)).size },
-          portal: { total: portalLogs.length, unique: new Set(portalLogs.map(l => l.ip_masked || l.id)).size },
-          quotes: { total: realLogs.filter(l => l.category === 'quotes').length, unique: 0 },
-          panggung: { total: realLogs.filter(l => l.category === 'panggung').length, unique: 0 },
-          admin: { total: 0, unique: 0 }
-        },
-        devices: {
-          mobile: mobileLogs.length,
-          desktop: desktopLogs.length,
-          tablet: tabletLogs.length,
-          mobile_pct: Math.round((mobileLogs.length / totalDevices) * 1000) / 10,
-          desktop_pct: Math.round((desktopLogs.length / totalDevices) * 1000) / 10,
-          tablet_pct: Math.round((tabletLogs.length / totalDevices) * 1000) / 10
-        }
-      };
-
-      if (Array.isArray(data.daily_trends)) {
-        const todayStr = new Date().toISOString().slice(0, 10);
-        data.daily_trends = data.daily_trends.map(d => {
-          if (d.date < todayStr) {
-            return { ...d, total: 0, karya: 0, portal: 0, other: 0, unique: 0 };
-          }
-          return {
-            ...d,
-            total: totalReal,
-            karya: karyaLogs.length,
-            portal: portalLogs.length,
-            other: realLogs.length - karyaLogs.length - portalLogs.length,
-            unique: uniqueVisitors
-          };
-        });
-      }
-    }
-  }
-
-  return data;
-}
-
 // In-memory cache untuk percepatan interaksi filter dashboard analitik
 const vLogMemoryCache = new Map<string, { data: VisitorAnalyticsData; timestamp: number }>();
 
@@ -1575,12 +1502,9 @@ export async function getVisitorAnalytics(
     try {
       const res = await callAppsScript<VisitorAnalyticsData>('getVisitorAnalytics', [period, category, token], 'POST', 15000);
       if (res && res.summary) {
-        const cleaned = sanitizeVisitorAnalytics(res);
-        if (cleaned) {
-          vLogMemoryCache.set(cacheKey, { data: cleaned, timestamp: Date.now() });
-          localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(cleaned));
-        }
-        return cleaned;
+        vLogMemoryCache.set(cacheKey, { data: res, timestamp: Date.now() });
+        localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(res));
+        return res;
       }
     } catch (e) {
       console.warn('[AppsScript] Gagal ambil analisis pengunjung:', e);
@@ -1591,7 +1515,7 @@ export async function getVisitorAnalytics(
   const cached = localStorage.getItem('rs_visitor_analytics_cache');
   if (cached) {
     try {
-      return sanitizeVisitorAnalytics(JSON.parse(cached));
+      return JSON.parse(cached);
     } catch (e) {}
   }
 

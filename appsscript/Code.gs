@@ -1153,6 +1153,24 @@ function getVisitorAnalytics(period, categoryFilter, token) {
     visitor_hash: header.indexOf('visitor_hash')
   };
 
+  // Langsung hapus baris pengunjung dummy di backend jika masih tertinggal (Hanya lembar Pengunjung)
+  let hasDeletedDummy = false;
+  if (sheet && rows.length > 1 && colIdx.id >= 0) {
+    for (let i = rows.length - 1; i >= 1; i--) {
+      const logId = (rows[i][colIdx.id] || '').toString();
+      const isRealLog = logId.startsWith('vlog_1') && logId.length > 15;
+      if (!isRealLog) {
+        try {
+          sheet.deleteRow(i + 1);
+          hasDeletedDummy = true;
+        } catch (delErr) {}
+      }
+    }
+    if (hasDeletedDummy) {
+      rows = sheet.getDataRange().getValues();
+    }
+  }
+
   const curPeriodRows = [];
   const prevPeriodRows = [];
   const todayRows = [];
@@ -1161,7 +1179,7 @@ function getVisitorAnalytics(period, categoryFilter, token) {
     const r = rows[i];
     const logId = (r[colIdx.id] || '').toString();
 
-    // Hapus/abaikan data seed dummy (ID dummy berukuran <= 15 atau tidak diawali vlog_1...)
+    // Pastikan hanya membaca log nyata
     const isRealLog = logId.startsWith('vlog_1') && logId.length > 15;
     if (!isRealLog) {
       continue;
@@ -1368,11 +1386,12 @@ function getVisitorAnalytics(period, categoryFilter, token) {
 }
 
 /**
- * Menghapus seluruh entri kunjungan dummy/seed dari spreadsheet,
- * hanya mempertahankan log kunjungan asli yang dicatat oleh sistem.
+ * Menghapus seluruh entri kunjungan dummy/seed dari lembar 'Pengunjung' di spreadsheet,
+ * hanya mempertahankan log kunjungan asli yang dicatat oleh sistem (ID vlog_17...).
+ * KHUSUS data pengunjung saja; tidak menghapus data karya, komentar, quotes, atau lainnya.
+ * Dapat dijalankan langsung dari editor Apps Script via tombol 'Run'.
  */
-function bersihkanDataDummy(token) {
-  verifikasiAdminToken_(token);
+function bersihkanPengunjungDummy() {
   const ss = getDb_();
   let deletedVisitors = 0;
 
@@ -1389,11 +1408,17 @@ function bersihkanDataDummy(token) {
     }
   }
 
+  Logger.log('Pembersihan data dummy pengunjung selesai: ' + deletedVisitors + ' baris dihapus.');
   return {
     success: true,
-    message: 'Data dummy berhasil dibersihkan! Total ' + deletedVisitors + ' entri kunjungan dummy dihapus.',
+    message: 'Data dummy pengunjung berhasil dibersihkan! Total ' + deletedVisitors + ' entri kunjungan dummy dihapus dari lembar Pengunjung.',
     deletedVisitors: deletedVisitors
   };
+}
+
+// Alias fungsi untuk kompatibilitas
+function bersihkanDataDummy() {
+  return bersihkanPengunjungDummy();
 }
 
 // ============================================================
@@ -1701,8 +1726,8 @@ function doGet(e) {
         } catch (ex) {}
       }
       hasil = loginAdmin(u, pass);
-    } else if (fn === 'bersihkanDataDummy') {
-      hasil = bersihkanDataDummy(p.token);
+    } else if (fn === 'bersihkanDataDummy' || fn === 'bersihkanPengunjungDummy') {
+      hasil = bersihkanPengunjungDummy();
     } else {
       hasil = { status: 'unknown_function', fn: fn };
     }
@@ -1782,8 +1807,8 @@ function doPost(e) {
       hasil = fetchAllKarya(args[0] || body.token);
     } else if (fn === 'getFullData') {
       hasil = getFullData(args[0] || body.token);
-    } else if (fn === 'bersihkanDataDummy') {
-      hasil = bersihkanDataDummy(args[0] || body.token);
+    } else if (fn === 'bersihkanDataDummy' || fn === 'bersihkanPengunjungDummy') {
+      hasil = bersihkanPengunjungDummy();
     } else {
       throw new Error('Fungsi backend "' + fn + '" tidak dikenali.');
     }
