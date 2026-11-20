@@ -711,11 +711,11 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                 <table class="w-full text-left text-xs">
                   <thead>
                     <tr class="border-b border-[var(--rule-strong)] bg-[var(--paper-deep)] text-[var(--ink)] font-bold mono">
-                      <th class="py-2.5 px-3 w-12 text-center">#</th>
-                      <th class="py-2.5 px-3">Judul Karya &amp; Penulis</th>
-                      <th class="py-2.5 px-3">Kategori</th>
-                      <th class="py-2.5 px-3 text-right">Total Pembaca</th>
-                      <th class="py-2.5 px-3 text-center w-24">Aksi</th>
+                      <th class="py-2.5 px-3 w-12 text-center whitespace-nowrap">#</th>
+                      <th class="py-2.5 px-3 min-w-[200px]">Judul Karya &amp; Penulis</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap">Kategori</th>
+                      <th class="py-2.5 px-3 text-right whitespace-nowrap">Total Pembaca</th>
+                      <th class="py-2.5 px-3 text-center w-24 whitespace-nowrap">Aksi</th>
                     </tr>
                   </thead>
                   <tbody id="vlog-top-karya-tbody" class="divide-y divide-[var(--rule)]">
@@ -2786,9 +2786,9 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
               <span class="font-semibold text-xs text-[var(--ink)] block">${k.author}</span>
               <span class="mono text-[0.68rem] text-[var(--ink-faint)]">${k.author_grade || '-'}</span>
             </td>
-            <td class="px-4 py-3">
-              <span class="mono text-[0.65rem] px-2 py-0.5 rounded border border-[var(--rule)] text-[var(--ink-soft)] uppercase">
-                ${k.category_label || k.category}
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--rule)] text-[var(--ink-soft)] uppercase font-semibold whitespace-nowrap inline-flex items-center">
+                ${escapeHtml(k.category_label || k.category || 'Sastra')}
               </span>
             </td>
             <td class="px-4 py-3 mono text-xs font-semibold text-[var(--ink)]">
@@ -4427,25 +4427,25 @@ ${formContent.value}
 
         return `
           <tr class="hover:bg-[var(--paper-deep)]/60 transition">
-            <td class="py-3 px-3 text-center">${rankBadge}</td>
-            <td class="py-3 px-3">
+            <td class="py-3 px-3 text-center whitespace-nowrap">${rankBadge}</td>
+            <td class="py-3 px-3 min-w-[200px]">
               <strong class="font-['Fraunces',serif] text-sm font-semibold text-[var(--ink)] block">
-                ${item.title}
+                ${escapeHtml(item.title)}
               </strong>
               <span class="mono text-[0.68rem] text-[var(--ink-faint)]">
-                Oleh: ${item.author}
+                Oleh: ${escapeHtml(item.author)}
               </span>
             </td>
-            <td class="py-3 px-3">
-              <span class="mono text-[0.65rem] px-2 py-0.5 rounded-full border border-[var(--rule-strong)] text-[var(--crimson)] font-semibold uppercase">
-                ${item.categoryLabel}
+            <td class="py-3 px-3 whitespace-nowrap">
+              <span class="mono text-[0.65rem] px-2.5 py-0.5 rounded-full border border-[var(--rule-strong)] bg-[var(--paper)] text-[var(--crimson)] font-semibold uppercase inline-flex items-center whitespace-nowrap shadow-2xs">
+                ${escapeHtml(item.categoryLabel || (item as any).category || 'Sastra')}
               </span>
             </td>
-            <td class="py-3 px-3 text-right mono font-bold text-sm text-[var(--crimson)]">
+            <td class="py-3 px-3 text-right mono font-bold text-sm text-[var(--crimson)] whitespace-nowrap">
               👁️ ${(item.views || 0).toLocaleString('id-ID')}
             </td>
-            <td class="py-3 px-3 text-center">
-              <a href="${basePath}/karya/${item.slug}" target="_blank" class="mono text-xs text-[var(--crimson)] hover:underline font-bold inline-flex items-center gap-1">
+            <td class="py-3 px-3 text-center whitespace-nowrap">
+              <a href="${basePath}/karya/${escapeHtml(item.slug)}" target="_blank" class="mono text-xs text-[var(--crimson)] hover:underline font-bold inline-flex items-center gap-1">
                 <span>Buka</span>
                 <span>→</span>
               </a>
