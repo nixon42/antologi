@@ -458,7 +458,7 @@ function isiDemoData(forceReset) {
     ]);
   }
 
-  // 5. Data Pengunjung Awal (Past 30 Days Realistic Seed for Analytics)
+  // 5. Lembar Pengunjung (Murni mencatat kunjungan nyata, tidak menginjeksi data dummy)
   const pengunjungSheet = ss.getSheetByName('Pengunjung');
   if (forceReset && pengunjungSheet && pengunjungSheet.getLastRow() > 1) {
     try {
@@ -467,74 +467,8 @@ function isiDemoData(forceReset) {
       pengunjungSheet.getRange(2, 1, pengunjungSheet.getLastRow() - 1, pengunjungSheet.getLastColumn()).clearContent();
     }
   }
-  if (pengunjungSheet && (pengunjungSheet.getLastRow() <= 1 || forceReset)) {
-    const seedVisitors = [];
-    const sampleKaryaSlugs = [
-      { slug: 'jejak-di-ujung-pena', title: 'Jejak di Ujung Pena', cat: 'puisi' },
-      { slug: 'analisis-semiotika-puisi-santri', title: 'Analisis Semiotika Riffaterre', cat: 'ilmiah' },
-      { slug: 'lentera-di-pinggir-kota', title: 'Lentera di Pinggir Kota', cat: 'cerpen' },
-      { slug: 'antologi-gemuruh-kata-generasi-qurani', title: 'Antologi: Gemuruh Kata Generasi Qurani', cat: 'antologi' },
-      { slug: 'naskah-drama-layar-terkembang', title: 'Layar Terkembang di Tepian Zaman', cat: 'drama' }
-    ];
-    const referrers = ['direct', 'https://api.whatsapp.com', 'https://www.google.com', 'https://l.instagram.com', 'direct'];
-    const devices = ['mobile', 'mobile', 'mobile', 'desktop', 'desktop', 'tablet'];
-    const nowMs = new Date().getTime();
 
-    for (let dayAgo = 29; dayAgo >= 0; dayAgo--) {
-      const dayDate = new Date(nowMs - dayAgo * 24 * 60 * 60 * 1000);
-      const dateStr = Utilities.formatDate(dayDate, 'Asia/Jakarta', 'yyyy-MM-dd');
-      const visitsToday = Math.floor(4 + (Math.sin(dayAgo * 0.4) + 1) * 3 + (dayAgo % 4));
-
-      for (let v = 0; v < visitsToday; v++) {
-        const hour = Math.floor(7 + Math.random() * 14);
-        const min = Math.floor(Math.random() * 60);
-        const sec = Math.floor(Math.random() * 60);
-        const timeStr = dateStr + ' ' + (hour < 10 ? '0' + hour : hour) + ':' + (min < 10 ? '0' + min : min) + ':' + (sec < 10 ? '0' + sec : sec);
-        const dev = devices[Math.floor(Math.random() * devices.length)];
-        const ref = referrers[Math.floor(Math.random() * referrers.length)];
-        const vHash = 'hash_' + (dayAgo % 7) + '_' + Math.floor(Math.random() * 100);
-        const ip = '180.252.' + (100 + (dayAgo % 50)) + '.***';
-
-        const randType = Math.random();
-        let cat = 'portal';
-        let path = '/';
-        let title = 'Beranda Ruang Sastra';
-        let kId = '';
-
-        if (randType < 0.65) {
-          const k = sampleKaryaSlugs[Math.floor(Math.random() * sampleKaryaSlugs.length)];
-          cat = 'karya';
-          path = '/karya/' + k.slug;
-          title = k.title;
-          kId = k.slug;
-        } else if (randType < 0.85) {
-          cat = 'portal';
-          path = Math.random() < 0.5 ? '/' : '/karya';
-          title = path === '/' ? 'Beranda Ruang Sastra' : 'Pojok Baca Literatur';
-        } else if (randType < 0.95) {
-          cat = 'quotes';
-          path = '/quotes';
-          title = 'Quotes Sastra Santri';
-        } else {
-          cat = 'panggung';
-          path = '/panggung';
-          title = 'Panggung Sastra';
-        }
-
-        const vlogId = 'vlog_' + (dayAgo * 1000 + v);
-        seedVisitors.push([
-          vlogId, timeStr, dateStr, cat, path, title, kId, dev, ref, ip, vHash, 'Mozilla/5.0'
-        ]);
-      }
-    }
-
-    for (let i = 0; i < seedVisitors.length; i += 50) {
-      const batch = seedVisitors.slice(i, i + 50);
-      pengunjungSheet.getRange(pengunjungSheet.getLastRow() + 1, 1, batch.length, batch[0].length).setValues(batch);
-    }
-  }
-
-  return 'Data demo Ruang Sastra berhasil diisi!';
+  return 'Inisialisasi database Ruang Sastra berhasil (tanpa data dummy).';
 }
 
 // ============================================================
@@ -1225,6 +1159,14 @@ function getVisitorAnalytics(period, categoryFilter, token) {
 
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
+    const logId = (r[colIdx.id] || '').toString();
+
+    // Hapus/abaikan data seed dummy (ID dummy berukuran <= 15 atau tidak diawali vlog_1...)
+    const isRealLog = logId.startsWith('vlog_1') && logId.length > 15;
+    if (!isRealLog) {
+      continue;
+    }
+
     const vDate = formatCellDate_(r[colIdx.visit_date]);
     const cat = (r[colIdx.category] || '').toString().toLowerCase();
 
@@ -1422,6 +1364,35 @@ function getVisitorAnalytics(period, categoryFilter, token) {
     top_karya: topKarya.slice(0, 10),
     top_referrers: topReferrers,
     recent_logs: recentLogs
+  };
+}
+
+/**
+ * Menghapus seluruh entri kunjungan dummy/seed dari spreadsheet,
+ * hanya mempertahankan log kunjungan asli yang dicatat oleh sistem.
+ */
+function bersihkanDataDummy(token) {
+  verifikasiAdminToken_(token);
+  const ss = getDb_();
+  let deletedVisitors = 0;
+
+  const sheetPengunjung = ss.getSheetByName('Pengunjung');
+  if (sheetPengunjung && sheetPengunjung.getLastRow() > 1) {
+    const data = sheetPengunjung.getDataRange().getValues();
+    for (let i = data.length - 1; i >= 1; i--) {
+      const id = String(data[i][0] || '');
+      const isReal = id.startsWith('vlog_1') && id.length > 15;
+      if (!isReal) {
+        sheetPengunjung.deleteRow(i + 1);
+        deletedVisitors++;
+      }
+    }
+  }
+
+  return {
+    success: true,
+    message: 'Data dummy berhasil dibersihkan! Total ' + deletedVisitors + ' entri kunjungan dummy dihapus.',
+    deletedVisitors: deletedVisitors
   };
 }
 
@@ -1730,6 +1701,8 @@ function doGet(e) {
         } catch (ex) {}
       }
       hasil = loginAdmin(u, pass);
+    } else if (fn === 'bersihkanDataDummy') {
+      hasil = bersihkanDataDummy(p.token);
     } else {
       hasil = { status: 'unknown_function', fn: fn };
     }
@@ -1809,6 +1782,8 @@ function doPost(e) {
       hasil = fetchAllKarya(args[0] || body.token);
     } else if (fn === 'getFullData') {
       hasil = getFullData(args[0] || body.token);
+    } else if (fn === 'bersihkanDataDummy') {
+      hasil = bersihkanDataDummy(args[0] || body.token);
     } else {
       throw new Error('Fungsi backend "' + fn + '" tidak dikenali.');
     }

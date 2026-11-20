@@ -474,6 +474,20 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
                 <span>Reset</span>
               </button>
 
+              <!-- Hapus Dummy Button -->
+              <button 
+                type="button" 
+                onclick="purgeDummyVisitorData()" 
+                id="btn-purge-dummy-vlog"
+                class="px-3 py-1.5 text-xs font-bold text-amber-800 hover:text-amber-950 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-xl transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                title="Hapus seluruh log dan statistik dummy (hanya pertahankan kunjungan asli)"
+              >
+                <svg class="w-3.5 h-3.5" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Hapus Dummy</span>
+              </button>
+
               <!-- Export CSV Button -->
               <button 
                 type="button" 
@@ -1554,6 +1568,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       simpanPengaturan,
       formatDriveImageUrl,
       getVisitorAnalytics,
+      bersihkanDataDummy,
       type KaryaInput,
       type FullDatabaseDump,
       type VisitorAnalyticsData,
@@ -3218,5 +3233,30 @@ ${formContent.value}
       document.body.removeChild(link);
     }
     (window as any).exportVlogCsv = exportVlogCsv;
+
+    async function purgeDummyVisitorData() {
+      if (!confirm('Apakah Anda yakin ingin menghapus seluruh log data dummy dan membersihkan cache? Statistik analitik pengunjung selanjutnya hanya akan menampilkan data kunjungan riil.')) {
+        return;
+      }
+      const btn = document.getElementById('btn-purge-dummy-vlog') as HTMLButtonElement | null;
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add('opacity-50');
+      }
+      try {
+        const res = await bersihkanDataDummy();
+        localStorage.removeItem('rs_visitor_analytics_cache');
+        alert(res?.message || 'Data dummy berhasil dibersihkan.');
+        await loadVisitorAnalytics();
+      } catch (err: any) {
+        alert('Gagal membersihkan data dummy: ' + (err?.message || err));
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove('opacity-50');
+        }
+      }
+    }
+    (window as any).purgeDummyVisitorData = purgeDummyVisitorData;
   </script>
 </Layout>
