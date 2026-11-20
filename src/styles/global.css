@@ -83,6 +83,13 @@ svg {
   max-width: 100%;
 }
 
+/* Ensure hidden SVGs are properly hidden even with element display styles */
+svg.hidden,
+svg[hidden],
+[hidden] {
+  display: none !important;
+}
+
 html {
   background-color: var(--paper);
   color: var(--ink);

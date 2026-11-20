@@ -146,7 +146,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       </nav>
 
       <!-- Right Utility Group + CTA -->
-      <div class="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 flex-shrink-0">
+      <div class="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 flex-shrink-0 flex-nowrap">
         <!-- Search Trigger Button -->
         <button 
           id="search-modal-trigger" 
@@ -198,7 +198,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         </a>
 
         <!-- Logged-in Group (Desktop: Authenticated Redaksi / Penulis) -->
-        <div id="desktop-logged-in-group" class="hidden items-center gap-1.5 sm:gap-2">
+        <div id="desktop-logged-in-group" class="hidden max-md:!hidden md:inline-flex items-center gap-1.5 sm:gap-2 flex-nowrap">
           <a 
             id="desktop-user-badge-link"
             href={`${basePath}/admin`} 
@@ -234,14 +234,14 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         <!-- Mobile Menu Toggle Button (Hamburger / Close) -->
         <button 
           id="mobile-menu-toggle"
-          class="md:hidden p-2 text-[var(--ink)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors"
+          class="md:hidden p-2 text-[var(--ink)] hover:text-[var(--crimson)] hover:bg-[var(--paper-deep)] rounded transition-colors flex items-center justify-center cursor-pointer"
           aria-label="Buka Menu Navigasi"
           aria-expanded="false"
         >
-          <svg id="hamburger-icon" class="w-5 h-5" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="hamburger-icon" class="w-5 h-5 block" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
-          <svg id="close-icon" class="w-5 h-5 hidden" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="close-icon" class="w-5 h-5 hidden !hidden" style="display: none;" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
@@ -457,12 +457,16 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
       if (willExpand) {
         mobileDrawer?.classList.remove('hidden');
-        hamburgerIcon?.classList.add('hidden');
-        closeIcon?.classList.remove('hidden');
+        hamburgerIcon?.classList.add('hidden', '!hidden');
+        if (hamburgerIcon) hamburgerIcon.style.display = 'none';
+        closeIcon?.classList.remove('hidden', '!hidden');
+        if (closeIcon) closeIcon.style.display = 'block';
       } else {
         mobileDrawer?.classList.add('hidden');
-        hamburgerIcon?.classList.remove('hidden');
-        closeIcon?.classList.add('hidden');
+        hamburgerIcon?.classList.remove('hidden', '!hidden');
+        if (hamburgerIcon) hamburgerIcon.style.display = 'block';
+        closeIcon?.classList.add('hidden', '!hidden');
+        if (closeIcon) closeIcon.style.display = 'none';
       }
     });
 
@@ -471,8 +475,10 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       link.addEventListener('click', () => {
         mobileDrawer?.classList.add('hidden');
         mobileToggle?.setAttribute('aria-expanded', 'false');
-        hamburgerIcon?.classList.remove('hidden');
-        closeIcon?.classList.add('hidden');
+        hamburgerIcon?.classList.remove('hidden', '!hidden');
+        if (hamburgerIcon) hamburgerIcon.style.display = 'block';
+        closeIcon?.classList.add('hidden', '!hidden');
+        if (closeIcon) closeIcon.style.display = 'none';
       });
     });
 
@@ -610,7 +616,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         if (hasAdminSession) {
           desktopLoginLink?.classList.add('!hidden');
           desktopLoggedInGroup?.classList.remove('hidden');
-          desktopLoggedInGroup?.classList.add('md:inline-flex');
+          desktopLoggedInGroup?.classList.add('max-md:!hidden', 'md:inline-flex');
           if (desktopUserBadgeLink) desktopUserBadgeLink.href = `${clientBasePath}/admin`;
           if (desktopUserBadgeText) desktopUserBadgeText.textContent = 'Redaksi ✎';
 
@@ -624,7 +630,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
             const penulis = JSON.parse(penulisSessionRaw);
             desktopLoginLink?.classList.add('!hidden');
             desktopLoggedInGroup?.classList.remove('hidden');
-            desktopLoggedInGroup?.classList.add('md:inline-flex');
+            desktopLoggedInGroup?.classList.add('max-md:!hidden', 'md:inline-flex');
             if (desktopUserBadgeLink) desktopUserBadgeLink.href = `${clientBasePath}/kirim`;
             if (desktopUserBadgeText) desktopUserBadgeText.textContent = `✍️ ${penulis.nama.split(' ')[0]}`;
 
@@ -641,7 +647,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
         } else {
           desktopLoginLink?.classList.remove('!hidden');
           desktopLoggedInGroup?.classList.add('hidden');
-          desktopLoggedInGroup?.classList.remove('md:inline-flex');
+          desktopLoggedInGroup?.classList.remove('md:inline-flex', 'max-md:!hidden');
 
           drawerLoginLink?.classList.remove('hidden');
           drawerAdminLink?.classList.add('hidden');
