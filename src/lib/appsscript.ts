@@ -1479,6 +1479,129 @@ export async function recordVisit(options: {
 const vLogMemoryCache = new Map<string, { data: VisitorAnalyticsData; timestamp: number }>();
 
 /**
+ * Validasi apakah sebuah ID log pengunjung adalah ID nyata hasil rekaman sistem
+ * Log nyata: diawali 'vlog_1' (timestamp 13 digit dimulai 17...) dengan panjang > 15 karakter
+ */
+function isRealLogId(id: string): boolean {
+  return typeof id === 'string' && id.startsWith('vlog_1') && id.length > 15;
+}
+
+/**
+ * Menyaring data analitik agar secara ketat hanya menyajikan data kunjungan nyata (genuine)
+ * Menyingkirkan seluruh residu seed dummy (vlog_1000..3000, vlog_29000..) baik di backend maupun cache
+ */
+function sanitizeVisitorAnalytics(data: VisitorAnalyticsData | null): VisitorAnalyticsData | null {
+  if (!data) return data;
+
+  // 1. Saring recent_logs agar hanya menyisakan log asli
+  if (Array.isArray(data.recent_logs)) {
+    data.recent_logs = data.recent_logs.filter(l => l && isRealLogId(l.id));
+  }
+
+  // 2. Jika summary mengandung indikasi angka dummy (misal ada baris dummy di sheet),
+  // sinkronisasikan summary dan daily trends berdasarkan log nyata
+  if (data.summary && Array.isArray(data.recent_logs)) {
+    const realLogs = data.recent_logs;
+    const hasDummyIndicator = (data.summary.total_views > realLogs.length && realLogs.length > 0) || data.summary.growth_pct > 500;
+
+    if (hasDummyIndicator) {
+      const now = new Date();
+      const todayStr = now.toISOString().slice(0, 10);
+      const sevenDaysAgoStr = new Date(now.getTime() - 7 * 86400000).toISOString().slice(0, 10);
+      const thirtyDaysAgoStr = new Date(now.getTime() - 30 * 86400000).toISOString().slice(0, 10);
+
+      // Saring log berdasarkan periode yang dipilih
+      let periodLogs = realLogs;
+      if (data.period === 'today') {
+        periodLogs = realLogs.filter(l => (l.visit_date || '').startsWith(todayStr));
+      } else if (data.period === '7d') {
+        periodLogs = realLogs.filter(l => (l.visit_date || '').slice(0, 10) >= sevenDaysAgoStr);
+      } else if (data.period === '30d') {
+        periodLogs = realLogs.filter(l => (l.visit_date || '').slice(0, 10) >= thirtyDaysAgoStr);
+      }
+
+      // Saring log berdasarkan kategori jika dipilih
+      if (data.category && data.category !== 'all') {
+        periodLogs = periodLogs.filter(l => (l.category || '').toLowerCase() === data.category.toLowerCase());
+      }
+
+      const totalPeriod = periodLogs.length;
+      const todayLogs = realLogs.filter(l => (l.visit_date || '').startsWith(todayStr));
+      const uniqueVisitors = new Set(periodLogs.map(l => l.ip_masked || l.id)).size;
+      const todayUnique = new Set(todayLogs.map(l => l.ip_masked || l.id)).size;
+
+      const karyaLogs = periodLogs.filter(l => l.category === 'karya');
+      const portalLogs = periodLogs.filter(l => l.category === 'portal');
+      const quotesLogs = periodLogs.filter(l => l.category === 'quotes');
+      const panggungLogs = periodLogs.filter(l => l.category === 'panggung');
+      const adminLogs = periodLogs.filter(l => l.category === 'admin');
+
+      const mobileLogs = periodLogs.filter(l => l.device_type === 'mobile');
+      const desktopLogs = periodLogs.filter(l => l.device_type === 'desktop');
+      const tabletLogs = periodLogs.filter(l => l.device_type === 'tablet');
+      const totalDevices = mobileLogs.length + desktopLogs.length + tabletLogs.length || 1;
+
+      data.summary = {
+        total_views: totalPeriod,
+        today_views: todayLogs.length,
+        unique_visitors: uniqueVisitors,
+        today_unique: todayUnique,
+        growth_pct: 0,
+        categories: {
+          karya: { total: karyaLogs.length, unique: new Set(karyaLogs.map(l => l.ip_masked || l.id)).size },
+          portal: { total: portalLogs.length, unique: new Set(portalLogs.map(l => l.ip_masked || l.id)).size },
+          quotes: { total: quotesLogs.length, unique: new Set(quotesLogs.map(l => l.ip_masked || l.id)).size },
+          panggung: { total: panggungLogs.length, unique: new Set(panggungLogs.map(l => l.ip_masked || l.id)).size },
+          admin: { total: adminLogs.length, unique: new Set(adminLogs.map(l => l.ip_masked || l.id)).size }
+        },
+        devices: {
+          mobile: mobileLogs.length,
+          desktop: desktopLogs.length,
+          tablet: tabletLogs.length,
+          mobile_pct: Math.round((mobileLogs.length / totalDevices) * 1000) / 10,
+          desktop_pct: Math.round((desktopLogs.length / totalDevices) * 1000) / 10,
+          tablet_pct: Math.round((tabletLogs.length / totalDevices) * 1000) / 10
+        }
+      };
+
+      if (Array.isArray(data.daily_trends)) {
+        const dateCountMap = new Map<string, { total: number; karya: number; portal: number; other: number; unique: Set<string> }>();
+        for (const l of realLogs) {
+          const d = (l.visit_date || '').slice(0, 10);
+          if (!d) continue;
+          if (!dateCountMap.has(d)) {
+            dateCountMap.set(d, { total: 0, karya: 0, portal: 0, other: 0, unique: new Set() });
+          }
+          const item = dateCountMap.get(d)!;
+          item.total++;
+          if (l.category === 'karya') item.karya++;
+          else if (l.category === 'portal') item.portal++;
+          else item.other++;
+          item.unique.add(l.ip_masked || l.id);
+        }
+
+        data.daily_trends = data.daily_trends.map(d => {
+          const counts = dateCountMap.get(d.date);
+          if (!counts) {
+            return { ...d, total: 0, karya: 0, portal: 0, other: 0, unique: 0 };
+          }
+          return {
+            ...d,
+            total: counts.total,
+            karya: counts.karya,
+            portal: counts.portal,
+            other: counts.other,
+            unique: counts.unique.size
+          };
+        });
+      }
+    }
+  }
+
+  return data;
+}
+
+/**
  * Fetch Full Visitor Analytics for Admin Dashboard
  */
 export async function getVisitorAnalytics(
@@ -1502,9 +1625,12 @@ export async function getVisitorAnalytics(
     try {
       const res = await callAppsScript<VisitorAnalyticsData>('getVisitorAnalytics', [period, category, token], 'POST', 15000);
       if (res && res.summary) {
-        vLogMemoryCache.set(cacheKey, { data: res, timestamp: Date.now() });
-        localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(res));
-        return res;
+        const cleaned = sanitizeVisitorAnalytics(res);
+        if (cleaned) {
+          vLogMemoryCache.set(cacheKey, { data: cleaned, timestamp: Date.now() });
+          localStorage.setItem('rs_visitor_analytics_cache', JSON.stringify(cleaned));
+        }
+        return cleaned;
       }
     } catch (e) {
       console.warn('[AppsScript] Gagal ambil analisis pengunjung:', e);
@@ -1515,7 +1641,8 @@ export async function getVisitorAnalytics(
   const cached = localStorage.getItem('rs_visitor_analytics_cache');
   if (cached) {
     try {
-      return JSON.parse(cached);
+      const parsed = JSON.parse(cached);
+      return sanitizeVisitorAnalytics(parsed);
     } catch (e) {}
   }
 
